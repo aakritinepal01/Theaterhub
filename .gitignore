@@ -2,7 +2,6 @@ node_modules/
 .next/
 .env
 .env.local
-public/uploads/
 legacy-import/
 npm-debug.log*
 *.tsbuildinfo
