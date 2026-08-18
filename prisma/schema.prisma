@@ -1,0 +1,380 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id           Int       @id
+  username     String    @unique
+  passwordHash String
+  firstName    String    @default("")
+  lastName     String    @default("")
+  email        String    @default("")
+  isStaff      Boolean   @default(false)
+  isSuperuser  Boolean   @default(false)
+  isActive     Boolean   @default(true)
+  dateJoined   DateTime
+  lastLogin    DateTime?
+  profiles     Profile[]
+  blogPosts    BlogPost[]
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    Int
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Site {
+  id       Int       @id
+  domain   String    @unique
+  name     String
+  profiles Profile[]
+  theatres Theatre[]
+  plays    Play[]
+  pages    Page[]
+  posts    BlogPost[]
+  settings SiteSetting[]
+}
+
+model Profile {
+  id                 Int           @id
+  siteId             Int
+  title              String
+  slug               String?       @unique
+  metaTitle          String?       @map("meta_title")
+  description        String        @default("")
+  genDescription     Boolean       @default(true)
+  keywordsString     String        @default("")
+  created            DateTime?
+  updated            DateTime?
+  status             ContentStatus @default(PUBLISHED)
+  publishDate        DateTime?
+  expiryDate         DateTime?
+  shortUrl           String?
+  inSitemap          Boolean       @default(true)
+  name               String
+  profilePic         String?
+  email              String        @default("")
+  mobile             String        @default("")
+  dob                 DateTime?     @db.Date
+  activeSince         DateTime?     @db.Date
+  linkWebsite        String        @default("")
+  linkFacebook       String        @default("")
+  linkTwitter        String        @default("")
+  linkInstagram      String        @default("")
+  bio                 String        @default("")
+  address             String        @default("")
+  ownerId             Int?
+  site                Site          @relation(fields: [siteId], references: [id])
+  owner               User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  makerCredits        PlayMaker[]
+  castCredits         PlayCast[]
+  crewCredits         PlayCrew[]
+
+  @@index([name])
+  @@index([status, publishDate])
+}
+
+model Theatre {
+  id             Int           @id
+  siteId         Int
+  title          String
+  slug           String?       @unique
+  metaTitle      String?
+  description    String        @default("")
+  genDescription Boolean       @default(true)
+  keywordsString String        @default("")
+  created        DateTime?
+  updated        DateTime?
+  status         ContentStatus @default(PUBLISHED)
+  publishDate    DateTime?
+  expiryDate     DateTime?
+  shortUrl       String?
+  inSitemap      Boolean       @default(true)
+  about          String        @default("")
+  profilePic     String?
+  coverImage     String?
+  establishedOn  DateTime?     @db.Date
+  email          String        @default("")
+  phone          String        @default("")
+  address        String        @default("")
+  closedOn       DateTime?     @db.Date
+  linkWebsite    String        @default("")
+  linkFacebook   String        @default("")
+  linkTwitter    String        @default("")
+  linkInstagram  String        @default("")
+  site           Site          @relation(fields: [siteId], references: [id])
+  plays          Play[]
+  showsMeta      ShowsMeta[]
+  shows          Show[]
+
+  @@index([title])
+}
+
+model Play {
+  id              Int           @id
+  siteId          Int
+  title           String
+  slug            String?       @unique
+  metaTitle       String?
+  description     String        @default("")
+  genDescription  Boolean       @default(true)
+  keywordsString  String        @default("")
+  created         DateTime?
+  updated         DateTime?
+  status          ContentStatus @default(PUBLISHED)
+  publishDate     DateTime?
+  expiryDate      DateTime?
+  shortUrl        String?
+  inSitemap       Boolean       @default(true)
+  ratingCount     Int           @default(0)
+  ratingSum       Int           @default(0)
+  ratingAverage   Float         @default(0)
+  abstract        String
+  directorialNote String
+  coverImage      String?
+  duration        Int?
+  launchedOn      DateTime?     @db.Date
+  endedOn         DateTime?     @db.Date
+  isFeatured      Boolean       @default(false)
+  theatreId       Int?
+  site            Site          @relation(fields: [siteId], references: [id])
+  theatre         Theatre?      @relation(fields: [theatreId], references: [id], onDelete: SetNull)
+  makers          PlayMaker[]
+  cast            PlayCast[]
+  crew            PlayCrew[]
+  schedules       ShowsMeta[]
+  shows           Show[]
+
+  @@index([status, launchedOn])
+}
+
+model PlayMaker {
+  id        Int     @id
+  order     Int?    @map("_order")
+  playId    Int
+  role      String
+  profileId Int
+  play      Play    @relation(fields: [playId], references: [id], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([playId, role, profileId])
+  @@index([playId, order])
+}
+
+model PlayCast {
+  id        Int     @id
+  order     Int?    @map("_order")
+  playId    Int
+  role      String
+  profileId Int
+  play      Play    @relation(fields: [playId], references: [id], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([playId, role, profileId])
+  @@index([playId, order])
+}
+
+model PlayCrew {
+  id        Int     @id
+  order     Int?    @map("_order")
+  playId    Int
+  role      String
+  profileId Int
+  play      Play    @relation(fields: [playId], references: [id], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([playId, role, profileId])
+  @@index([playId, order])
+}
+
+model ShowsMeta {
+  id           Int                @id
+  playId       Int
+  theatreId    Int
+  startDate    DateTime           @db.Date
+  endDate      DateTime           @db.Date
+  sunday       String             @default("")
+  monday       String             @default("")
+  tuesday      String             @default("")
+  wednesday    String             @default("")
+  thursday     String             @default("")
+  friday       String             @default("")
+  saturday     String             @default("")
+  play         Play               @relation(fields: [playId], references: [id], onDelete: Cascade)
+  theatre      Theatre            @relation(fields: [theatreId], references: [id], onDelete: Cascade)
+  excludeDates ExcludeDate[]
+  extraShows   ExtraIncludeDate[]
+}
+
+model ExcludeDate {
+  id     Int       @id
+  showId Int
+  date   DateTime  @db.Date
+  show   ShowsMeta @relation(fields: [showId], references: [id], onDelete: Cascade)
+}
+
+model ExtraIncludeDate {
+  id     Int       @id
+  showId Int
+  date   DateTime  @db.Date
+  time   String    @default("")
+  show   ShowsMeta @relation(fields: [showId], references: [id], onDelete: Cascade)
+}
+
+model Show {
+  id        Int      @id @default(autoincrement())
+  playId    Int
+  theatreId Int
+  showtime  DateTime
+  play      Play     @relation(fields: [playId], references: [id], onDelete: Cascade)
+  theatre   Theatre  @relation(fields: [theatreId], references: [id], onDelete: Cascade)
+
+  @@index([playId, showtime])
+}
+
+model Page {
+  id             Int           @id
+  siteId         Int
+  title          String
+  slug           String
+  metaTitle      String?
+  description    String        @default("")
+  genDescription Boolean       @default(true)
+  keywordsString String        @default("")
+  created        DateTime?
+  updated        DateTime?
+  status         ContentStatus @default(PUBLISHED)
+  publishDate    DateTime?
+  expiryDate     DateTime?
+  shortUrl       String?
+  inSitemap      Boolean       @default(true)
+  order          Int           @default(0)
+  contentModel   String
+  parentId       Int?
+  inMenus        String        @default("")
+  loginRequired  Boolean       @default(false)
+  content        String        @default("")
+  linkUrl        String?
+  site           Site          @relation(fields: [siteId], references: [id])
+  parent         Page?         @relation("PageTree", fields: [parentId], references: [id])
+  children       Page[]        @relation("PageTree")
+  form           Form?
+
+  @@unique([siteId, slug])
+}
+
+model BlogCategory {
+  id    Int        @id
+  title String
+  slug  String     @unique
+  posts BlogPostCategory[]
+}
+
+model BlogPost {
+  id             Int           @id
+  siteId         Int
+  userId         Int
+  title          String
+  slug           String        @unique
+  metaTitle      String?
+  description    String        @default("")
+  genDescription Boolean       @default(true)
+  keywordsString String        @default("")
+  content        String
+  created        DateTime?
+  updated        DateTime?
+  status         ContentStatus @default(PUBLISHED)
+  publishDate    DateTime?
+  expiryDate     DateTime?
+  shortUrl       String?
+  inSitemap      Boolean       @default(true)
+  allowComments  Boolean       @default(true)
+  featuredImage  String?
+  commentsCount  Int           @default(0)
+  ratingCount    Int           @default(0)
+  ratingSum      Int           @default(0)
+  ratingAverage  Float         @default(0)
+  site           Site          @relation(fields: [siteId], references: [id])
+  user           User          @relation(fields: [userId], references: [id])
+  categories     BlogPostCategory[]
+}
+
+model BlogPostCategory {
+  postId     Int
+  categoryId Int
+  post       BlogPost     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@id([postId, categoryId])
+}
+
+model Form {
+  id            Int         @id
+  pageId        Int         @unique
+  content       String      @default("")
+  buttonText    String      @default("Submit")
+  response      String      @default("")
+  sendEmail     Boolean     @default(false)
+  emailFrom     String      @default("")
+  emailCopies   String      @default("")
+  emailSubject  String      @default("")
+  emailMessage  String      @default("")
+  page          Page        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  fields        FormField[]
+  entries       FormEntry[]
+}
+
+model FormField {
+  id              Int              @id
+  formId          Int
+  order           Int              @default(0)
+  label           String
+  fieldType       Int
+  required        Boolean          @default(false)
+  visible         Boolean          @default(true)
+  choices         String           @default("")
+  defaultValue    String           @default("")
+  placeholderText String           @default("")
+  helpText        String           @default("")
+  form            Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
+  values          FormFieldEntry[]
+}
+
+model FormEntry {
+  id        Int              @id
+  formId    Int
+  entryTime DateTime
+  form      Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
+  values    FormFieldEntry[]
+}
+
+model FormFieldEntry {
+  id      Int       @id
+  entryId Int
+  fieldId Int
+  value   String
+  entry   FormEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  field   FormField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+}
+
+model SiteSetting {
+  id     Int    @id
+  siteId Int
+  name   String
+  value  String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  @@unique([siteId, name])
+}

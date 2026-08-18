@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {prisma} from "@/lib/prisma";import {currentUser} from "@/lib/auth";
+export async function GET(req:Request){const user=await currentUser();if(!user?.isStaff)return NextResponse.json({results:[]},{status:403});const q=new URL(req.url).searchParams.get("q")||"";const rows=await prisma.profile.findMany({where:{name:{startsWith:q,mode:"insensitive"}},orderBy:{name:"asc"},take:20});return NextResponse.json({results:rows.map(x=>({id:x.id,text:x.name}))});}
