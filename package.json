@@ -12,6 +12,7 @@
     "db:push": "dotenv -e .env -- prisma db push",
     "db:migrate": "dotenv -e .env -- prisma migrate dev",
     "db:seed": "dotenv -e .env -- tsx prisma/seed.ts",
+    "db:studio": "dotenv -e .env -- prisma studio",
     "import:legacy": "dotenv -e .env -- tsx scripts/import-legacy.ts"
   },
   "dependencies": {

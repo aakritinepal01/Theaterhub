@@ -3,7 +3,7 @@ type Credit<T> = { role: string; profile: T };
 export function groupRoles<T>(credits: Credit<T>[]) {
   const groups = new Map<string, T[]>();
   for (const credit of credits) groups.set(credit.role, [...(groups.get(credit.role) ?? []), credit.profile]);
-  return [...groups].map(([role, profiles]) => ({ role, profiles }));
+  return [...groups].map(([role, profiles]) => ({ role, profiles })).sort((a, b) => a.role.localeCompare(b.role));
 }
 
 export function groupCreditsByPlay<T extends { id: number }>(credits: { role: string; play: T }[]) {

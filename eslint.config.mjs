@@ -9,7 +9,8 @@ export default defineConfig([
   {
     rules: {
       "@next/next/no-img-element": "off",
-      "react/no-unescaped-entities": "off"
+      "react/no-unescaped-entities": "off",
+      "no-console": ["warn", { allow: ["warn", "error"] }],
     }
   }
 ]);

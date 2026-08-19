@@ -12,6 +12,12 @@ enum ContentStatus {
   PUBLISHED
 }
 
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
 model User {
   id           Int       @id
   username     String    @unique
@@ -27,6 +33,7 @@ model User {
   profiles     Profile[]
   blogPosts    BlogPost[]
   sessions     Session[]
+  bookings     Booking[]
 }
 
 model Session {
@@ -236,14 +243,35 @@ model ExtraIncludeDate {
 }
 
 model Show {
-  id        Int      @id @default(autoincrement())
-  playId    Int
-  theatreId Int
-  showtime  DateTime
-  play      Play     @relation(fields: [playId], references: [id], onDelete: Cascade)
-  theatre   Theatre  @relation(fields: [theatreId], references: [id], onDelete: Cascade)
+  id             Int       @id @default(autoincrement())
+  playId         Int
+  theatreId      Int
+  showtime       DateTime
+  totalSeats     Int       @default(0)
+  availableSeats Int       @default(0)
+  price          Float?
+  play           Play      @relation(fields: [playId], references: [id], onDelete: Cascade)
+  theatre        Theatre   @relation(fields: [theatreId], references: [id], onDelete: Cascade)
+  bookings       Booking[]
 
   @@index([playId, showtime])
+}
+
+model Booking {
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  showId        Int
+  seats         Int           @default(1)
+  totalAmount   Float?
+  status        BookingStatus @default(PENDING)
+  paymentMethod String?
+  paymentRef    String?
+  bookedAt      DateTime      @default(now())
+  user          User          @relation(fields: [userId], references: [id])
+  show          Show          @relation(fields: [showId], references: [id])
+
+  @@index([userId])
+  @@index([showId])
 }
 
 model Page {
