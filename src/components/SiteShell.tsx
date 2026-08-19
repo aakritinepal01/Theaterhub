@@ -1,13 +1,26 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { clearSession, currentUser } from "@/lib/auth";
+import { Navbar } from "@/components/Navbar";
 
-export async function Header() {
-  let pages: { id:number; title:string; slug:string; linkUrl:string|null }[] = [];
-  try { pages = await prisma.page.findMany({ where:{ status:"PUBLISHED", inMenus:{ contains:"1" } }, orderBy:{ order:"asc" }, select:{id:true,title:true,slug:true,linkUrl:true} }); } catch {}
-  const fallback = [{id:-1,title:"Plays",slug:"/play/",linkUrl:"/play/"},{id:-2,title:"Theatres",slug:"/theatre/",linkUrl:"/theatre/"},{id:-3,title:"Blog",slug:"/blog/",linkUrl:"/blog/"},{id:-4,title:"About Us",slug:"about-us",linkUrl:null},{id:-5,title:"Contact Us",slug:"contact-us",linkUrl:null}];
-  return <nav className="navbar"><div className="site-container nav-inner"><Link className="brand" href="/">TheatreHub</Link><div className="nav-links">{(pages.length?pages:fallback).map(p=><Link key={p.id} href={p.linkUrl || `/${p.slug.replace(/^\/+|\/+$/g,"")}/`}>{p.title}</Link>)}</div></div></nav>;
+async function logout() {
+  "use server";
+  await clearSession();
+  redirect("/");
 }
 
-export function Sidebar(){return <aside className="sidebar"><div className="panel panel-default"><h3>Like us on Facebook</h3><a href={process.env.NEXT_PUBLIC_FACEBOOK_PAGE_URL || "https://www.facebook.com/theatrehub.org"} target="_blank" rel="noreferrer">TheatreHub on Facebook</a></div></aside>}
+export async function Header() {
+  const user = await currentUser().catch(() => null);
+  const profile = user ? await prisma.profile.findFirst({ where: { ownerId: user.id }, select: { slug: true } }).catch(() => null) : null;
+  const links = [
+    { label: "Home", href: "/" },
+    { label: "Plays", href: "/play/" },
+    { label: "Theatres", href: "/theatre/" },
+    { label: "Blog", href: "/blog/" },
+    { label: "About", href: "/about-us/" },
+    { label: "Contact", href: "/contact-us/" },
+  ];
+  return <Navbar links={links} user={user ? { username: user.username, isStaff: user.isStaff, profileSlug: profile?.slug } : null} logoutAction={logout} />;
+}
 
-export function PageFrame({children,sidebar=true}:{children:React.ReactNode;sidebar?:boolean}){return <div className="site-container main-grid"><main>{children}</main>{sidebar&&<Sidebar/>}</div>}
+export function PageFrame({children,fullWidth=false}:{children:React.ReactNode;sidebar?:boolean;fullWidth?:boolean}){return <div className={fullWidth?"page-frame-full":"site-container main-grid main-grid-full"}><main>{children}</main></div>}
