@@ -30,7 +30,11 @@ export async function createSession(userId: number) {
 export async function clearSession() {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
-  if (token) await prisma.session.deleteMany({ where: { tokenHash: hash(token) } });
+  if (token) {
+    await prisma.session.deleteMany({ where: { tokenHash: hash(token) } });
+    // Also clean up expired sessions on logout
+    await prisma.session.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+  }
   jar.delete(COOKIE);
 }
 
