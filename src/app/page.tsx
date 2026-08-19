@@ -33,21 +33,15 @@ export default async function Home() {
     return image ? [image] : [];
   });
 
-  return <>
-    <Hero images={heroImages} />
+  const heroStats = [
+    { value: stats.plays, label: "Published plays" },
+    { value: stats.theatres, label: "Theatres" },
+    { value: stats.upcomingShows, label: "Upcoming shows" },
+    { value: stats.bookings, label: "Bookings" },
+  ];
 
-    <section className="landing-stats" aria-label="TheatreHub statistics">
-      <div className="site-container landing-stats-grid">
-        {[
-          [stats.plays, "Published plays"],
-          [stats.theatres, "Theatres"],
-          [stats.upcomingShows, "Upcoming shows"],
-          [stats.bookings, "Bookings"],
-        ].map(([value, label]) => <div className="landing-stat" key={label}>
-          <strong>{value}</strong><span>{label}</span>
-        </div>)}
-      </div>
-    </section>
+  return <>
+    <Hero images={heroImages} stats={heroStats} />
 
     <main>
       <section className="landing-section site-container">

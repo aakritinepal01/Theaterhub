@@ -7,11 +7,13 @@ import { Logo } from "@/components/Logo";
 
 type NavLink = { label: string; href: string };
 type NavUser = { username: string; isStaff: boolean; profileSlug?: string | null } | null;
+type ThemeMode = "light" | "dark";
 
 export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: NavUser; logoutAction: () => Promise<void> }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState<ThemeMode>("light");
   const normalize = (path: string) => path === "/" ? path : path.replace(/\/+$/, "");
   const currentPath = normalize(pathname);
   const isActive = (href: string) => {
@@ -26,6 +28,30 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
     return () => window.removeEventListener("scroll", update);
   }, []);
 
+  useEffect(() => {
+    let nextTheme: ThemeMode = "light";
+    try {
+      nextTheme = window.localStorage.getItem("theaterhub-theme") === "dark" ? "dark" : "light";
+    } catch {
+      nextTheme = "light";
+    }
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme(current => {
+      const nextTheme: ThemeMode = current === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = nextTheme;
+      try {
+        window.localStorage.setItem("theaterhub-theme", nextTheme);
+      } catch {
+        // Theme still changes for the current page if persistence is unavailable.
+      }
+      return nextTheme;
+    });
+  };
+
   if (pathname === "/login/" || pathname === "/login" || pathname === "/signup/" || pathname === "/signup") return null;
 
   return <header className={`navbar${scrolled ? " is-scrolled" : ""}${open ? " menu-open" : ""}`}>
@@ -35,14 +61,28 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
         {links.map(link => <Link aria-current={isActive(link.href) ? "page" : undefined} className={isActive(link.href) ? "is-active" : ""} href={link.href} key={link.href}>{link.label}</Link>)}
       </nav>
       <div className="nav-actions">
-        {user ? <details className="nav-account">
+        <button className={`theme-toggle${theme === "dark" ? " is-dark" : ""}`} type="button" role="switch" aria-checked={theme === "dark"} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} title={theme === "dark" ? "Light mode" : "Dark mode"} onClick={toggleTheme}>
+          <span className="theme-toggle-icon theme-toggle-sun" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" />
+            </svg>
+          </span>
+          <span className="theme-toggle-icon theme-toggle-moon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M20.8 14.4A7.4 7.4 0 0 1 9.6 3.2a8.2 8.2 0 1 0 11.2 11.2Z" />
+            </svg>
+          </span>
+          <span className="theme-toggle-knob" aria-hidden="true" />
+        </button>
+        {user && <details className="nav-account">
           <summary aria-label="Open account menu"><span className="nav-avatar">{user.username.slice(0, 1).toUpperCase()}</span><span className="nav-username">{user.username}</span></summary>
           <div className="nav-account-menu">
             {user.profileSlug && <Link href={`/profile/${user.profileSlug}/`}>Profile</Link>}
             {user.isStaff && <Link href="/admin/">Administration</Link>}
             <form action={logoutAction}><button type="submit">Logout</button></form>
           </div>
-        </details> : <><Link className="nav-login" href="/login/">Login</Link><Link className="nav-signup" href="/signup/">Sign Up</Link></>}
+        </details>}
         <button className="nav-toggle" type="button" aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(value => !value)}>
           <span /><span /><span />
         </button>
@@ -51,7 +91,6 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
     <nav className="nav-mobile" id="mobile-navigation" aria-label="Mobile navigation">
       <div className="site-container">
         {links.map(link => <Link aria-current={isActive(link.href) ? "page" : undefined} className={isActive(link.href) ? "is-active" : ""} href={link.href} key={link.href} onClick={() => setOpen(false)}>{link.label}<span aria-hidden="true">→</span></Link>)}
-        {!user && <><Link href="/login/" onClick={() => setOpen(false)}>Login<span aria-hidden="true">→</span></Link><Link href="/signup/" onClick={() => setOpen(false)}>Sign Up<span aria-hidden="true">→</span></Link></>}
       </div>
     </nav>
   </header>;
