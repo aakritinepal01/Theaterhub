@@ -18,6 +18,12 @@ export function plainText(html: string) {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export function formatDate(date?: Date | null) {
-  return date ? new Intl.DateTimeFormat("en-NP", { dateStyle: "medium", timeZone: "Asia/Kathmandu" }).format(date) : "";
+export function formatDate(date?: Date | null, includeTime = false) {
+  if (!date) return "";
+  const options: Intl.DateTimeFormatOptions = {
+    dateStyle: "medium",
+    timeZone: "Asia/Kathmandu",
+    ...(includeTime ? { timeStyle: "short" } : {}),
+  };
+  return new Intl.DateTimeFormat("en-NP", options).format(date);
 }
