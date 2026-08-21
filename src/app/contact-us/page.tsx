@@ -191,7 +191,7 @@ export default function ContactPage() {
 
                   <div className="contact-field">
                     <label htmlFor="contact-subject">Topic / Reason <span aria-hidden="true">*</span></label>
-                    <select id="contact-subject" name="subject" className="contact-input" required defaultvalue="">
+                    <select id="contact-subject" name="subject" className="contact-input" required defaultValue="">
                       <option value="" disabled>Select a topic…</option>
                       <option value="list-production">List a production / show dates</option>
                       <option value="register-venue">Register or claim a theatre venue</option>
