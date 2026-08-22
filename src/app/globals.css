@@ -3504,3 +3504,84 @@ html[data-theme="dark"] .artist-card-footer {
   color: var(--brand);
   text-decoration: none;
 }
+
+/* ── Ultra-Visible Pagination Navigation ── */
+.artists-pagination-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 48px;
+  margin-bottom: 56px;
+  width: 100%;
+}
+.artists-pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand, #9d4f36);
+  background: #ffffff;
+  color: var(--brand, #9d4f36);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.pagination-btn.is-disabled {
+  opacity: 0.45;
+  border-color: #d6cac2;
+  color: #9c8e85;
+  background: #f7f3f0;
+}
+.pagination-page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pagination-num-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 1px solid #dfd3cb;
+  background: #ffffff;
+  color: #211b18;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.pagination-num-btn.is-active {
+  background: var(--brand, #9d4f36);
+  border-color: var(--brand, #9d4f36);
+  color: #ffffff;
+  font-weight: 800;
+}
+.pagination-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: #f7ede6;
+  border: 1px solid #ebdcd1;
+  color: #5c4e45;
+  font-size: 13px;
+  font-weight: 600;
+}
+.pagination-status-pill strong {
+  color: var(--brand, #9d4f36);
+  font-weight: 800;
+  margin: 0 3px;
+}
