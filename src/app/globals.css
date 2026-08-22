@@ -3682,3 +3682,17 @@ html[data-theme="dark"] .artists-spotlight-section {
   text-decoration: none;
   white-space: nowrap;
 }
+
+.search-submit-btn,
+.search-submit-btn:hover,
+.search-submit-btn:focus,
+.search-submit-btn:active {
+  box-shadow: none !important;
+  transform: none !important;
+}
+.artists-tab.is-active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #ffffff;
+  box-shadow: none;
+}
