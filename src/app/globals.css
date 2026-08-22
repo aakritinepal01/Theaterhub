@@ -43,6 +43,8 @@ img { max-width:100%; height:auto; }
 .logo { flex:none; display:inline-flex; align-items:center; gap:9px; color:#211b18; }
 .logo:hover { text-decoration:none; }
 .logo-curtain { width:30px; height:30px; color:#c58962; filter:drop-shadow(0 2px 5px rgba(0,0,0,.15)); }
+.logo-img { width:34px; height:34px; object-fit:contain; filter:drop-shadow(0 2px 5px rgba(0,0,0,.12)); transition:transform 0.22s ease; }
+.logo:hover .logo-img { transform:scale(1.06); }
 .logo-wordmark { font-family:"Raleway",sans-serif; font-size:17px; font-weight:700; letter-spacing:-.03em; }
 .logo-wordmark strong { color:#c58962; font-weight:700; }
 .navbar .logo { color:#211b18; }

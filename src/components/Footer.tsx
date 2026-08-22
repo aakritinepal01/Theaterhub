@@ -73,7 +73,6 @@ export function Footer() {
             <li><Link href="/about-us/">About Us</Link></li>
             <li><Link href="/contact-us/">Contact Team</Link></li>
             <li><Link href="/signup/">Join TheatreHub</Link></li>
-            <li><Link href="/login/">Sign In</Link></li>
           </ul>
         </div>
 
