@@ -77,17 +77,6 @@ export function Footer() {
           </ul>
         </div>
 
-        {/* For Theatre Teams Column */}
-        <div className="footer-column">
-          <h3 className="footer-col-heading">For Theatre Teams</h3>
-          <ul className="footer-links">
-            <li><Link href="/signup/">Create Profile</Link></li>
-            <li><Link href="/contact-us/">Submit Show Dates</Link></li>
-            <li><Link href="/contact-us/">Register Venue</Link></li>
-            <li><Link href="/blog/">Submit Story Pitch</Link></li>
-          </ul>
-        </div>
-
         {/* Connect Column */}
         <div className="footer-column footer-connect">
           <h3 className="footer-col-heading">Connect</h3>
