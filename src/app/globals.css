@@ -3290,3 +3290,60 @@ html[data-theme="dark"] .footer-bottom-links a:hover {
 
 
 
+
+
+/* ── Artists Spotlight Hero & Page Layout ── */
+.artists-hero {
+  position: relative;
+  padding: 56px 0 36px;
+  background: linear-gradient(180deg, #fff7f2 0%, #ffffff 100%);
+  border-bottom: 1px solid #ebdcd1;
+}
+html[data-theme="dark"] .artists-hero {
+  background: linear-gradient(180deg, #1c1512 0%, #12100f 100%);
+  border-bottom-color: #352d28;
+}
+
+.artists-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid #ebdcd1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(157, 79, 54, 0.06);
+}
+html[data-theme="dark"] .artists-hero-badge {
+  background: #251c18;
+  border-color: #4a352a;
+  color: #e4a47b;
+}
+
+.artists-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(32px, 4.5vw, 52px);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #1a1412;
+  letter-spacing: -0.02em;
+}
+html[data-theme="dark"] .artists-hero h1 {
+  color: #fcf9f7;
+}
+
+.artists-hero-sub {
+  margin: 0 0 28px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #665b54;
+}
+html[data-theme="dark"] .artists-hero-sub {
+  color: #b8aba1;
+}
