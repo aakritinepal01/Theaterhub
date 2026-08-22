@@ -5,3 +5,6 @@ node_modules/
 legacy-import/
 npm-debug.log*
 *.tsbuildinfo
+.vercel/
+.vscode/
+

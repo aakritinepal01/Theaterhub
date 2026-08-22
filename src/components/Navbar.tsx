@@ -61,19 +61,38 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
         {links.map(link => <Link aria-current={isActive(link.href) ? "page" : undefined} className={isActive(link.href) ? "is-active" : ""} href={link.href} key={link.href}>{link.label}</Link>)}
       </nav>
       <div className="nav-actions">
-        <button className={`theme-toggle${theme === "dark" ? " is-dark" : ""}`} type="button" role="switch" aria-checked={theme === "dark"} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} title={theme === "dark" ? "Light mode" : "Dark mode"} onClick={toggleTheme}>
+        <button
+          className={`theme-toggle${theme === "dark" ? " is-dark" : ""}`}
+          type="button"
+          role="switch"
+          aria-checked={theme === "dark"}
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          title={theme === "dark" ? "Light mode" : "Dark mode"}
+          onClick={toggleTheme}
+        >
           <span className="theme-toggle-icon theme-toggle-sun" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" />
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
             </svg>
           </span>
           <span className="theme-toggle-icon theme-toggle-moon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M20.8 14.4A7.4 7.4 0 0 1 9.6 3.2a8.2 8.2 0 1 0 11.2 11.2Z" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
             </svg>
           </span>
-          <span className="theme-toggle-knob" aria-hidden="true" />
+          <span className="theme-toggle-knob" aria-hidden="true">
+            {theme === "dark" ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="knob-icon moon-icon">
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="knob-icon sun-icon">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+              </svg>
+            )}
+          </span>
         </button>
         {user && <details className="nav-account">
           <summary aria-label="Open account menu"><span className="nav-avatar">{user.username.slice(0, 1).toUpperCase()}</span><span className="nav-username">{user.username}</span></summary>

@@ -16,6 +16,7 @@ export async function Header() {
     { label: "Home", href: "/" },
     { label: "Plays", href: "/play/" },
     { label: "Theatres", href: "/theatre/" },
+    { label: "Artists", href: "/profile/" },
     { label: "Blog", href: "/blog/" },
     { label: "About", href: "/about-us/" },
     { label: "Contact", href: "/contact-us/" },
