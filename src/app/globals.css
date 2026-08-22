@@ -230,7 +230,7 @@ header.site-container.theatre-page-header h1 { font-size:clamp(30px,3.5vw,42px);
 .footer-spotlight-links { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px; }
 .footer-spotlight-links a { display:inline-flex; min-height:42px; align-items:center; padding:10px 16px; border:1px solid #dfd5cf; border-radius:999px; color:var(--brand); background:#ffffff; font-size:13px; font-weight:800; box-shadow:0 4px 14px rgba(83,57,43,.06); transition:color .2s,background .2s,border-color .2s,transform .2s,box-shadow .2s; }
 .footer-spotlight-links a:hover { border-color:var(--brand); color:#ffffff; background:var(--brand); text-decoration:none; transform:translateY(-1px); box-shadow:0 8px 20px rgba(157,79,54,.22); }
-.footer-grid { display:grid; grid-template-columns:minmax(260px,1.6fr) repeat(4,minmax(130px,1fr)); gap:42px; padding-bottom:58px; }
+.footer-grid { display:grid; grid-template-columns:minmax(260px,1.6fr) repeat(3,minmax(130px,1fr)); gap:42px; padding-bottom:58px; }
 .footer-brand .logo { margin-bottom:24px; color:#211b18; }
 .footer-brand>p { max-width:390px; margin:0; color:#665b54; line-height:1.8; }
 .footer-notes { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; }
@@ -2856,7 +2856,7 @@ html[data-theme="dark"] .theatre-type-examples span {
 /* ── Footer Grid: Brand + Nav Columns ── */
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1.4fr;
+  grid-template-columns: 2fr 1fr 1fr 1.4fr;
   gap: 48px;
   padding-block: 64px;
   border-top: 1px solid #eee8e3;
