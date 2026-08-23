@@ -2,6 +2,7 @@ import Link from "next/link";
 import { mediaUrl, plainText } from "@/lib/content";
 import { getFeaturedPlays, getHeroPlays, getHomepageStats, getUpcomingShows } from "@/lib/home";
 import { Hero } from "@/components/Hero";
+import { LiveStageMarquee } from "@/components/LiveStageMarquee";
 
 export const revalidate = 300;
 
@@ -54,6 +55,9 @@ export default async function Home() {
       <Hero images={heroImages} stats={heroStats} />
 
       <main>
+        {/* ── 0. LIVE STAGE MARQUEE TICKER (Auto-scrolling Live Plays in Nepal) ── */}
+        <LiveStageMarquee shows={shows} plays={plays} />
+
         {/* ── 1. FEATURED PLAYS (Curated Showcase) ── */}
         <section className="landing-section landing-featured site-container">
           <div className="landing-section-heading">
