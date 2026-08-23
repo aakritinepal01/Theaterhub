@@ -63,11 +63,13 @@ const FAQS = [
 
 export default function ContactPage() {
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(0); // First FAQ open by default for rich visual layout
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
+    setErrorMessage("");
     try {
       const data = Object.fromEntries(new FormData(e.currentTarget));
       const r = await fetch("/api/forms/contact", {
@@ -75,39 +77,22 @@ export default function ContactPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(data),
       });
+      const payload = await r.json().catch(() => null) as { error?: string } | null;
       if (r.ok) {
         setStatus("done");
         (e.target as HTMLFormElement).reset();
       } else {
+        setErrorMessage(payload?.error || "We couldn't submit your message. Please try again.");
         setStatus("error");
       }
     } catch {
+      setErrorMessage("We couldn't connect to the contact service. Please try again shortly.");
       setStatus("error");
     }
   }
 
   return (
     <>
-      {/* Hero */}
-      <section className="contact-hero">
-        <div className="contact-hero-orb contact-hero-orb-1" aria-hidden="true" />
-        <div className="contact-hero-orb contact-hero-orb-2" aria-hidden="true" />
-
-        <div className="site-container contact-hero-inner">
-          <div className="contact-hero-badge">
-            <span className="contact-badge-pulse" />
-            <span>We respond in ≤ 24 hours</span>
-          </div>
-
-          <h1>Let&apos;s talk about the stage.</h1>
-
-          <p className="contact-hero-lead">
-            Whether you are announcing a new play, listing a venue, pitching a story, or asking a question —
-            our team is ready to connect with you.
-          </p>
-        </div>
-      </section>
-
       <main>
         {/* Reason Cards */}
         <section className="contact-reasons-section">
@@ -155,13 +140,16 @@ export default function ContactPage() {
                   <button
                     type="button"
                     className="about-btn about-btn-primary"
-                    onClick={() => setStatus("idle")}
+                    onClick={() => {
+                      setErrorMessage("");
+                      setStatus("idle");
+                    }}
                   >
                     Send another message
                   </button>
                 </div>
               ) : (
-                <form className="contact-form" onSubmit={handleSubmit} noValidate>
+                <form className="contact-form" onSubmit={handleSubmit}>
                   <div className="contact-form-row">
                     <div className="contact-field">
                       <label htmlFor="contact-name">Full name <span aria-hidden="true">*</span></label>
@@ -227,8 +215,7 @@ export default function ContactPage() {
 
                   {status === "error" && (
                     <div className="contact-error" role="alert">
-                      <span>⚠️</span> Something went wrong submitting the form. You can also email us directly at{" "}
-                      <a href="mailto:hello@theatrehub.org">hello@theatrehub.org</a>.
+                      <span>⚠️</span> {errorMessage}
                     </div>
                   )}
 
@@ -254,15 +241,15 @@ export default function ContactPage() {
                 <ul className="contact-info-list">
                   <li>
                     <span className="contact-info-label">General &amp; Support</span>
-                    <a href="mailto:hello@theatrehub.org">hello@theatrehub.org</a>
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@theatrehub.org" target="_blank" rel="noopener noreferrer">hello@theatrehub.org</a>
                   </li>
                   <li>
                     <span className="contact-info-label">Editorial &amp; Stories</span>
-                    <a href="mailto:stories@theatrehub.org">stories@theatrehub.org</a>
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=stories@theatrehub.org" target="_blank" rel="noopener noreferrer">stories@theatrehub.org</a>
                   </li>
                   <li>
                     <span className="contact-info-label">Partnerships</span>
-                    <a href="mailto:partners@theatrehub.org">partners@theatrehub.org</a>
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=partners@theatrehub.org" target="_blank" rel="noopener noreferrer">partners@theatrehub.org</a>
                   </li>
                 </ul>
               </div>
