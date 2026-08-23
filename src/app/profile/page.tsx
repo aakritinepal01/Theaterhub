@@ -46,7 +46,7 @@ function getAvatarStyle(name: string) {
   return AVATAR_GRADIENTS[index];
 }
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 15;
 
 export default async function ArtistsPage({
   searchParams,
@@ -131,7 +131,28 @@ export default async function ArtistsPage({
 
             {/* Unified Search & Filter Control Row */}
             <div className="artists-control-row">
-              {/* Category Filter Tabs (Left side) */}
+              {/* Search Bar (Left side) */}
+              <form className="artists-search-bar" action="/profile/" method="GET">
+                <div className="artists-search-input-wrap">
+                  <svg className="artists-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <input
+                    type="search"
+                    name="q"
+                    defaultValue={query}
+                    placeholder="Search artists..."
+                    className="artists-search-input"
+                  />
+                  {roleFilter && <input type="hidden" name="role" value={roleFilter} />}
+                </div>
+                <button type="submit" className="about-btn about-btn-primary search-submit-btn">
+                  Search
+                </button>
+              </form>
+
+              {/* Category Filter Tabs (Right side) */}
               <div className="artists-filter-tabs">
                 <Link
                   href="/profile/"
@@ -158,27 +179,6 @@ export default async function ArtistsPage({
                   🛠️ Stage &amp; Crew
                 </Link>
               </div>
-
-              {/* Search Bar (Right side) */}
-              <form className="artists-search-bar" action="/profile/" method="GET">
-                <div className="artists-search-input-wrap">
-                  <svg className="artists-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <input
-                    type="search"
-                    name="q"
-                    defaultValue={query}
-                    placeholder="Search artists..."
-                    className="artists-search-input"
-                  />
-                  {roleFilter && <input type="hidden" name="role" value={roleFilter} />}
-                </div>
-                <button type="submit" className="about-btn about-btn-primary search-submit-btn">
-                  Search
-                </button>
-              </form>
             </div>
           </div>
         </div>
@@ -246,25 +246,22 @@ export default async function ArtistsPage({
 
                     {/* Card Body */}
                     <div className="artist-card-body">
-                      <div className="artist-card-title-wrap">
-                        <h3>
+                      <div className="artist-card-title-row">
+                        <h3 className="artist-card-name">
                           <Link href={`/profile/${artist.slug || artist.id}/`}>
                             {artist.name}
                           </Link>
                         </h3>
-                        {artist.address && (
-                          <span className="artist-location-pill">📍 {artist.address}</span>
+                        {tags.length > 0 && (
+                          <span className="artist-role-tag">
+                            <span>{tags[0].icon}</span> {tags[0].label}
+                          </span>
                         )}
                       </div>
 
-                      {/* Primary Role Tags */}
-                      <div className="artist-role-tags">
-                        {tags.slice(0, 2).map((tag, idx) => (
-                          <span key={idx} className="artist-role-tag">
-                            <span>{tag.icon}</span> {tag.label}
-                          </span>
-                        ))}
-                      </div>
+                      {artist.address && (
+                        <span className="artist-location-pill">📍 {artist.address}</span>
+                      )}
 
                       <p className="artist-card-bio">
                         {artist.bio
@@ -312,31 +309,26 @@ export default async function ArtistsPage({
 
                   {/* Page Numbers */}
                   <div className="pagination-page-numbers">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
-                      .reduce<(number | string)[]>((acc, p, i, arr) => {
-                        if (i > 0 && p - (arr[i - 1] as number) > 1) {
-                          acc.push("...");
-                        }
-                        acc.push(p);
-                        return acc;
-                      }, [])
-                      .map((p, idx) =>
-                        typeof p === "number" ? (
-                          <Link
-                            key={p}
-                            href={`/profile/?page=${p}${query ? `&q=${encodeURIComponent(query)}` : ""}${roleFilter ? `&role=${roleFilter}` : ""}`}
-                            className={`pagination-num-btn ${p === page ? "is-active" : ""}`}
-                            aria-current={p === page ? "page" : undefined}
-                          >
-                            {p}
-                          </Link>
-                        ) : (
-                          <span key={`dots-${idx}`} className="pagination-ellipsis">
-                            &hellip;
-                          </span>
-                        )
-                      )}
+                    {(() => {
+                      let start = Math.max(1, page - 1);
+                      if (start + 2 > totalPages) {
+                        start = Math.max(1, totalPages - 2);
+                      }
+                      const visiblePages = Array.from(
+                        { length: Math.min(3, totalPages) },
+                        (_, i) => start + i
+                      );
+                      return visiblePages.map((p) => (
+                        <Link
+                          key={p}
+                          href={`/profile/?page=${p}${query ? `&q=${encodeURIComponent(query)}` : ""}${roleFilter ? `&role=${roleFilter}` : ""}`}
+                          className={`pagination-num-btn ${p === page ? "is-active" : ""}`}
+                          aria-current={p === page ? "page" : undefined}
+                        >
+                          {p}
+                        </Link>
+                      ));
+                    })()}
                   </div>
 
                   {/* Next Button */}
