@@ -139,19 +139,37 @@ export default async function Plays({ searchParams }: { searchParams: Promise<{ 
         )}
 
         {count > PAGE_SIZE && (
-          <nav className="pagination play-index-pagination" aria-label="Play pages">
-            {Array.from({ length: pages }, (_, index) => {
-              const item = index + 1;
-              return item === page ? (
-                <span className="is-active" aria-current="page" key={item}>
-                  {item}
-                </span>
-              ) : (
-                <Link key={item} href={`/play/?page=${item}`}>
-                  {item}
-                </Link>
-              );
-            })}
+          <nav className="theatre-pagination play-index-pagination" aria-label="Play pages">
+            {page > 1 ? (
+              <Link className="theatre-page-btn" href={`/play/?page=${page - 1}`}>
+                ← Prev
+              </Link>
+            ) : (
+              <span className="theatre-page-btn" aria-disabled="true">← Prev</span>
+            )}
+
+            <div className="theatre-page-numbers">
+              {Array.from({ length: pages }, (_, index) => {
+                const item = index + 1;
+                return item === page ? (
+                  <span className="theatre-page-num is-active" aria-current="page" key={item}>
+                    {item}
+                  </span>
+                ) : (
+                  <Link className="theatre-page-num" key={item} href={`/play/?page=${item}`}>
+                    {item}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {page < pages ? (
+              <Link className="theatre-page-btn" href={`/play/?page=${page + 1}`}>
+                Next →
+              </Link>
+            ) : (
+              <span className="theatre-page-btn" aria-disabled="true">Next →</span>
+            )}
           </nav>
         )}
       </main>

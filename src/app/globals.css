@@ -532,10 +532,10 @@ header.site-container.theatre-page-header h1 { font-size:clamp(30px,3.5vw,42px);
 .landing-actions { display:flex; flex-wrap:wrap; gap:10px; }
 .landing-button { display:inline-flex; min-height:48px; align-items:center; justify-content:center; padding:12px 26px; border:1px solid transparent; border-radius:3px; font-weight:700; letter-spacing:.02em; transition:transform .2s,background .2s,border-color .2s; }
 .landing-button:hover { transform:translateY(-2px); text-decoration:none; }
-.landing-button-primary { color:#ffffff; background:#171311; border-color:#171311; box-shadow:0 8px 24px rgba(0,0,0,.26); }
-.landing-button-primary:hover { background:#000000; border-color:#000000; color:#ffffff; }
-.landing-button-ghost { color:#fff; border-color:#171311; background:#171311; box-shadow:0 8px 24px rgba(0,0,0,.22); backdrop-filter:blur(8px); }
-.landing-button-ghost:hover { color:#fff; border-color:#000; background:#000; }
+.landing-button-primary,
+.landing-button-ghost { color:#ffffff; border-color:var(--accent); background:var(--accent); box-shadow:0 8px 24px rgba(0,0,0,.22); backdrop-filter:blur(8px); }
+.landing-button-primary:hover,
+.landing-button-ghost:hover { color:#ffffff; border-color:var(--brand); background:var(--brand); }
 
 /* Right side cinematic stats */
 .landing-hero-stats { display:grid; grid-template-columns:repeat(2,1fr); gap:24px 22px; justify-self:end; width:100%; max-width:400px; padding-left:8px; }
@@ -7144,7 +7144,7 @@ html[data-theme="dark"] .theatre-index-hero .play-index-actions a.about-btn-ghos
   text-align: center;
   padding: 10px;
   border-radius: 12px;
-  background: #251711;
+  background: var(--brand);
   color: #ffffff;
   font-size: 12px;
   font-weight: 800;
@@ -7153,10 +7153,11 @@ html[data-theme="dark"] .theatre-index-hero .play-index-actions a.about-btn-ghos
 }
 
 .theatre-view-btn:hover {
-  background: #e0723e;
+  background: var(--brand);
   color: #ffffff;
   text-decoration: none;
   transform: translateY(-1px);
+  filter: brightness(0.9);
 }
 
 .theatre-empty-state {
@@ -7244,13 +7245,13 @@ html[data-theme="dark"] .theatre-icon-link {
 }
 
 html[data-theme="dark"] .theatre-view-btn {
-  background: #2d1c15;
-  border: 1px solid #452b20;
+  background: var(--brand);
+  border: 1px solid var(--brand);
 }
 
 html[data-theme="dark"] .theatre-view-btn:hover {
-  background: #e0723e;
-  border-color: #e0723e;
+  background: var(--brand);
+  border-color: var(--brand);
 }
 
 html[data-theme="dark"] .theatre-empty-state {
@@ -7390,10 +7391,10 @@ html[data-theme="dark"] .theatre-cta-text p:not(.landing-kicker) {
 
 .theatre-page-btn {
   padding: 10px 22px;
-  border: 1.5px solid #c9b8ae;
+  border: 1.5px solid var(--brand);
   border-radius: 8px;
   background: transparent;
-  color: #5c4e46;
+  color: var(--brand);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -7401,13 +7402,15 @@ html[data-theme="dark"] .theatre-cta-text p:not(.landing-kicker) {
   letter-spacing: 0.02em;
 }
 
-.theatre-page-btn:hover:not(:disabled) {
-  background: #3d2b1f;
+.theatre-page-btn:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--brand);
   color: #fff;
-  border-color: #3d2b1f;
+  border-color: var(--brand);
+  text-decoration: none;
 }
 
-.theatre-page-btn:disabled {
+.theatre-page-btn:disabled,
+.theatre-page-btn[aria-disabled="true"] {
   opacity: 0.3;
   cursor: not-allowed;
 }
@@ -7425,7 +7428,7 @@ html[data-theme="dark"] .theatre-cta-text p:not(.landing-kicker) {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #ddd2ca;
+  border: 1.5px solid var(--line);
   border-radius: 8px;
   background: transparent;
   color: #5c4e46;
@@ -7435,13 +7438,33 @@ html[data-theme="dark"] .theatre-cta-text p:not(.landing-kicker) {
   transition: background 0.18s, color 0.18s, border-color 0.18s;
 }
 
-.theatre-page-num:hover {
-  background: #f5ede8;
-  border-color: #c9b8ae;
+.theatre-page-num:hover:not(.is-active) {
+  background: color-mix(in srgb, var(--brand) 10%, transparent);
+  border-color: var(--brand);
+  color: var(--brand);
+  text-decoration: none;
 }
 
 .theatre-page-num.is-active {
-  background: #3d2b1f;
+  background: var(--brand);
   color: #fff;
-  border-color: #3d2b1f;
+  border-color: var(--brand);
+}
+
+html[data-theme="dark"] .theatre-page-btn {
+  background: #1a120e;
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+html[data-theme="dark"] .theatre-page-num {
+  background: #1a120e;
+  border-color: #403832;
+  color: #f7f2ee;
+}
+
+html[data-theme="dark"] .theatre-page-num:hover:not(.is-active) {
+  background: #241712;
+  border-color: var(--brand);
+  color: var(--brand);
 }
