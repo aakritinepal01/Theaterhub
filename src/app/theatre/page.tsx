@@ -29,25 +29,46 @@ const showDateFormat = new Intl.DateTimeFormat("en-NP", {
 const STAGE_TYPES = [
   {
     title: "Black Box Studios",
-    icon: "⬛",
+    svg: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="3" />
+        <path d="M8 12h8" />
+        <path d="M12 8v8" />
+      </svg>
+    ),
     description: "Intimate, flexible experimental spaces where audience sits up close with the performers.",
     examples: "Mandala Studio, Shilpee Gothale Natakghar, Kausi Theatre",
   },
   {
     title: "Proscenium Auditoriums",
-    icon: "🎭",
+    svg: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 20h20" />
+        <path d="M5 20V8l7-5 7 5v12" />
+        <path d="M9 12h6v8H9z" />
+      </svg>
+    ),
     description: "Grand traditional framed stages with elevated platforms, curtain lines, and tiered seating.",
     examples: "Rastriya Nachghar, Nepal Academy, Rastriya Sabha Griha",
   },
   {
     title: "Traditional Dabali",
-    icon: "🏛️",
+    svg: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M3 11l9-7 9 7" />
+      </svg>
+    ),
     description: "Historic stone open-air platforms crafted in ancient Newari squares for community festivals.",
     examples: "Patan Durbar Square, Bhaktapur Dabali, Basantapur",
   },
   {
     title: "Regional Cultural Hubs",
-    icon: "🌿",
+    svg: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+        <circle cx="12" cy="10" r="3" />
+      </svg>
+    ),
     description: "Independent performance venues taking contemporary stage productions beyond Kathmandu.",
     examples: "Gandharva Natak Ghar Pokhara, Aarohan Gurukul Biratnagar",
   },
@@ -203,8 +224,10 @@ export default async function TheatresPage() {
           <div className="theatre-types-grid">
             {STAGE_TYPES.map((type) => (
               <div className="theatre-type-card" key={type.title}>
-                <span className="theatre-type-icon">{type.icon}</span>
-                <h3>{type.title}</h3>
+                <div className="theatre-type-header">
+                  <span className="theatre-type-icon-wrap">{type.svg}</span>
+                  <h3>{type.title}</h3>
+                </div>
                 <p>{type.description}</p>
                 <div className="theatre-type-examples">
                   <span>Notable:</span> {type.examples}
