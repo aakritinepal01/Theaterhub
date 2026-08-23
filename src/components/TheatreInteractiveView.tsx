@@ -218,30 +218,7 @@ export function TheatreInteractiveView({
 
       {/* ── Search & Filter Controls ── */}
       <section className="theatre-controls-bar">
-        <div className="theatre-search-box">
-          <svg className="theatre-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search by theatre name, location, or keyword..."
-            value={searchQuery}
-            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            className="theatre-input-search"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              className="theatre-clear-btn"
-              onClick={() => setSearchQuery("")}
-            >
-              ✕
-            </button>
-          )}
-        </div>
-
-        {/* City Filter Pills */}
+        {/* City Filter Pills (Left side) */}
         <div className="theatre-city-tabs" role="tablist">
           <button
             type="button"
@@ -255,7 +232,7 @@ export function TheatreInteractiveView({
             className={`theatre-city-chip ${activeCity === "kathmandu-valley" ? "is-active" : ""}`}
             onClick={() => { setActiveCity("kathmandu-valley"); setCurrentPage(1); }}
           >
-            📍 Kathmandu Valley ({regionCounts.ktm})
+            📍 KTM ({regionCounts.ktm})
           </button>
           <button
             type="button"
@@ -269,7 +246,7 @@ export function TheatreInteractiveView({
             className={`theatre-city-chip ${activeCity === "eastern-nepal" ? "is-active" : ""}`}
             onClick={() => { setActiveCity("eastern-nepal"); setCurrentPage(1); }}
           >
-            🌾 Koshi &amp; Eastern Nepal ({regionCounts.eastern})
+            🌾 Eastern Nepal ({regionCounts.eastern})
           </button>
         </div>
 
@@ -287,6 +264,30 @@ export function TheatreInteractiveView({
             <option value="year">Oldest Established</option>
           </select>
         </div>
+
+        {/* Search Box (Far Right side) */}
+        <div className="theatre-search-box">
+          <svg className="theatre-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search theatres..."
+            value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+            className="theatre-input-search"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="theatre-clear-btn"
+              onClick={() => setSearchQuery("")}
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </section>
 
       {/* ── Venues Grid ── */}
@@ -300,7 +301,13 @@ export function TheatreInteractiveView({
             transition: "opacity 0.22s ease, transform 0.22s ease",
           }}
         >
-          {displayTheatres.map((theatre) => (
+          {displayTheatres.map((theatre) => {
+            // Resolve logo URL from profilePic field
+            const logoSrc = theatre.profilePic
+              ? (theatre.profilePic.startsWith("http") ? theatre.profilePic : `/uploads/${theatre.profilePic.replace(/^\/?(?:uploads\/)?/, "")}`)
+              : "/brand-logo.png";
+
+            return (
             <article className="theatre-rich-card" key={theatre.id}>
               {/* Card Image Banner with Logo Badge */}
               <div className="theatre-rich-img-wrap">
@@ -311,6 +318,15 @@ export function TheatreInteractiveView({
                   loading="lazy"
                 />
                 <div className="theatre-rich-overlay" />
+
+                {/* Theatre Logo Avatar - bottom left */}
+                <div className="theatre-rich-avatar">
+                  <img
+                    src={logoSrc}
+                    alt={`${theatre.title} logo`}
+                    onError={(e) => { (e.target as HTMLImageElement).src = "/brand-logo.png"; }}
+                  />
+                </div>
 
                 {/* Top Badges */}
                 <div className="theatre-rich-top-badges">
@@ -414,7 +430,8 @@ export function TheatreInteractiveView({
                 </div>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="theatre-empty-state">
@@ -447,15 +464,25 @@ export function TheatreInteractiveView({
           </button>
 
           <div className="theatre-page-numbers">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                className={`theatre-page-num ${p === safePage ? "is-active" : ""}`}
-                onClick={() => goToPage(p)}
-              >
-                {p}
-              </button>
-            ))}
+            {(() => {
+              let start = Math.max(1, safePage - 1);
+              if (start + 2 > totalPages) {
+                start = Math.max(1, totalPages - 2);
+              }
+              const visiblePages = Array.from(
+                { length: Math.min(3, totalPages) },
+                (_, i) => start + i
+              );
+              return visiblePages.map((p) => (
+                <button
+                  key={p}
+                  className={`theatre-page-num ${p === safePage ? "is-active" : ""}`}
+                  onClick={() => goToPage(p)}
+                >
+                  {p}
+                </button>
+              ));
+            })()}
           </div>
 
           <button
