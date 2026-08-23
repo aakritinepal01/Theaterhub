@@ -289,20 +289,32 @@ export default function ContactPage() {
               </div>
 
               <div className="contact-social-card">
-                <h3>Connect on Social</h3>
-                <p>Follow show announcements, director interviews, and stage photos.</p>
-                <a
-                  href="https://www.facebook.com/theatrehub.org"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="contact-facebook"
-                  aria-label="TheatreHub on Facebook"
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14.2 8.2V6.6c0-.8.5-1 1-1h2.6V2h-3.5c-3.5 0-4.7 2.1-4.7 4.6v1.6H7v4h2.6V22h4.6v-9.8h3.1l.5-4h-3.6Z" />
-                  </svg>
-                  Follow on Facebook
-                </a>
+                <h3>Connect &amp; Join Community</h3>
+                <p>Stay updated with instant show announcements, director interviews, and stage updates.</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <a
+                    href="https://chat.whatsapp.com/KloK0eNsAv7CAEb8MuQdXK"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="contact-facebook"
+                    style={{ background: "#25D366", borderColor: "#25D366", color: "#fff" }}
+                    aria-label="Join Official WhatsApp Group"
+                  >
+                    💬 Join Official WhatsApp Group
+                  </a>
+                  <a
+                    href="https://www.facebook.com/theatrehub.org"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="contact-facebook"
+                    aria-label="TheatreHub on Facebook"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14.2 8.2V6.6c0-.8.5-1 1-1h2.6V2h-3.5c-3.5 0-4.7 2.1-4.7 4.6v1.6H7v4h2.6V22h4.6v-9.8h3.1l.5-4h-3.6Z" />
+                    </svg>
+                    Follow on Facebook
+                  </a>
+                </div>
               </div>
             </aside>
           </div>
