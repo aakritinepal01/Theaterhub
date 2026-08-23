@@ -149,18 +149,27 @@ export default async function Plays({ searchParams }: { searchParams: Promise<{ 
             )}
 
             <div className="theatre-page-numbers">
-              {Array.from({ length: pages }, (_, index) => {
-                const item = index + 1;
-                return item === page ? (
-                  <span className="theatre-page-num is-active" aria-current="page" key={item}>
-                    {item}
-                  </span>
-                ) : (
-                  <Link className="theatre-page-num" key={item} href={`/play/?page=${item}`}>
-                    {item}
-                  </Link>
+              {(() => {
+                let start = Math.max(1, page - 1);
+                if (start + 2 > pages) {
+                  start = Math.max(1, pages - 2);
+                }
+                const visiblePages = Array.from(
+                  { length: Math.min(3, pages) },
+                  (_, i) => start + i
                 );
-              })}
+                return visiblePages.map((item) =>
+                  item === page ? (
+                    <span className="theatre-page-num is-active" aria-current="page" key={item}>
+                      {item}
+                    </span>
+                  ) : (
+                    <Link className="theatre-page-num" key={item} href={`/play/?page=${item}`}>
+                      {item}
+                    </Link>
+                  )
+                );
+              })()}
             </div>
 
             {page < pages ? (
