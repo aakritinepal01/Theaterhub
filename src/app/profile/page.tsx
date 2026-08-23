@@ -4,6 +4,25 @@ import { getArtistPhoto, plainText } from "@/lib/content";
 import { PageFrame } from "@/components/SiteShell";
 
 export const revalidate = 300;
+export const dynamic = "force-dynamic";
+
+// Retry helper for transient Neon DB cold starts & pool timeouts
+async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 600): Promise<T> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code;
+      const isTransient = code === "P1001" || code === "P2024";
+      if (isTransient && attempt < retries) {
+        await new Promise((r) => setTimeout(r, delayMs * (attempt + 1)));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error("Unreachable");
+}
 
 const AVATAR_GRADIENTS = [
   "linear-gradient(135deg, #FF512F 0%, #DD2476 100%)",
@@ -61,50 +80,34 @@ export default async function ArtistsPage({
     where.crewCredits = { some: {} };
   }
 
-  const [totalCount, profiles, featuredArtists] = await Promise.all([
-    prisma.profile.count({ where }),
-    prisma.profile.findMany({
-      where,
-      orderBy: { name: "asc" },
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-      include: {
-        _count: {
-          select: {
-            castCredits: true,
-            crewCredits: true,
-            makerCredits: true,
-          },
-        },
-      },
-    }),
-    // Featured spotlight practitioners (only fetch if on page 1 with no filters)
-    page === 1 && !query && !roleFilter
-      ? prisma.profile.findMany({
-          where: {
-            status: "PUBLISHED",
-            OR: [
-              { castCredits: { some: {} } },
-              { makerCredits: { some: {} } },
-              { profilePic: { not: null } },
-            ],
-          },
-          orderBy: { updated: "desc" },
-          take: 6,
-          include: {
-            _count: {
-              select: {
-                castCredits: true,
-                crewCredits: true,
-                makerCredits: true,
-              },
+  let totalCount = 0;
+  let profiles: any[] = [];
+
+  try {
+    totalCount = await withRetry(() => prisma.profile.count({ where }));
+    profiles = await withRetry(() =>
+      prisma.profile.findMany({
+        where,
+        orderBy: { name: "asc" },
+        skip: (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+        include: {
+          _count: {
+            select: {
+              castCredits: true,
+              crewCredits: true,
+              makerCredits: true,
             },
           },
-        })
-      : Promise.resolve([]),
-  ]);
+        },
+      })
+    );
+  } catch (error) {
+    console.error("Database connection error on ArtistsPage:", error);
+  }
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
 
   return (
     <>
@@ -182,50 +185,6 @@ export default async function ArtistsPage({
       </section>
 
       <PageFrame>
-        {/* ── Featured Artists Spotlight (Page 1 default view) ── */}
-        {featuredArtists.length > 0 && (
-          <section className="artists-spotlight-section">
-            <div className="spotlight-section-header">
-              <div>
-                <span className="landing-kicker">Stage Practitioners Spotlight</span>
-                <h2>Featured Artists</h2>
-              </div>
-              <p className="spotlight-sub-desc">
-                Prominent directors, performers, and creators actively contributing to Nepali theatre.
-              </p>
-            </div>
-
-            <div className="spotlight-artists-grid">
-              {featuredArtists.map((artist) => {
-                const image = getArtistPhoto(artist);
-                const bgGradient = getAvatarStyle(artist.name);
-                const totalCredits =
-                  artist._count.castCredits + artist._count.makerCredits + artist._count.crewCredits;
-
-                return (
-                  <Link
-                    key={artist.id}
-                    href={`/profile/${artist.slug || artist.id}/`}
-                    className="spotlight-artist-card"
-                  >
-                    <div className="spotlight-card-bg" style={{ background: bgGradient }} />
-                    <div className="spotlight-card-avatar">
-                      <img src={image} alt={artist.name} />
-                    </div>
-                    <div className="spotlight-card-info">
-                      <h4>{artist.name}</h4>
-                      {artist.address && <p className="spotlight-location">📍 {artist.address}</p>}
-                      <span className="spotlight-badge">
-                        🎭 {totalCredits} {totalCredits === 1 ? "credit" : "credits"}
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
         {/* ── Main Artists Grid Results Header ── */}
         <div className="artists-results-header">
           <div className="artists-results-title">
