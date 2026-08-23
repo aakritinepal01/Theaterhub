@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
+import { BackButton } from "@/components/BackButton";
 
 type NavLink = { label: string; href: string };
 type NavUser = { username: string; isStaff: boolean; profileSlug?: string | null } | null;
@@ -56,7 +57,10 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
 
   return <header className={`navbar${scrolled ? " is-scrolled" : ""}${open ? " menu-open" : ""}`}>
     <div className="site-container nav-inner">
-      <Logo />
+      <div className="nav-logo-group">
+        <BackButton />
+        <Logo />
+      </div>
       <nav className="nav-desktop" aria-label="Primary navigation">
         {links.map(link => <Link aria-current={isActive(link.href) ? "page" : undefined} className={isActive(link.href) ? "is-active" : ""} href={link.href} key={link.href}>{link.label}</Link>)}
       </nav>
