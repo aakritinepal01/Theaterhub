@@ -1,20 +1,26 @@
+import type { Metadata } from "next";
 import { ContentStatus } from "@prisma/client";
 import Link from "next/link";
-import { mediaUrl, plainText, publishedWhere } from "@/lib/content";
+import { mediaUrl, plainText, publishedWhere, getTheatrePhoto } from "@/lib/content";
 import { prisma } from "@/lib/prisma";
-import { PageFrame } from "@/components/SiteShell";
+import { TheatreInteractiveView, type TheatreCardData } from "@/components/TheatreInteractiveView";
 
 export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
-const PAGE_SIZE = 9;
+export const metadata: Metadata = {
+  title: "Theatres & Performance Spaces in Nepal | TheatreHub",
+  description:
+    "Explore Nepal's premier auditoriums, black box theatres, and historic cultural stages. Discover venue locations, phone numbers, websites, and play schedules.",
+};
 
-const showTime = new Intl.DateTimeFormat("en-NP", {
+const showTimeFormat = new Intl.DateTimeFormat("en-NP", {
   hour: "numeric",
   minute: "2-digit",
   timeZone: "Asia/Kathmandu",
 });
 
-const nextShowDate = new Intl.DateTimeFormat("en-NP", {
+const showDateFormat = new Intl.DateTimeFormat("en-NP", {
   day: "2-digit",
   month: "short",
   timeZone: "Asia/Kathmandu",
@@ -22,96 +28,127 @@ const nextShowDate = new Intl.DateTimeFormat("en-NP", {
 
 const STAGE_TYPES = [
   {
-    title: "Proscenium Stages",
-    icon: "🎭",
-    description: "Classic framed stages with grand curtain lines, elevated stages, and tiered auditorium seating.",
-    examples: "Rastriya Nachghar, Nepal Academy",
-  },
-  {
     title: "Black Box Studios",
     icon: "⬛",
-    description: "Intimate, reconfigurable experimental spaces bringing actors and audience closer than ever.",
-    examples: "Shilpee Theatre, Mandala Studio, Kausi Theatre",
+    description: "Intimate, flexible experimental spaces where audience sits up close with the performers.",
+    examples: "Mandala Studio, Shilpee Gothale Natakghar, Kausi Theatre",
+  },
+  {
+    title: "Proscenium Auditoriums",
+    icon: "🎭",
+    description: "Grand traditional framed stages with elevated platforms, curtain lines, and tiered seating.",
+    examples: "Rastriya Nachghar, Nepal Academy, Rastriya Sabha Griha",
   },
   {
     title: "Traditional Dabali",
     icon: "🏛️",
-    description: "Open-air Newari stone platforms built into historic squares for community theatrical festivals.",
-    examples: "Patan Dabali, Bhaktapur Squares",
+    description: "Historic stone open-air platforms crafted in ancient Newari squares for community festivals.",
+    examples: "Patan Durbar Square, Bhaktapur Dabali, Basantapur",
   },
   {
-    title: "Community Hubs",
+    title: "Regional Cultural Hubs",
     icon: "🌿",
-    description: "Multipurpose cultural spaces hosting indie plays, play-readings, drama workshops, and rehearsals.",
-    examples: "Aarohan Gurukul, Independent Halls",
+    description: "Independent performance venues taking contemporary stage productions beyond Kathmandu.",
+    examples: "Gandharva Natak Ghar Pokhara, Aarohan Gurukul Biratnagar",
   },
 ];
 
-export default async function Theatres({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string; q?: string }>;
-}) {
-  const params = await searchParams;
-  const rawPage = Number(params.page);
-  const query = params.q?.trim() || "";
-  const requested = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 600): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    if (retries > 0) {
+      await new Promise((res) => setTimeout(res, delayMs));
+      return withRetry(fn, retries - 1, delayMs * 1.5);
+    }
+    throw error;
+  }
+}
+
+export default async function TheatresPage() {
   const now = new Date();
-
   const baseWhere = { status: ContentStatus.PUBLISHED };
-  const searchFilter = query
-    ? {
-        OR: [
-          { title: { contains: query, mode: "insensitive" as const } },
-          { address: { contains: query, mode: "insensitive" as const } },
-          { description: { contains: query, mode: "insensitive" as const } },
-        ],
-      }
-    : {};
-
-  const where = { ...baseWhere, ...searchFilter };
   const liveWhere = { showtime: { gt: now }, play: publishedWhere(now) };
 
-  const [totalCount, activeVenues, upcomingShows, filteredCount] = await Promise.all([
-    prisma.theatre.count({ where: baseWhere }),
-    prisma.theatre.count({ where: { ...baseWhere, shows: { some: liveWhere } } }),
-    prisma.show.count({ where: { ...liveWhere, theatre: baseWhere } }),
-    prisma.theatre.count({ where }),
-  ]);
+  let dbTheatres: any[] = [];
+  try {
+    // Fetch all venues with their counts and next show
+    dbTheatres = await withRetry(() =>
+      prisma.theatre.findMany({
+        where: baseWhere,
+        orderBy: { title: "asc" },
+        include: {
+          shows: {
+            where: liveWhere,
+            orderBy: { showtime: "asc" },
+            take: 1,
+            include: { play: { select: { title: true, slug: true } } },
+          },
+          _count: {
+            select: {
+              plays: true,
+              shows: true,
+            },
+          },
+        },
+      })
+    );
+  } catch (error) {
+    console.error("Database connection error on Theatres page:", error);
+  }
 
-  const pages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
-  const page = Math.min(requested, pages);
 
-  const theatres = await prisma.theatre.findMany({
-    where,
-    orderBy: { title: "asc" },
-    skip: (page - 1) * PAGE_SIZE,
-    take: PAGE_SIZE,
-    include: {
-      shows: {
-        where: liveWhere,
-        orderBy: { showtime: "asc" },
-        take: 1,
-        include: { play: true },
-      },
-    },
+  // Calculate total stats
+  const totalTheatres = dbTheatres.length;
+  const totalPlays = dbTheatres.reduce((acc, t) => acc + t._count.plays, 0);
+  const totalShows = dbTheatres.reduce((acc, t) => acc + t._count.shows, 0);
+
+  const theatres: TheatreCardData[] = dbTheatres.map((t) => {
+    const rawDesc = t.description || t.about || "";
+    const cleanDesc = plainText(rawDesc) || "Discover this iconic theatre space in Nepal on TheatreHub.";
+    const nextShow = t.shows[0];
+
+    return {
+      id: t.id,
+      title: t.title,
+      slug: t.slug || String(t.id),
+      address: t.address,
+      coverImage: getTheatrePhoto(t),
+      profilePic: mediaUrl(t.profilePic),
+      phone: t.phone,
+      email: t.email,
+      linkWebsite: t.linkWebsite,
+      linkFacebook: t.linkFacebook,
+      linkInstagram: t.linkInstagram,
+      establishedYear: t.establishedOn ? new Date(t.establishedOn).getFullYear() : null,
+      description: cleanDesc.slice(0, 160) + (cleanDesc.length > 160 ? "…" : ""),
+      playsCount: t._count.plays,
+      showsCount: t._count.shows,
+      nextShow: nextShow
+        ? {
+            playTitle: nextShow.play.title,
+            playSlug: nextShow.play.slug || "",
+            showtimeFormatted: showTimeFormat.format(nextShow.showtime),
+            dateFormatted: showDateFormat.format(nextShow.showtime),
+          }
+        : null,
+    };
   });
 
   return (
-    <>
-      {/* Hero Header */}
-      <header className="theatre-index-hero">
-        <div className="theatre-hero-orb theatre-hero-orb-1" aria-hidden="true" />
-        <div className="theatre-hero-orb theatre-hero-orb-2" aria-hidden="true" />
-
+    <div className="theatre-page-unified-container">
+      {/* ── Theatre Index Hero ── */}
+      <header className="play-index-hero">
         <div className="site-container play-index-hero-inner">
           <div className="play-index-copy">
-            <div className="about-hero-pill">
-              <span className="about-hero-pill-dot" />
-              <span>Nepal Venue Directory</span>
+            <div className="play-hero-badge">
+              <span className="hero-badge-icon">🏛️</span>
+              <span>Nepal Venue Directory &amp; Cultural Stages</span>
             </div>
-            <h1>Theatres &amp; Performance Spaces</h1>
-            <p>
+            <h1 className="play-hero-title">
+              Theatres &amp; <span className="play-hero-gradient">Performance Spaces</span>
+            </h1>
+            <p className="play-hero-sub">
               Explore Nepal&apos;s iconic auditoriums, intimate black box studios, and historic open-air
               stages where stories come alive every night.
             </p>
@@ -121,170 +158,42 @@ export default async function Theatres({
                 Browse plays <span aria-hidden="true">→</span>
               </Link>
               <Link href="/contact-us/" className="about-btn about-btn-ghost">
-                Register a venue
+                Register a venue 🏛️
               </Link>
             </div>
           </div>
 
-          <div className="play-index-stats" aria-label="Theatre directory statistics">
-            <div className="theatre-stat-box">
-              <strong>{totalCount}</strong>
-              <small>Listed Theatres</small>
+          <div className="play-bento-stats" aria-label="Theatre directory statistics">
+            <div className="bento-stat-card">
+              <div className="bento-stat-icon">🏛️</div>
+              <div className="bento-stat-text">
+                <strong>{totalTheatres}</strong>
+                <small>Iconic Venues</small>
+              </div>
             </div>
-            <div className="theatre-stat-box">
-              <strong>{activeVenues}</strong>
-              <small>Active Stages</small>
+            <div className="bento-stat-card">
+              <div className="bento-stat-icon">🎭</div>
+              <div className="bento-stat-text">
+                <strong>{totalPlays}+</strong>
+                <small>Staged Plays</small>
+              </div>
             </div>
-            <div className="theatre-stat-box">
-              <strong>{upcomingShows}</strong>
-              <small>Upcoming Shows</small>
+            <div className="bento-stat-card">
+              <div className="bento-stat-icon">🎟️</div>
+              <div className="bento-stat-text">
+                <strong>{totalShows}+</strong>
+                <small>Recorded Shows</small>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <PageFrame fullWidth>
-        {/* Toolbar & Search */}
-        <section className="play-index-toolbar theatre-index-toolbar" aria-label="Theatre directory view">
-          <div>
-            <strong>Venue Directory</strong>
-            <span>
-              {filteredCount
-                ? `Showing ${theatres.length} of ${filteredCount} theatre venues`
-                : "No theatres match your search"}
-            </span>
-          </div>
+      {/* ── Main Interactive Directory Content ── */}
+      <main className="site-container theatre-main-content">
+        <TheatreInteractiveView theatres={theatres} />
 
-          <div className="theatre-search-wrap">
-            <form action="/theatre/" method="GET" className="theatre-search-form">
-              <input
-                type="text"
-                name="q"
-                defaultValue={query}
-                placeholder="Search venue or location..."
-                className="theatre-search-input"
-              />
-              {query && (
-                <Link href="/theatre/" className="theatre-search-clear" title="Clear search">
-                  ✕
-                </Link>
-              )}
-              <button type="submit" className="theatre-search-btn">
-                Search
-              </button>
-            </form>
-          </div>
-        </section>
-
-        {/* Theatres Grid */}
-        {theatres.length ? (
-          <div className="play-list-grid play-list-grid-animated theatre-list-grid">
-            {theatres.map((theatre) => {
-              const image = mediaUrl(theatre.coverImage || theatre.profilePic);
-              const nextShow = theatre.shows[0];
-              const summary =
-                plainText(theatre.description || theatre.about) ||
-                "Discover this theatre venue on TheatreHub.";
-              const establishedYear = theatre.establishedOn
-                ? new Date(theatre.establishedOn).getFullYear()
-                : null;
-
-              return (
-                <article className="play-list-card theatre-card" key={theatre.id}>
-                  <Link className="play-list-image theatre-list-image" href={`/theatre/${theatre.slug}/`}>
-                    {image ? (
-                      <img src={image} alt={theatre.title} loading="lazy" />
-                    ) : (
-                      <div className="theatre-empty-image">
-                        <span>🎭</span>
-                        <small>{theatre.title}</small>
-                      </div>
-                    )}
-                    <span className="theatre-card-badges">
-                      {nextShow ? (
-                        <span className="theatre-live-badge">● Stage Live</span>
-                      ) : (
-                        <span className="theatre-listed-badge">Venue</span>
-                      )}
-                      {establishedYear && (
-                        <span className="theatre-year-badge">Est. {establishedYear}</span>
-                      )}
-                    </span>
-                  </Link>
-
-                  <div className="play-list-copy theatre-list-copy">
-                    <div className="play-list-meta">
-                      {theatre.address ? (
-                        <span className="theatre-location-pin">📍 {theatre.address}</span>
-                      ) : (
-                        <span>Nepal</span>
-                      )}
-                    </div>
-
-                    <h3>
-                      <Link href={`/theatre/${theatre.slug}/`}>{theatre.title}</Link>
-                    </h3>
-                    <p>{summary.slice(0, 120)}{summary.length > 120 ? "…" : ""}</p>
-
-                    {/* Next Show Preview Card */}
-                    {nextShow && (
-                      <div className="theatre-next-show-box">
-                        <div className="theatre-next-show-header">
-                          <span className="theatre-next-label">Next Performance</span>
-                          <span className="theatre-next-date">{nextShowDate.format(nextShow.showtime)}</span>
-                        </div>
-                        <strong className="theatre-next-title">
-                          <Link href={`/play/${nextShow.play.slug}/`}>{nextShow.play.title}</Link>
-                        </strong>
-                        <span className="theatre-next-time">{showTime.format(nextShow.showtime)}</span>
-                      </div>
-                    )}
-
-                    <div className="theatre-card-footer">
-                      <Link className="play-read-more" href={`/theatre/${theatre.slug}/`}>
-                        Explore venue <span aria-hidden="true">→</span>
-                      </Link>
-                      {theatre.phone && (
-                        <a href={`tel:${theatre.phone}`} className="theatre-phone-link" title={`Call ${theatre.phone}`}>
-                          📞 {theatre.phone}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="landing-empty play-index-empty">
-            <h3>No theatres found</h3>
-            <p>Try clearing your search query or check back soon for new venue listings.</p>
-            <Link href="/theatre/" className="about-btn about-btn-primary" style={{ marginTop: 16 }}>
-              Reset search
-            </Link>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {filteredCount > PAGE_SIZE && (
-          <nav className="pagination play-index-pagination" aria-label="Theatre pages">
-            {Array.from({ length: pages }, (_, index) => {
-              const item = index + 1;
-              const href = query ? `/theatre/?q=${encodeURIComponent(query)}&page=${item}` : `/theatre/?page=${item}`;
-              return item === page ? (
-                <span className="is-active" aria-current="page" key={item}>
-                  {item}
-                </span>
-              ) : (
-                <Link key={item} href={href}>
-                  {item}
-                </Link>
-              );
-            })}
-          </nav>
-        )}
-
-        {/* Stage Types Guide Section */}
+        {/* ── Stage Types Guide Section ── */}
         <section className="theatre-guide-section">
           <div className="about-section-heading">
             <p className="landing-kicker">Stage Architecture</p>
@@ -305,15 +214,15 @@ export default async function Theatres({
           </div>
         </section>
 
-        {/* Venue Owner CTA */}
+        {/* ── Venue Owner CTA ── */}
         <section className="theatre-register-cta">
           <div className="theatre-cta-box">
             <div className="theatre-cta-text">
-              <p className="landing-kicker">For Stage Managers</p>
+              <p className="landing-kicker">For Stage Managers &amp; Organizers</p>
               <h2>Do you operate a theatre space or auditorium?</h2>
               <p>
                 List your venue on TheatreHub to reach thousands of theatre-goers, display your upcoming show dates,
-                and manage booking announcements in one central hub.
+                and manage booking announcements in Nepal&apos;s central theatre hub.
               </p>
             </div>
             <div className="theatre-cta-actions">
@@ -323,7 +232,7 @@ export default async function Theatres({
             </div>
           </div>
         </section>
-      </PageFrame>
-    </>
+      </main>
+    </div>
   );
 }
