@@ -5,7 +5,11 @@ import Link from "next/link";
 
 const CONTACT_REASONS = [
   {
-    emoji: "🎬",
+    icon: (
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="#e0723e" aria-hidden="true">
+        <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+      </svg>
+    ),
     title: "List a production",
     detail: "Get your play, musical, or dance show listed on TheatreHub with description, schedule, venue, and ticketing info.",
     href: "/signup/",
@@ -13,7 +17,11 @@ const CONTACT_REASONS = [
     tag: "Producers & Directors",
   },
   {
-    emoji: "🏛️",
+    icon: (
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="#e0723e" aria-hidden="true">
+        <path d="M12 2L2 7v2h20V7L12 2zM4 11v8h3v-8H4zm6 0v8h4v-8h-4zm7 0v8h3v-8h-3zm-15 10v2h20v-2H2z"/>
+      </svg>
+    ),
     title: "Register a venue",
     detail: "Theatre owners and hall managers can showcase their venue, publish stage details, and link upcoming performances.",
     href: "/signup/",
@@ -21,7 +29,11 @@ const CONTACT_REASONS = [
     tag: "Venue Managers",
   },
   {
-    emoji: "📰",
+    icon: (
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="#e0723e" aria-hidden="true">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+      </svg>
+    ),
     title: "Submit a story",
     detail: "Writers, critics, and theatre scholars can pitch articles, director interviews, and reviews for our blog.",
     href: "mailto:stories@theatrehub.org",
@@ -29,7 +41,11 @@ const CONTACT_REASONS = [
     tag: "Writers & Critics",
   },
   {
-    emoji: "🤝",
+    icon: (
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="#e0723e" aria-hidden="true">
+        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+      </svg>
+    ),
     title: "Partner with us",
     detail: "Festival organizers, cultural organizations, and sponsors — let's collaborate to build Nepal's theatre ecosystem.",
     href: "mailto:partners@theatrehub.org",
@@ -106,7 +122,7 @@ export default function ContactPage() {
               {CONTACT_REASONS.map((r) => (
                 <article className="contact-reason-card" key={r.title}>
                   <div className="contact-reason-top">
-                    <span className="contact-reason-emoji" aria-hidden="true">{r.emoji}</span>
+                    <span className="contact-reason-icon-wrap" aria-hidden="true">{r.icon}</span>
                     <span className="contact-reason-tag">{r.tag}</span>
                   </div>
                   <h3>{r.title}</h3>
@@ -208,7 +224,7 @@ export default function ContactPage() {
                       name="message"
                       className="contact-input contact-textarea"
                       placeholder="Share details about your show, venue, or inquiry..."
-                      rows={5}
+                      rows={3}
                       required
                     />
                   </div>
@@ -233,73 +249,147 @@ export default function ContactPage() {
 
             {/* Sidebar */}
             <aside className="contact-sidebar">
+              {/* Direct Emails Tile Card */}
               <div className="contact-info-card">
                 <div className="contact-card-title">
-                  <span className="contact-card-icon">✉️</span>
-                  <h3>Direct Emails</h3>
+                  <div className="contact-card-icon-wrap">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="#e0723e" aria-hidden="true">
+                      <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3>Direct Emails</h3>
+                    <p className="contact-card-subtitle">Direct desks for specific inquiries</p>
+                  </div>
                 </div>
-                <ul className="contact-info-list">
-                  <li>
-                    <span className="contact-info-label">General &amp; Support</span>
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@theatrehub.org" target="_blank" rel="noopener noreferrer">hello@theatrehub.org</a>
-                  </li>
-                  <li>
-                    <span className="contact-info-label">Editorial &amp; Stories</span>
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=stories@theatrehub.org" target="_blank" rel="noopener noreferrer">stories@theatrehub.org</a>
-                  </li>
-                  <li>
-                    <span className="contact-info-label">Partnerships</span>
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=partners@theatrehub.org" target="_blank" rel="noopener noreferrer">partners@theatrehub.org</a>
-                  </li>
-                </ul>
+
+                <div className="contact-email-tiles">
+                  <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@theatrehub.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-email-tile"
+                  >
+                    <div className="contact-tile-avatar">
+                      <svg viewBox="0 0 24 24" width="26" height="26" fill="#e0723e" aria-hidden="true">
+                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+                      </svg>
+                    </div>
+                    <div className="contact-tile-text">
+                      <strong>General &amp; Support</strong>
+                      <span>hello@theatrehub.org</span>
+                    </div>
+                    <span className="contact-tile-arrow" aria-hidden="true">→</span>
+                  </a>
+
+                  <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=stories@theatrehub.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-email-tile"
+                  >
+                    <div className="contact-tile-avatar">
+                      <svg viewBox="0 0 24 24" width="26" height="26" fill="#e0723e" aria-hidden="true">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                      </svg>
+                    </div>
+                    <div className="contact-tile-text">
+                      <strong>Editorial &amp; Stories</strong>
+                      <span>stories@theatrehub.org</span>
+                    </div>
+                    <span className="contact-tile-arrow" aria-hidden="true">→</span>
+                  </a>
+
+                  <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=partners@theatrehub.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-email-tile"
+                  >
+                    <div className="contact-tile-avatar">
+                      <svg viewBox="0 0 24 24" width="26" height="26" fill="#e0723e" aria-hidden="true">
+                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                      </svg>
+                    </div>
+                    <div className="contact-tile-text">
+                      <strong>Partnerships &amp; Brands</strong>
+                      <span>partners@theatrehub.org</span>
+                    </div>
+                    <span className="contact-tile-arrow" aria-hidden="true">→</span>
+                  </a>
+                </div>
               </div>
 
-              <div className="contact-info-card">
-                <div className="contact-card-title">
-                  <span className="contact-card-icon">⚡</span>
-                  <h3>Response SLAs</h3>
-                </div>
-                <ul className="contact-response-list">
-                  <li>
-                    <span>General inquiries</span>
-                    <strong className="contact-sla-badge">≤ 1 day</strong>
-                  </li>
-                  <li>
-                    <span>Show listings</span>
-                    <strong className="contact-sla-badge contact-sla-fast">≤ 24 hours</strong>
-                  </li>
-                  <li>
-                    <span>Partnerships</span>
-                    <strong className="contact-sla-badge">2–3 days</strong>
-                  </li>
-                </ul>
-              </div>
-
+              {/* Connect & Join Community Card */}
               <div className="contact-social-card">
-                <h3>Connect &amp; Join Community</h3>
-                <p>Stay updated with instant show announcements, director interviews, and stage updates.</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div className="contact-card-title">
+                  <div className="contact-card-icon-wrap">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="#e0723e" aria-hidden="true">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3>Connect &amp; Community</h3>
+                    <p className="contact-card-subtitle">Instant show alerts &amp; artist discussions</p>
+                  </div>
+                </div>
+
+                <div className="contact-email-tiles">
                   <a
                     href="https://chat.whatsapp.com/KloK0eNsAv7CAEb8MuQdXK"
                     target="_blank"
                     rel="noreferrer"
-                    className="contact-facebook"
-                    style={{ background: "#25D366", borderColor: "#25D366", color: "#fff" }}
+                    className="contact-email-tile"
                     aria-label="Join Official WhatsApp Group"
                   >
-                    💬 Join Official WhatsApp Group
+                    <div className="contact-tile-avatar">
+                      <svg viewBox="0 0 24 24" width="28" height="28" fill="#25D366" aria-hidden="true">
+                        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.06-1.07l-.29-.17-3.02.79.81-2.94-.19-.3a8.216 8.216 0 0 1-1.25-4.36c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.66c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.07-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43l-.47-.01c-.17 0-.43.06-.66.31-.23.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.55.12.17 1.74 2.65 4.21 3.72.59.25 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.12-.22-.19-.47-.31z"/>
+                      </svg>
+                    </div>
+                    <div className="contact-tile-text">
+                      <strong>Official WhatsApp Group</strong>
+                      <span>Live show alerts &amp; artist community</span>
+                    </div>
+                    <span className="contact-tile-arrow" aria-hidden="true">→</span>
                   </a>
+
                   <a
                     href="https://www.facebook.com/theatrehub.org"
                     target="_blank"
                     rel="noreferrer"
-                    className="contact-facebook"
+                    className="contact-email-tile"
                     aria-label="TheatreHub on Facebook"
                   >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14.2 8.2V6.6c0-.8.5-1 1-1h2.6V2h-3.5c-3.5 0-4.7 2.1-4.7 4.6v1.6H7v4h2.6V22h4.6v-9.8h3.1l.5-4h-3.6Z" />
-                    </svg>
-                    Follow on Facebook
+                    <div className="contact-tile-avatar">
+                      <svg viewBox="0 0 24 24" width="28" height="28" fill="#1877F2" aria-hidden="true">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                    </div>
+                    <div className="contact-tile-text">
+                      <strong>Facebook Page</strong>
+                      <span>Event updates &amp; stage photos</span>
+                    </div>
+                    <span className="contact-tile-arrow" aria-hidden="true">→</span>
+                  </a>
+
+                  <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@theatrehub.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-email-tile"
+                    aria-label="Email TheatreHub Team"
+                  >
+                    <div className="contact-tile-avatar">
+                      <svg viewBox="0 0 24 24" width="28" height="28" fill="#EA4335" aria-hidden="true">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+                      </svg>
+                    </div>
+                    <div className="contact-tile-text">
+                      <strong>Send Direct Email</strong>
+                      <span>hello@theatrehub.org</span>
+                    </div>
+                    <span className="contact-tile-arrow" aria-hidden="true">→</span>
                   </a>
                 </div>
               </div>
