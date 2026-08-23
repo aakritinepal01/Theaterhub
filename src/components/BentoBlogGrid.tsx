@@ -6,39 +6,86 @@ export type BentoBlogPost = {
   slug: string;
   image: string | null;
   excerpt: string;
+  date: string;
   categories: string[];
+  readTime?: string;
 };
 
-type IconKind = "camera" | "idea" | "film" | "people" | "article";
+// Curated theatre/stage/performance Unsplash fallback images per post id
+const THEATRE_FALLBACKS: Record<number, string> = {
+  1:  "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=1200&q=80",  // stage spotlight
+  3:  "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=1200&q=80",  // theatre interior
+  5:  "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",  // dramatic lighting
+  6:  "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",  // performance
+  7:  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80",  // stage curtain
+  8:  "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=1200&q=80",  // dramatic scene
+  9:  "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=1200&q=80",  // masks
+  10: "https://images.unsplash.com/photo-1504804884814-d58d4c9b0a35?auto=format&fit=crop&w=1200&q=80",  // epic stage
+  11: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=1200&q=80",  // letter / scroll
+  12: "https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?auto=format&fit=crop&w=1200&q=80",  // newsletter / paper
+};
 
-function chooseIcon(categories: string[], index: number): IconKind {
-  const value = categories.join(" ").toLowerCase();
-  if (/(photo|camera|gallery|behind)/.test(value)) return "camera";
-  if (/(review|opinion|idea|insight)/.test(value)) return "idea";
-  if (/(film|play|production|performance|theatre|theater)/.test(value)) return "film";
-  if (/(interview|cast|artist|profile|people|community)/.test(value)) return "people";
-  return (["article", "film", "camera", "people"] as IconKind[])[index % 4];
-}
+const GENERIC_FALLBACKS = [
+  "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80",
+];
 
-function TopicIcon({ kind }: { kind: IconKind }) {
-  if (kind === "camera") return <svg viewBox="0 0 24 24"><path d="M4 7h3l1.5-2h7L17 7h3v12H4V7Z"/><circle cx="12" cy="13" r="3.5"/></svg>;
-  if (kind === "idea") return <svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M8.2 15.4A7 7 0 1 1 15.8 15.4C14.7 16.2 14.3 17 14.2 18h-4.4c-.1-1-.5-1.8-1.6-2.6Z"/></svg>;
-  if (kind === "film") return <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="7.5" r="1.6"/><circle cx="16.2" cy="12" r="1.6"/><circle cx="12" cy="16.5" r="1.6"/><circle cx="7.8" cy="12" r="1.6"/><path d="M18.5 18.5 22 22"/></svg>;
-  if (kind === "people") return <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c.3-4 2.4-6 6-6s5.7 2 6 6M15 15c3.3-.4 5.2 1.3 5.5 4.5"/></svg>;
-  return <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6V3Z"/><path d="M15 3v5h4M9 12h7M9 16h7"/></svg>;
+function getPostImage(post: BentoBlogPost): string {
+  if (post.image) return post.image;
+  return THEATRE_FALLBACKS[post.id] ?? GENERIC_FALLBACKS[post.id % GENERIC_FALLBACKS.length];
 }
 
 export function BentoBlogGrid({ posts }: { posts: BentoBlogPost[] }) {
-  return <section className="bento-blog-grid" aria-label="Featured blog stories">
-    {posts.map((post, index) => <Link className={`bento-blog-card bento-blog-card-${index + 1}`} href={`/blog/${post.slug}/`} key={post.id}>
-      {post.image ? <img src={post.image} alt="" /> : <span className="bento-blog-fallback" />}
-      <span className="bento-blog-overlay" />
-      <span className="bento-blog-copy">
-        <span className="bento-blog-icon" aria-hidden="true"><TopicIcon kind={chooseIcon(post.categories, index)} /></span>
-        <strong>{post.title}</strong>
-        <span className="bento-blog-excerpt">{post.excerpt}</span>
-        <span className="bento-blog-more">Read More <i aria-hidden="true">→</i></span>
-      </span>
-    </Link>)}
-  </section>;
+  if (!posts.length) return null;
+
+  // First post is hero; rest are secondary
+  const [hero, ...rest] = posts;
+
+  return (
+    <section className="bento2-grid" aria-label="Featured blog stories">
+      {/* ── HERO CARD ── */}
+      <Link className="bento2-hero" href={`/blog/${hero.slug}/`}>
+        <img src={getPostImage(hero)} alt={hero.title} className="bento2-img" loading="eager" />
+        <div className="bento2-overlay" />
+        <div className="bento2-hero-body">
+          {hero.categories[0] && (
+            <span className="bento2-cat">{hero.categories[0]}</span>
+          )}
+          <h2 className="bento2-hero-title">{hero.title}</h2>
+          <p className="bento2-hero-excerpt">{hero.excerpt}</p>
+          <div className="bento2-meta">
+            <span>{hero.date}</span>
+            {hero.readTime && <span>· {hero.readTime}</span>}
+            <span className="bento2-read-link">Read Story →</span>
+          </div>
+        </div>
+      </Link>
+
+      {/* ── SECONDARY CARDS ── */}
+      {rest.length > 0 && (
+        <div className="bento2-secondaries">
+          {rest.map((post) => (
+            <Link key={post.id} className="bento2-secondary" href={`/blog/${post.slug}/`}>
+              <div className="bento2-secondary-img-wrap">
+                <img src={getPostImage(post)} alt={post.title} className="bento2-img" loading="lazy" />
+                <div className="bento2-overlay bento2-overlay-light" />
+              </div>
+              <div className="bento2-secondary-body">
+                {post.categories[0] && (
+                  <span className="bento2-cat bento2-cat-sm">{post.categories[0]}</span>
+                )}
+                <h3 className="bento2-secondary-title">{post.title}</h3>
+                <div className="bento2-meta bento2-meta-sm">
+                  <span>{post.date}</span>
+                  {post.readTime && <span>· {post.readTime}</span>}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
 }

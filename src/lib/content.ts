@@ -41,6 +41,34 @@ const ARTIST_PORTRAITS = [
   "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=500&q=80"
 ];
 
+const THEATRE_PHOTOS: Record<number, string> = {
+  1: "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=1200&q=80", // Mandala
+  2: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80", // Theatre Village
+  3: "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=1200&q=80", // Shilpee
+  4: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80", // Sarwanam
+  5: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80", // Theatre Mall
+  6: "https://images.unsplash.com/photo-1504804884814-d58d4c9b0a35?auto=format&fit=crop&w=1200&q=80", // Pokhara Theatre
+  7: "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=1200&q=80", // Kausi Theatre
+  8: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=1200&q=80", // Studio 7
+  9: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=1200&q=80", // Aarohan Gurukul
+  10: "https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?auto=format&fit=crop&w=1200&q=80", // RCSC
+  11: "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80", // Kunja Natak Ghar
+};
+
+const GENERIC_THEATRE_PHOTOS = [
+  "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",
+];
+
+export function getTheatrePhoto(theatre: { id: number; coverImage?: string | null }) {
+  if (theatre.coverImage) {
+    const url = mediaUrl(theatre.coverImage);
+    if (url) return url;
+  }
+  return THEATRE_PHOTOS[theatre.id] ?? GENERIC_THEATRE_PHOTOS[theatre.id % GENERIC_THEATRE_PHOTOS.length];
+}
+
 export function getArtistPhoto(artist: { id: number; profilePic?: string | null }) {
   if (artist.profilePic) {
     const url = mediaUrl(artist.profilePic);
