@@ -405,8 +405,17 @@ export default function AboutPage() {
                 <Link href="/signup/" className="au-btn-primary au-btn-lg">
                   Join TheatreHub — it&apos;s free
                 </Link>
+                <a
+                  href="https://chat.whatsapp.com/KloK0eNsAv7CAEb8MuQdXK"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="au-btn-outline au-btn-lg"
+                  style={{ borderColor: "#25D366", color: "#25D366" }}
+                >
+                  💬 Join WhatsApp Group
+                </a>
                 <Link href="/contact-us/" className="au-btn-outline au-btn-lg">
-                  Contact our team
+                  Contact team
                 </Link>
               </div>
             </div>
