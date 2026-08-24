@@ -47,7 +47,15 @@ export function BentoBlogGrid({ posts }: { posts: BentoBlogPost[] }) {
     <section className="bento2-grid" aria-label="Featured blog stories">
       {/* ── HERO CARD ── */}
       <Link className="bento2-hero" href={`/blog/${hero.slug}/`}>
-        <img src={getPostImage(hero)} alt={hero.title} className="bento2-img" loading="eager" />
+        <img
+          src={getPostImage(hero)}
+          alt={hero.title}
+          className="bento2-img"
+          loading="eager"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = THEATRE_FALLBACKS[hero.id] ?? GENERIC_FALLBACKS[0];
+          }}
+        />
         <div className="bento2-overlay" />
         <div className="bento2-hero-body">
           {hero.categories[0] && (
@@ -69,7 +77,15 @@ export function BentoBlogGrid({ posts }: { posts: BentoBlogPost[] }) {
           {rest.map((post) => (
             <Link key={post.id} className="bento2-secondary" href={`/blog/${post.slug}/`}>
               <div className="bento2-secondary-img-wrap">
-                <img src={getPostImage(post)} alt={post.title} className="bento2-img" loading="lazy" />
+                <img
+                  src={getPostImage(post)}
+                  alt={post.title}
+                  className="bento2-img"
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = THEATRE_FALLBACKS[post.id] ?? GENERIC_FALLBACKS[post.id % GENERIC_FALLBACKS.length];
+                  }}
+                />
                 <div className="bento2-overlay bento2-overlay-light" />
               </div>
               <div className="bento2-secondary-body">

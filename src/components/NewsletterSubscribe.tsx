@@ -79,21 +79,23 @@ export function NewsletterSubscribe({ compact = false }: { compact?: boolean }) 
         ) : (
           <form className="newsletter-main-form" onSubmit={handleSubmit}>
             <div className="newsletter-input-group">
-              <svg className="newsletter-mail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
-              </svg>
-              <input
-                type="email"
-                placeholder="Enter your email (e.g. artist@theatrehub.org)"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (status === "error") setStatus("idle");
-                }}
-                className="newsletter-big-input"
-                required
-              />
+              <div className="newsletter-input-wrap">
+                <svg className="newsletter-mail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+                <input
+                  type="email"
+                  placeholder="Enter your email address..."
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (status === "error") setStatus("idle");
+                  }}
+                  className="newsletter-big-input"
+                  required
+                />
+              </div>
               <button type="submit" className="newsletter-big-btn" disabled={status === "loading"}>
                 {status === "loading" ? "Joining..." : "Subscribe Free"}
               </button>
