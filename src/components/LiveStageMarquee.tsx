@@ -70,60 +70,65 @@ export function LiveStageMarquee({
       {/* Background Ambient Glow FX */}
       <div className="live-marquee-bg-glow" aria-hidden="true" />
 
-      <div className="site-container live-marquee-header-row">
-        <div className="live-marquee-header-left">
-          <div className="live-marquee-badge">
-            <span className="live-dot-pulse" />
-            <span>PLAYING NOW IN NEPAL</span>
+      <div className="site-container">
+        <div className="live-marquee-header-row">
+          <div className="live-marquee-heading-group">
+            <div className="live-marquee-kicker">
+              <span className="live-dot-pulse" />
+              <span>LIVE STAGE FEED</span>
+            </div>
+            <h2 className="live-marquee-title-heading">Playing Now in Nepal</h2>
+            <p className="live-marquee-subtext">
+              🎭 {items.length} Stage Shows Active Across Nepal · Real-time Showtimes &amp; Box Office Tickets
+            </p>
           </div>
-          <span className="live-marquee-sub">
-            🎭 <strong>{items.length}</strong> Stage Shows Active Across Nepal
-          </span>
+
+          <div className="live-marquee-header-meta">
+            <span className="live-marquee-status-pill">
+              📍 Active Kathmandu &amp; Regional Stages
+            </span>
+          </div>
         </div>
 
-        <div className="live-marquee-header-right">
-          <span className="live-marquee-hint">⚡ Auto-scrolling live feed · Hover to pause</span>
-        </div>
-      </div>
+        <div className="live-marquee-container">
+          <div className="live-marquee-track">
+            {loopItems.map((item, index) => (
+              <Link
+                key={`${item.id}-${index}`}
+                href={`/play/${item.slug}/`}
+                className="live-marquee-card"
+              >
+                {/* Card Poster Image with Status Pill */}
+                <div className="live-marquee-thumb">
+                  {item.image ? (
+                    <img src={item.image} alt={item.title} />
+                  ) : (
+                    <div className="live-marquee-thumb-fallback">
+                      <span>🎭</span>
+                    </div>
+                  )}
+                  <span className="live-thumb-live-tag">LIVE</span>
+                </div>
 
-      <div className="live-marquee-container">
-        <div className="live-marquee-track">
-          {loopItems.map((item, index) => (
-            <Link
-              key={`${item.id}-${index}`}
-              href={`/play/${item.slug}/`}
-              className="live-marquee-card"
-            >
-              {/* Card Poster Image with Status Pill */}
-              <div className="live-marquee-thumb">
-                {item.image ? (
-                  <img src={item.image} alt={item.title} />
-                ) : (
-                  <div className="live-marquee-thumb-fallback">
-                    <span>🎭</span>
+                {/* Card Main Info */}
+                <div className="live-marquee-info">
+                  <div className="live-marquee-meta-line">
+                    <span className="live-time-chip">🕒 {item.timeText}</span>
+                    <span className="live-price-pill">{item.price}</span>
                   </div>
-                )}
-                <span className="live-thumb-live-tag">LIVE</span>
-              </div>
 
-              {/* Card Main Info */}
-              <div className="live-marquee-info">
-                <div className="live-marquee-meta-line">
-                  <span className="live-time-chip">🕒 {item.timeText}</span>
-                  <span className="live-price-pill">{item.price}</span>
+                  <h4 className="live-marquee-title">{item.title}</h4>
+
+                  <div className="live-marquee-bottom-row">
+                    <p className="live-marquee-venue">📍 {item.venue}</p>
+                    <span className="live-card-btn">
+                      Get Tickets <span aria-hidden="true">→</span>
+                    </span>
+                  </div>
                 </div>
-
-                <h4 className="live-marquee-title">{item.title}</h4>
-
-                <div className="live-marquee-bottom-row">
-                  <p className="live-marquee-venue">📍 {item.venue}</p>
-                  <span className="live-card-btn">
-                    Get Tickets <span aria-hidden="true">→</span>
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>
