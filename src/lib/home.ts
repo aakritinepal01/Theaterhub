@@ -7,6 +7,13 @@ const playCardInclude = {
     orderBy: { showtime: "asc" as const },
     take: 1,
   },
+  theatre: true,
+  makers: {
+    include: {
+      profile: true,
+    },
+    orderBy: { order: "asc" as const },
+  },
 };
 
 export async function getFeaturedPlays() {
