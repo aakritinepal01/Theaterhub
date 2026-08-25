@@ -9,7 +9,7 @@ type LiveShow = {
   price: number | null;
   play: {
     title: string;
-    slug: string;
+    slug: string | null;
     coverImage?: string | null;
   };
   theatre: {
@@ -20,7 +20,7 @@ type LiveShow = {
 type LivePlay = {
   id: number;
   title: string;
-  slug: string;
+  slug: string | null;
   coverImage?: string | null;
   shows: Array<{ showtime: Date }>;
 };
@@ -34,31 +34,35 @@ export function LiveStageMarquee({
 }) {
   // Combine shows and plays into detailed live ticker items
   const items = shows.length
-    ? shows.map((s) => ({
-        id: `show-${s.id}`,
-        title: s.play.title,
-        slug: s.play.slug,
-        venue: s.theatre.title,
-        price: s.price != null ? `NPR ${s.price.toLocaleString()}` : "Free RSVP",
-        image: mediaUrl(s.play.coverImage),
-        timeText: new Intl.DateTimeFormat("en-NP", {
-          weekday: "short",
-          month: "short",
-          day: "2-digit",
-          hour: "numeric",
-          minute: "2-digit",
-          timeZone: "Asia/Kathmandu",
-        }).format(new Date(s.showtime)),
-      }))
-    : plays.map((p) => ({
-        id: `play-${p.id}`,
-        title: p.title,
-        slug: p.slug,
-        venue: "Kathmandu Stages",
-        price: "Box Office",
-        image: mediaUrl(p.coverImage),
-        timeText: "On Stage Today",
-      }));
+    ? shows
+        .filter((s) => s.play.slug) // Only include items with valid slugs
+        .map((s) => ({
+          id: `show-${s.id}`,
+          title: s.play.title,
+          slug: s.play.slug!,
+          venue: s.theatre.title,
+          price: s.price != null ? `NPR ${s.price.toLocaleString()}` : "Free RSVP",
+          image: mediaUrl(s.play.coverImage),
+          timeText: new Intl.DateTimeFormat("en-NP", {
+            weekday: "short",
+            month: "short",
+            day: "2-digit",
+            hour: "numeric",
+            minute: "2-digit",
+            timeZone: "Asia/Kathmandu",
+          }).format(new Date(s.showtime)),
+        }))
+    : plays
+        .filter((p) => p.slug) // Only include items with valid slugs
+        .map((p) => ({
+          id: `play-${p.id}`,
+          title: p.title,
+          slug: p.slug!,
+          venue: "Kathmandu Stages",
+          price: "Box Office",
+          image: mediaUrl(p.coverImage),
+          timeText: "On Stage Today",
+        }));
 
   if (!items.length) return null;
 
