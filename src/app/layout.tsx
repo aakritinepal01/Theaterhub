@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/SiteShell";
 import { Footer } from "@/components/Footer";
+import { TheatreCurtainSplash } from "@/components/TheatreCurtainSplash";
 
 export const metadata:Metadata={
   title:{default:"TheatreHub",template:"%s | TheatreHub"},
@@ -14,4 +15,4 @@ export const metadata:Metadata={
 };
 export const dynamic = "force-dynamic";
 const themeScript = `try{document.documentElement.dataset.theme=localStorage.getItem("theaterhub-theme")==="dark"?"dark":"light"}catch{document.documentElement.dataset.theme="light"}`;
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en" suppressHydrationWarning><body><script dangerouslySetInnerHTML={{__html:themeScript}}/><Header/>{children}<Footer/></body></html>}
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en" suppressHydrationWarning><body><script dangerouslySetInnerHTML={{__html:themeScript}}/><TheatreCurtainSplash/><Header/>{children}<Footer/></body></html>}
