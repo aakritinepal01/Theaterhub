@@ -50,7 +50,14 @@ export default async function Plays({ searchParams }: { searchParams: Promise<{ 
         orderBy: { launchedOn: "desc" },
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
-        include: { shows: { where: { showtime: { gt: now } }, take: 1 } },
+        include: {
+          shows: { where: { showtime: { gt: now } }, take: 1 },
+          theatre: true,
+          makers: {
+            include: { profile: true },
+            orderBy: { order: "asc" },
+          },
+        },
       })
     );
   } catch (error) {
@@ -126,7 +133,7 @@ export default async function Plays({ searchParams }: { searchParams: Promise<{ 
         </section>
 
         {plays.length ? (
-          <div className="play-list-grid play-list-grid-animated">
+          <div className="landing-play-grid play-list-grid-animated">
             {plays.map((play) => (
               <PlayCard key={play.id} play={play} />
             ))}

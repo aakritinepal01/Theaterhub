@@ -89,7 +89,7 @@ export default async function BlogPostPage({
           <nav className="post-breadcrumbs" aria-label="Breadcrumbs">
             <Link href="/">Home</Link>
             <span aria-hidden="true">/</span>
-            <Link href="/blog/">Blog</Link>
+            <Link href="/blog/">News</Link>
             <span aria-hidden="true">/</span>
             <span className="current-crumb">{post.title}</span>
           </nav>

@@ -69,7 +69,7 @@ export function Footer() {
           <ul className="footer-links">
             <li><Link href="/play/">Plays Catalog</Link></li>
             <li><Link href="/theatre/">Theatre Venues</Link></li>
-            <li><Link href="/blog/">Stories &amp; Articles</Link></li>
+            <li><Link href="/blog/">News &amp; Stories</Link></li>
             <li><Link href="/search/">Search Archive</Link></li>
           </ul>
         </div>
