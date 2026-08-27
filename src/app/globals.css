@@ -1033,43 +1033,53 @@ html[data-theme="dark"] .back-btn:hover {
   transform: translateX(3px);
 }
 
-.play-list-grid-animated .play-list-card {
+.play-list-grid-animated .play-list-card,
+.play-list-grid-animated .landing-play-card {
   animation: playFadeUp .54s ease both;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(1) {
+.play-list-grid-animated .play-list-card:nth-child(1),
+.play-list-grid-animated .landing-play-card:nth-child(1) {
   animation-delay: .02s;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(2) {
+.play-list-grid-animated .play-list-card:nth-child(2),
+.play-list-grid-animated .landing-play-card:nth-child(2) {
   animation-delay: .06s;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(3) {
+.play-list-grid-animated .play-list-card:nth-child(3),
+.play-list-grid-animated .landing-play-card:nth-child(3) {
   animation-delay: .1s;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(4) {
+.play-list-grid-animated .play-list-card:nth-child(4),
+.play-list-grid-animated .landing-play-card:nth-child(4) {
   animation-delay: .14s;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(5) {
+.play-list-grid-animated .play-list-card:nth-child(5),
+.play-list-grid-animated .landing-play-card:nth-child(5) {
   animation-delay: .18s;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(6) {
+.play-list-grid-animated .play-list-card:nth-child(6),
+.play-list-grid-animated .landing-play-card:nth-child(6) {
   animation-delay: .22s;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(7) {
+.play-list-grid-animated .play-list-card:nth-child(7),
+.play-list-grid-animated .landing-play-card:nth-child(7) {
   animation-delay: .26s;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(8) {
+.play-list-grid-animated .play-list-card:nth-child(8),
+.play-list-grid-animated .landing-play-card:nth-child(8) {
   animation-delay: .3s;
 }
 
-.play-list-grid-animated .play-list-card:nth-child(9) {
+.play-list-grid-animated .play-list-card:nth-child(9),
+.play-list-grid-animated .landing-play-card:nth-child(9) {
   animation-delay: .34s;
 }
 
@@ -2086,8 +2096,6 @@ header.site-container.theatre-page-header h1 {
 .landing-hero-content {
   position: relative;
   z-index: 1;
-  width: 90%;
-  max-width: none;
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
   align-items: center;
