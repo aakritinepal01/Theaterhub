@@ -7,7 +7,7 @@ import { Logo } from "@/components/Logo";
 import { BackButton } from "@/components/BackButton";
 
 type NavLink = { label: string; href: string };
-type NavUser = { username: string; isStaff: boolean; profileSlug?: string | null } | null;
+type NavUser = { username: string; isStaff: boolean; isSuperuser: boolean } | null;
 type ThemeMode = "light" | "dark";
 
 export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: NavUser; logoutAction: () => Promise<void> }) {
@@ -36,8 +36,9 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
     } catch {
       nextTheme = "light";
     }
-    setTheme(nextTheme);
+    const frame = window.requestAnimationFrame(() => setTheme(nextTheme));
     document.documentElement.dataset.theme = nextTheme;
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const toggleTheme = () => {
@@ -98,11 +99,11 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
             )}
           </span>
         </button>
+        {!user && <Link className="nav-login" href="/login">Login</Link>}
         {user && <details className="nav-account">
           <summary aria-label="Open account menu"><span className="nav-avatar">{user.username.slice(0, 1).toUpperCase()}</span><span className="nav-username">{user.username}</span></summary>
           <div className="nav-account-menu">
-            {user.profileSlug && <Link href={`/profile/${user.profileSlug}/`}>Profile</Link>}
-            {user.isStaff && <Link href="/admin/">Administration</Link>}
+            {user.isStaff || user.isSuperuser ? <Link href="/admin">Admin Panel</Link> : <Link href="/theatre-dashboard">My Dashboard</Link>}
             <form action={logoutAction}><button type="submit">Logout</button></form>
           </div>
         </details>}
@@ -114,6 +115,10 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
     <nav className="nav-mobile" id="mobile-navigation" aria-label="Mobile navigation">
       <div className="site-container">
         {links.map(link => <Link aria-current={isActive(link.href) ? "page" : undefined} className={isActive(link.href) ? "is-active" : ""} href={link.href} key={link.href} onClick={() => setOpen(false)}>{link.label}<span aria-hidden="true">→</span></Link>)}
+        {!user ? <Link href="/login" onClick={() => setOpen(false)}>Login<span aria-hidden="true">→</span></Link> : <>
+          <Link href={user.isStaff || user.isSuperuser ? "/admin" : "/theatre-dashboard"} onClick={() => setOpen(false)}>{user.isStaff || user.isSuperuser ? "Admin Panel" : "My Dashboard"}<span aria-hidden="true">→</span></Link>
+          <form action={logoutAction} className="nav-mobile-logout"><button type="submit">Logout</button></form>
+        </>}
       </div>
     </nav>
   </header>;
