@@ -16,13 +16,21 @@ export async function currentUser() {
 
 export async function requireStaff() {
   const user = await currentUser();
-  if (!user?.isStaff) throw new Error("UNAUTHORIZED");
+  if (!user || (!user.isStaff && !user.isSuperuser)) throw new Error("UNAUTHORIZED");
+  if (!user.isPasswordChanged) throw new Error("PASSWORD_CHANGE_REQUIRED");
+  return user;
+}
+
+export async function requireTheatreUser() {
+  const user = await currentUser();
+  if (!user || user.isStaff || user.isSuperuser) throw new Error("UNAUTHORIZED");
+  if (!user.isPasswordChanged) throw new Error("PASSWORD_CHANGE_REQUIRED");
   return user;
 }
 
 export async function createSession(userId: number) {
   const token = randomBytes(32).toString("base64url");
-  const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   await prisma.session.create({ data: { tokenHash: hash(token), userId, expiresAt } });
   (await cookies()).set(COOKIE, token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", expires: expiresAt, path: "/" });
 }
