@@ -15,7 +15,6 @@ const errors:Record<string,string>={
 export default async function CreateUser({searchParams}:{searchParams:Promise<Record<string,string|undefined>>}){
   const user=await currentUser();
   if(!user||(!user.isStaff&&!user.isSuperuser))redirect("/login");
-  if(!user.isPasswordChanged)redirect("/set-new-password");
   const query=await searchParams;
   return <main className="manage-page"><div className="manage-shell">
     <nav className="manage-nav"><Link href="/admin">Administration</Link><Link href="/admin/theatres">Manage theatres</Link></nav>

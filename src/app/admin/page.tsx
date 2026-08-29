@@ -22,7 +22,6 @@ function Icon({name}:{name:IconName}) {
 export default async function Admin(){
   const user=await currentUser();
   if(!user||(!user.isStaff&&!user.isSuperuser))redirect("/login");
-  if(!user.isPasswordChanged)redirect("/set-new-password");
 
   const [plays,profiles,theatres,schedules,posts,entries,claimed,users,recentTheatres]=await Promise.all([
     prisma.play.count(),prisma.profile.count(),prisma.theatre.count(),prisma.showsMeta.count(),prisma.blogPost.count(),prisma.formEntry.count(),
