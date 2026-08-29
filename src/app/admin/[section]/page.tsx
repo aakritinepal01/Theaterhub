@@ -6,7 +6,6 @@ import { notFound, redirect } from "next/navigation";
 export default async function Section({params}:{params:Promise<{section:string}>}){
   const user=await currentUser();
   if(!user||(!user.isStaff&&!user.isSuperuser))redirect("/login");
-  if(!user.isPasswordChanged)redirect("/set-new-password");
   const {section}=await params;
   let rows:{id:number;name:string;href?:string}[]=[];
   if(section==="plays")rows=(await prisma.play.findMany({orderBy:{title:"asc"}})).map(item=>({id:item.id,name:item.title,href:`/play/${item.slug}/`}));

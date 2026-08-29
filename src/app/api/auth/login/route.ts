@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSession, verifyPassword } from "@/lib/auth";
+import { createSession, requiresPasswordChange, verifyPassword } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
@@ -12,6 +12,6 @@ export async function POST(request: Request) {
   }
   await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
   await createSession(user.id);
-  const destination = !user.isPasswordChanged ? "/set-new-password" : user.isStaff || user.isSuperuser ? "/admin" : "/theatre-dashboard";
+  const destination = requiresPasswordChange(user) ? "/set-new-password" : user.isStaff || user.isSuperuser ? "/admin" : "/theatre-dashboard";
   return NextResponse.redirect(new URL(destination, request.url), 303);
 }

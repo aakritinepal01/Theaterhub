@@ -8,7 +8,6 @@ const show = (value:unknown) => value instanceof Date ? value.toLocaleDateString
 export default async function TheatreDetail({params}:{params:Promise<{id:string}>}) {
   const user=await currentUser();
   if(!user||(!user.isStaff&&!user.isSuperuser))redirect("/login");
-  if(!user.isPasswordChanged)redirect("/set-new-password");
   const {id}=await params;
   const theatre=await prisma.theatre.findUnique({where:{id:Number(id)},include:{owner:{select:{firstName:true,lastName:true,username:true,email:true,lastLogin:true,dateJoined:true}},plays:{orderBy:{title:"asc"}},shows:{include:{play:true},orderBy:{showtime:"desc"}},showsMeta:{include:{play:true,excludeDates:true,extraShows:true},orderBy:{startDate:"desc"}}}});
   if(!theatre)notFound();
