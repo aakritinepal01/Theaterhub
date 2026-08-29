@@ -7,24 +7,32 @@ import { prisma } from "@/lib/prisma";
 const COOKIE = "theatrehub_session";
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 
+type PasswordChangeUser = { isPasswordChanged: boolean; isStaff: boolean; isSuperuser: boolean };
+
+export function requiresPasswordChange(user: PasswordChangeUser) {
+  return !user.isStaff && !user.isSuperuser && !user.isPasswordChanged;
+}
+
 export async function currentUser() {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   const session = await prisma.session.findUnique({ where: { tokenHash: hash(token) }, include: { user: true } });
-  return session && session.expiresAt > new Date() && session.user.isActive ? session.user : null;
+  if (!session || session.expiresAt <= new Date() || !session.user.isActive) return null;
+  return session.user.isStaff || session.user.isSuperuser
+    ? { ...session.user, isPasswordChanged: true }
+    : session.user;
 }
 
 export async function requireStaff() {
   const user = await currentUser();
   if (!user || (!user.isStaff && !user.isSuperuser)) throw new Error("UNAUTHORIZED");
-  if (!user.isPasswordChanged) throw new Error("PASSWORD_CHANGE_REQUIRED");
   return user;
 }
 
 export async function requireTheatreUser() {
   const user = await currentUser();
   if (!user || user.isStaff || user.isSuperuser) throw new Error("UNAUTHORIZED");
-  if (!user.isPasswordChanged) throw new Error("PASSWORD_CHANGE_REQUIRED");
+  if (requiresPasswordChange(user)) throw new Error("PASSWORD_CHANGE_REQUIRED");
   return user;
 }
 
