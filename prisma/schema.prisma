@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  directUrl = env("DATABASE_URL")
 }
 
 enum ContentStatus {
@@ -32,6 +32,8 @@ model User {
   isActive     Boolean   @default(true)
   dateJoined   DateTime
   lastLogin    DateTime?
+  isPasswordChanged Boolean @default(false)
+  theatre      Theatre?
   profiles     Profile[]
   blogPosts    BlogPost[]
   sessions     Session[]
@@ -125,6 +127,8 @@ model Theatre {
   linkFacebook   String        @default("")
   linkTwitter    String        @default("")
   linkInstagram  String        @default("")
+  ownerId        Int?          @unique
+  owner          User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   site           Site          @relation(fields: [siteId], references: [id])
   plays          Play[]
   showsMeta      ShowsMeta[]
