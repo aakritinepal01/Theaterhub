@@ -13,7 +13,6 @@ const errors: Record<string, string> = {
   failed: "The account could not be created. Please try again.",
 };
 
-<<<<<<< HEAD
 export default async function CreateUser({
   searchParams,
 }: {
@@ -27,7 +26,7 @@ export default async function CreateUser({
 
   return (
     <main className="adm-inner-shell">
-      {/* Sidebar */}
+      {/* Sidebar Navigation */}
       <aside className="adm-inner-dock">
         <div className="adm-inner-brand">
           <Link href="/" className="adm-inner-brand-link">
@@ -55,7 +54,7 @@ export default async function CreateUser({
               <span>Productions</span>
             </Link>
             <Link href="/admin/profiles" className="adm-inner-nav-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1 0 7.75"/></svg>
               <span>Artists</span>
             </Link>
           </div>
@@ -74,7 +73,7 @@ export default async function CreateUser({
         </nav>
 
         <div className="adm-inner-dock-foot">
-          <span className="adm-inner-user-dot">{user.username.slice(0,1).toUpperCase()}</span>
+          <span className="adm-inner-user-dot">{user.username.slice(0, 1).toUpperCase()}</span>
           <div className="adm-inner-user-info">
             <strong>{user.firstName || user.username}</strong>
             <small>{user.isSuperuser ? "Superadmin" : "Staff"}</small>
@@ -82,8 +81,9 @@ export default async function CreateUser({
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Stage */}
       <section className="adm-inner-main">
+        {/* Topbar */}
         <header className="adm-inner-topbar">
           <div className="adm-inner-breadcrumb">
             <Link href="/admin" className="adm-inner-bc-link">Console</Link>
@@ -96,102 +96,209 @@ export default async function CreateUser({
         </header>
 
         <div className="adm-inner-content">
-          {/* Page Header */}
-          <div className="adm-inner-page-header">
-            <div className="adm-inner-page-icon">
+          {/* Page Banner Header */}
+          <div className="adm-inner-page-header adm-page-header-fancy">
+            <div className="adm-inner-page-icon adm-icon-glow">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
             </div>
             <div>
-              <h1>Provision Theatre Account</h1>
-              <p>Create a new theatre owner account with credentials and link it to a venue in the directory</p>
-          <div className="adm-form-card">
-            <div className="adm-form-card-header">
-              <div className="adm-form-card-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+              <div className="adm-header-badge">
+                <span className="adm-badge-pulse" />
+                <span>PROVISIONING STUDIO</span>
               </div>
-              <div>
-                <h2>Create Theatre Owner Account</h2>
-                <p>Provision credentials and grant administrative access to a registered venue.</p>
+              <h1>Provision Theatre Account</h1>
+              <p>Register a theatre owner account, generate administrative credentials, and link venue management rights.</p>
+            </div>
+          </div>
+
+          {/* 2-Column Layout */}
+          <div className="adm-create-user-layout">
+            {/* Left Column: Form Card */}
+            <div className="adm-form-card adm-card-accent-top">
+              <div className="adm-form-card-header">
+                <div className="adm-form-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+                </div>
+                <div>
+                  <h2>Create Owner Account</h2>
+                  <p>Grant administrative ownership and provision initial credentials.</p>
+                </div>
+              </div>
+
+              {/* Status Notifications */}
+              {query.error && (
+                <div className="adm-form-alert error" role="alert">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>{errors[query.error] || errors.failed}</span>
+                </div>
+              )}
+
+              {query.success && (
+                <div className="adm-form-alert success" role="alert">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <span>
+                    {query.success === "linked"
+                      ? `Successfully linked account to existing venue: ${query.theatre}`
+                      : `Successfully created owner account and registered venue: ${query.theatre}`}
+                  </span>
+                </div>
+              )}
+
+              {query.sent && (
+                <div className="adm-form-alert info" role="alert">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <span>Initial credentials dispatched to <strong>{query.sent}</strong></span>
+                </div>
+              )}
+
+              {/* Provision Form */}
+              <form className="adm-form" action="/api/admin/users" method="post">
+                {/* Theatre Name Field */}
+                <div className="adm-form-field">
+                  <label htmlFor="theatreName">
+                    Theatre / Venue Name
+                    <span className="adm-required-star">*</span>
+                  </label>
+                  <div className="adm-input-with-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="adm-input-prefix-icon"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+                    <input
+                      id="theatreName"
+                      name="theatreName"
+                      type="text"
+                      defaultValue={query.theatreName || ""}
+                      placeholder="e.g. Mandala Theatre Nepal"
+                      className="has-prefix-icon"
+                      required
+                    />
+                  </div>
+                  <span className="adm-field-hint">
+                    Auto-links if an unclaimed theatre record with this name already exists in the venue directory.
+                  </span>
+                </div>
+
+                {/* Email Field */}
+                <div className="adm-form-field">
+                  <label htmlFor="email">
+                    Administrator Email Address
+                    <span className="adm-required-star">*</span>
+                  </label>
+                  <div className="adm-input-with-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="adm-input-prefix-icon"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="owner@theatre.org.np"
+                      className="has-prefix-icon"
+                      required
+                    />
+                  </div>
+                  <span className="adm-field-hint">
+                    Login credentials and password reset dispatches will be sent to this inbox.
+                  </span>
+                </div>
+
+                <div className="adm-form-divider" />
+
+                {/* Password Fields with Live Strength Meter */}
+                <PasswordFields />
+
+                {/* Actions */}
+                <div className="adm-form-actions">
+                  <button type="submit" className="adm-btn-submit adm-btn-glow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+                    <span>Provision Account & Send Credentials</span>
+                  </button>
+                </div>
+              </form>
+
+              <div className="adm-form-footer">
+                <p>Need to verify existing venue profiles first?</p>
+                <div className="adm-form-info-links">
+                  <Link href="/admin/theatres">Browse venue directory →</Link>
+                </div>
               </div>
             </div>
 
-            {query.error && (
-              <div className="adm-form-alert error" role="alert">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span>{errors[query.error] || errors.failed}</span>
-              </div>
-            )}
+            {/* Right Column: Studio Guidance & Workflow Assistant */}
+            <div className="adm-side-guide-column">
+              {/* Card 1: Provisioning Workflow Steps */}
+              <div className="adm-guide-card">
+                <div className="adm-guide-card-header">
+                  <div className="adm-guide-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                  </div>
+                  <div>
+                    <h3>Provisioning Workflow</h3>
+                    <p>Automated provisioning sequence</p>
+                  </div>
+                </div>
 
-            {query.success && (
-              <div className="adm-form-alert success" role="alert">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span>
-                  {query.success === "linked"
-                    ? `Successfully linked to existing theatre: ${query.theatre}`
-                    : `Successfully created new theatre: ${query.theatre}`}
-                </span>
-              </div>
-            )}
+                <div className="adm-workflow-steps">
+                  <div className="adm-workflow-step">
+                    <span className="adm-step-num">1</span>
+                    <div>
+                      <strong>Venue Verification</strong>
+                      <p>System searches venue database for exact name match to auto-link record.</p>
+                    </div>
+                  </div>
 
-            {query.sent && (
-              <div className="adm-form-alert info" role="alert">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                <span>Credentials sent to {query.sent}</span>
-              </div>
-            )}
+                  <div className="adm-workflow-step">
+                    <span className="adm-step-num">2</span>
+                    <div>
+                      <strong>Identity Provisioning</strong>
+                      <p>Creates secure user record with encrypted password and admin role.</p>
+                    </div>
+                  </div>
 
-            <form className="adm-form" action="/api/admin/users" method="post">
-              <div className="adm-form-field">
-                <label htmlFor="theatreName">
-                  Theatre / Venue Name
-                  <span className="adm-required-star">*</span>
-                </label>
-                <input
-                  id="theatreName"
-                  name="theatreName"
-                  type="text"
-                  defaultValue={query.theatreName || ""}
-                  placeholder="e.g. Mandala Theatre Nepal"
-                  required
-                />
-                <span className="adm-field-hint">
-                  If this matches an existing unclaimed theatre record, it will automatically link to this user.
-                </span>
+                  <div className="adm-workflow-step">
+                    <span className="adm-step-num">3</span>
+                    <div>
+                      <strong>First Login Activation</strong>
+                      <p>Owner is prompted to reset initial password upon their first sign-in.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="adm-form-field">
-                <label htmlFor="email">
-                  Administrator Email Address
-                  <span className="adm-required-star">*</span>
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="owner@theatre.org.np"
-                  required
-                />
-                <span className="adm-field-hint">
-                  Initial credentials and password reset notifications will be dispatched to this address.
-                </span>
+              {/* Card 2: Security & Password Policy Note */}
+              <div className="adm-guide-card adm-security-guide-card">
+                <div className="adm-guide-card-header">
+                  <div className="adm-guide-icon is-emerald">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <div>
+                    <h3>Security Policy</h3>
+                    <p>Access control standards</p>
+                  </div>
+                </div>
+                <ul className="adm-security-list">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+                    Minimum 8 characters password requirement
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+                    Mandatory password change on first sign-in
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+                    Audited administrative action logging
+                  </li>
+                </ul>
               </div>
 
-              <div className="adm-form-divider" />
-
-              <PasswordFields />
-
-              <div className="adm-form-actions">
-                <button type="submit" className="adm-btn-submit">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-                  <span>Provision Account & Send Credentials</span>
-                </button>
-              </div>
-            </form>
-
-            <div className="adm-form-footer">
-              <p>Looking to verify an existing theatre profile before creating an account?</p>
-              <div className="adm-form-info-links">
-                <Link href="/admin/theatres">Browse all venues →</Link>
+              {/* Card 3: Quick Action Navigation */}
+              <div className="adm-guide-card adm-quick-action-card">
+                <div className="adm-quick-action-content">
+                  <div className="adm-quick-action-badge">QUICK ACCESS</div>
+                  <h4>Manage Registered Venues</h4>
+                  <p>View, edit owner links, or update stage profiles in the venue directory.</p>
+                  <Link href="/admin/theatres" className="adm-quick-action-btn">
+                    <span>View Venue Directory</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
