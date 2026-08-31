@@ -8,6 +8,14 @@ export function Footer() {
   const pathname = usePathname();
   const facebookUrl = process.env.NEXT_PUBLIC_FACEBOOK_PAGE_URL || "https://www.facebook.com/theatrehub.org";
 
+  const isStandalonePage =
+    pathname?.startsWith("/login") ||
+    pathname?.startsWith("/signup") ||
+    pathname?.startsWith("/set-new-password") ||
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/theatre-dashboard");
+  if (isStandalonePage) return null;
+
   const isBlogPage = pathname?.startsWith("/blog");
 
   return (
