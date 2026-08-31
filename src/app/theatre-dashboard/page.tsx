@@ -1,6 +1,7 @@
 import { PlayEditor, ProfileForm } from "@/components/TheatreDashboardForms";
 import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -26,10 +27,20 @@ export default async function Dashboard(){
     <aside className="owner-sidebar">
       <Link className="owner-brand" href="/"><span>TH</span><strong>Owner Studio</strong></Link>
       <nav><p>Workspace</p><a href="#overview" className="is-active">Overview</a><a href="#profile">Theatre profile</a><a href="#plays">Productions <span>{theatre.plays.length}</span></a><a href="#schedules">Schedules <span>{theatre.showsMeta.length}</span></a><p>Public presence</p>{theatre.slug?<Link href={`/theatre/${theatre.slug}`}>View theatre page ↗</Link>:<span className="owner-muted-link">Public page unavailable</span>}</nav>
-      <div className="owner-account"><span>{user.username.slice(0,1).toUpperCase()}</span><div><strong>{theatre.title}</strong><small>{user.username}</small></div></div>
+      <div className="owner-account"><span>{user.username.slice(0,1).toUpperCase()}</span><div><strong>{user.username}</strong><small>ID: #{user.id} · {theatre.title}</small></div></div>
     </aside>
     <section className="owner-workspace">
-      <header className="owner-topbar"><div><span className="owner-status"><i/>Owner account active</span><small>Last updated {date(theatre.updated)}</small></div><div>{theatre.slug&&<Link href={`/theatre/${theatre.slug}`}>View public page</Link>}<form action="/api/auth/logout" method="post"><button>Log out</button></form></div></header>
+      <header className="owner-topbar">
+        <div>
+          <span className="owner-status"><i/>Logged in as: <strong>{user.username}</strong> (ID: #{user.id})</span>
+          <small>Theatre: {theatre.title} · Last updated {date(theatre.updated)}</small>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
+          <ThemeToggle/>
+          {theatre.slug&&<Link href={`/theatre/${theatre.slug}`}>View public page</Link>}
+          <form action="/api/auth/logout" method="post"><button>Log out</button></form>
+        </div>
+      </header>
       <div className="owner-content" id="overview">
         <section className="owner-cover" style={theatre.coverImage?{backgroundImage:`linear-gradient(90deg,rgba(10,9,11,.95),rgba(10,9,11,.5)),url(${JSON.stringify(theatre.coverImage).slice(1,-1)})`}:undefined}>
           <div className="owner-cover-copy"><p>Theatre management studio</p><h1>{theatre.title}</h1><span>{theatre.address||"Add your theatre address"}</span><div><b className={theatre.status==="PUBLISHED"?"published":"draft"}>{theatre.status}</b>{theatre.establishedOn&&<small>Established {theatre.establishedOn.getFullYear()}</small>}</div></div>
