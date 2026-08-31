@@ -1,14 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function TheatreCurtainSplash() {
+  const pathname = usePathname();
+  const isHomePage = pathname === "/" || pathname === "";
+
   const [phase, setPhase] = useState<
     "closed" | "curtains-sliding" | "black-screen-welcome" | "fade-to-website" | "done"
-  >("closed");
+  >(isHomePage ? "closed" : "done");
   const [flashActive, setFlashActive] = useState(false);
 
   useEffect(() => {
+    if (!isHomePage) return;
+
     const t1 = setTimeout(() => setPhase("curtains-sliding"), 350);
 
     const t2 = setTimeout(() => {
@@ -23,7 +29,7 @@ export function TheatreCurtainSplash() {
     const t4 = setTimeout(() => setPhase("done"), 6700);
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
-  }, []);
+  }, [isHomePage]);
 
   const handleSkip = () => {
     if (phase === "fade-to-website" || phase === "done") return;

@@ -38,9 +38,17 @@ export async function requireTheatreUser() {
 
 export async function createSession(userId: number) {
   const token = randomBytes(32).toString("base64url");
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const maxAgeInSeconds = 30 * 24 * 60 * 60; // 30 days
+  const expiresAt = new Date(Date.now() + maxAgeInSeconds * 1000);
   await prisma.session.create({ data: { tokenHash: hash(token), userId, expiresAt } });
-  (await cookies()).set(COOKIE, token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", expires: expiresAt, path: "/" });
+  (await cookies()).set(COOKIE, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    expires: expiresAt,
+    maxAge: maxAgeInSeconds,
+    path: "/",
+  });
 }
 
 export async function clearSession() {
