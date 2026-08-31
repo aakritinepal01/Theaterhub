@@ -16048,49 +16048,166 @@ body:has(.adm-inner-shell) {
   color: var(--adm-amber);
 }
 
-/* Inner Form Layout (Create User) */
-.adm-form-layout {
+/* Inner Form Layout (Create User & Admin Forms) */
+.adm-create-user-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
-  gap: 24px;
+  grid-template-columns: minmax(0, 1.65fr) minmax(310px, 1fr);
+  gap: 26px;
   align-items: start;
 }
 
-.adm-form-main-card {
-  padding: 28px;
-  border-radius: 12px;
+@media (max-width: 1024px) {
+  .adm-create-user-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adm-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--adm-amber-bg);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--adm-amber);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.adm-badge-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--adm-amber);
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  animation: admPulse 2s infinite;
+}
+
+@keyframes admPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+.adm-form-card {
+  width: 100%;
+  padding: 32px;
+  border-radius: 14px;
   border: 1px solid var(--adm-border);
   background: var(--adm-surface);
   box-shadow: var(--adm-card-shadow);
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
-.adm-inner-alert {
+.adm-card-accent-top {
+  border-top: 3px solid var(--adm-amber);
+}
+
+.adm-form-card-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 13px;
-  font-weight: 600;
+  gap: 16px;
+  padding-bottom: 22px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--adm-border-subtle);
 }
 
-.adm-inner-alert.error {
-  background: rgba(225, 29, 72, 0.1);
+.adm-form-card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--adm-amber-bg);
+  color: var(--adm-amber);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.adm-form-card-icon svg {
+  width: 22px;
+  height: 22px;
+  max-width: 22px;
+  max-height: 22px;
+}
+
+.adm-form-card-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--adm-text);
+  margin: 0 0 3px;
+  letter-spacing: -0.01em;
+}
+
+.adm-form-card-header p {
+  font-size: 13px;
+  color: var(--adm-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.adm-form-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 9px;
+  margin-bottom: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.adm-form-alert svg {
+  width: 18px;
+  height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  flex-shrink: 0;
+}
+
+.adm-form-alert.error {
+  background: var(--adm-crimson-bg);
   border: 1px solid var(--adm-crimson);
   color: var(--adm-crimson);
 }
 
-.adm-inner-alert.success {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid #10b981;
-  color: #10b981;
+.adm-form-alert.success {
+  background: var(--adm-emerald-bg);
+  border: 1px solid var(--adm-emerald);
+  color: var(--adm-emerald);
 }
 
-.adm-inner-form {
+.adm-form-alert.info {
+  background: var(--adm-blue-bg);
+  border: 1px solid var(--adm-blue);
+  color: var(--adm-blue);
+}
+
+.adm-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.adm-form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 640px) {
+  .adm-form-grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .adm-form-field {
@@ -16099,25 +16216,516 @@ body:has(.adm-inner-shell) {
   gap: 6px;
 }
 
-.adm-form-label {
+.adm-form-field label {
   font-size: 13px;
+  font-weight: 700;
+  color: var(--adm-text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.adm-required-star {
+  color: var(--adm-crimson);
+  font-weight: 800;
+}
+
+/* Input Prefix Icon Styling */
+.adm-input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.adm-input-prefix-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 17px;
+  height: 17px;
+  max-width: 17px;
+  max-height: 17px;
+  color: var(--adm-muted);
+  pointer-events: none;
+  transition: color 0.2s ease;
+  z-index: 2;
+}
+
+.adm-input-with-icon:focus-within .adm-input-prefix-icon {
+  color: var(--adm-amber);
+}
+
+.adm-form-field input,
+.adm-form-field select,
+.adm-form-field textarea {
+  width: 100%;
+  padding: 11px 15px;
+  border-radius: 9px;
+  border: 1px solid var(--adm-border);
+  background: var(--adm-surface-subtle);
+  color: var(--adm-text);
+  font-size: 13.5px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.adm-form-field input.has-prefix-icon {
+  padding-left: 42px !important;
+}
+
+.adm-form-field input:focus,
+.adm-form-field select:focus,
+.adm-form-field textarea:focus {
+  border-color: var(--adm-amber);
+  box-shadow: 0 0 0 3px var(--adm-amber-bg);
+  background: var(--adm-surface);
+}
+
+.adm-field-hint {
+  font-size: 12px;
+  color: var(--adm-subtle-text);
+  line-height: 1.45;
+}
+
+.adm-form-divider {
+  height: 1px;
+  background: var(--adm-border-subtle);
+  margin: 4px 0;
+}
+
+/* Role Privilege Box */
+.adm-role-privilege-box {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--adm-surface-subtle);
+  border: 1px solid var(--adm-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 2px 0;
+}
+
+.adm-role-privilege-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--adm-subtle-text);
+  letter-spacing: 0.08em;
+}
+
+.adm-role-privilege-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.adm-privilege-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 6px;
+  background: var(--adm-surface);
+  border: 1px solid var(--adm-border);
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--adm-text);
 }
 
-.adm-form-input {
+.adm-privilege-badge svg {
+  color: var(--adm-emerald);
+}
+
+/* Password Input Wrap Styling */
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--adm-border);
-  background: var(--adm-surface);
+}
+
+.password-input-wrap .adm-input-prefix-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  color: var(--adm-muted);
+  pointer-events: none;
+  z-index: 2;
+  transition: color 0.2s ease;
+}
+
+.password-input-wrap:focus-within .adm-input-prefix-icon {
+  color: var(--adm-amber);
+}
+
+.password-input-wrap input {
+  width: 100%;
+  padding: 11px 44px 11px 42px;
+  border-radius: 9px;
+  border: 1.5px solid var(--adm-border);
+  background: var(--adm-surface-subtle);
   color: var(--adm-text);
   font-size: 13.5px;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.adm-f/* Theatre owner studio - Raleway Font & Light/Dark Theme Support */
+.password-input-wrap input:focus {
+  border-color: var(--adm-amber);
+  box-shadow: 0 0 0 3px var(--adm-amber-bg);
+  background: var(--adm-surface);
+}
+
+.password-input-wrap input.is-valid {
+  border-color: var(--adm-emerald);
+  box-shadow: 0 0 0 3px var(--adm-emerald-bg);
+}
+
+.password-input-wrap input.is-invalid {
+  border-color: var(--adm-crimson);
+  box-shadow: 0 0 0 3px var(--adm-crimson-bg);
+}
+
+.password-input-wrap button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--adm-muted);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 3;
+}
+
+.password-input-wrap button:hover {
+  color: var(--adm-amber);
+  background: var(--adm-amber-bg);
+}
+
+.password-input-wrap button svg {
+  width: 18px;
+  height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+/* Password Strength Meter Bar */
+.adm-password-strength-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.adm-strength-bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  height: 4px;
+}
+
+.adm-strength-bar {
+  flex: 1;
+  border-radius: 2px;
+  transition: background-color 0.25s ease;
+}
+
+.adm-strength-text {
+  font-size: 11px;
+  font-weight: 800;
+  min-width: 45px;
+  text-align: right;
+}
+
+.adm-match-feedback {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.adm-match-feedback.is-match {
+  color: var(--adm-emerald);
+}
+
+.adm-match-feedback.is-mismatch {
+  color: var(--adm-crimson);
+}
+
+.adm-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.adm-btn-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.adm-btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+  filter: brightness(1.06);
+}
+
+.adm-btn-glow::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.25) 50%, transparent 70%);
+  transform: rotate(30deg) translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.adm-btn-glow:hover::after {
+  transform: rotate(30deg) translateX(100%);
+}
+
+.adm-btn-submit svg {
+  width: 18px;
+  height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  stroke-width: 2.2;
+  flex-shrink: 0;
+}
+
+.adm-form-footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--adm-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--adm-muted);
+}
+
+.adm-form-footer p {
+  margin: 0;
+}
+
+.adm-form-info-links a {
+  color: var(--adm-amber);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.adm-form-info-links a:hover {
+  text-decoration: underline;
+}
+
+/* Side Assistant Column Styling */
+.adm-side-guide-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.adm-guide-card {
+  padding: 22px;
+  border-radius: 14px;
+  border: 1px solid var(--adm-border);
+  background: var(--adm-surface);
+  box-shadow: var(--adm-card-shadow);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.adm-guide-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.adm-guide-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--adm-amber-bg);
+  color: var(--adm-amber);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.adm-guide-icon.is-emerald {
+  background: var(--adm-emerald-bg);
+  color: var(--adm-emerald);
+}
+
+.adm-guide-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.adm-guide-card-header h3 {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--adm-text);
+  margin: 0 0 2px;
+}
+
+.adm-guide-card-header p {
+  font-size: 12px;
+  color: var(--adm-muted);
+  margin: 0;
+}
+
+.adm-workflow-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.adm-workflow-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.adm-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--adm-amber-bg);
+  color: var(--adm-amber);
+  font-weight: 800;
+  font-size: 11.5px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.adm-workflow-step strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--adm-text);
+  margin-bottom: 2px;
+}
+
+.adm-workflow-step p {
+  font-size: 12px;
+  color: var(--adm-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.adm-security-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.adm-security-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--adm-muted);
+}
+
+.adm-security-list li svg {
+  color: var(--adm-emerald);
+  flex-shrink: 0;
+}
+
+.adm-quick-action-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.03) 100%);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.adm-quick-action-content h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--adm-text);
+  margin: 4px 0 6px;
+}
+
+.adm-quick-action-content p {
+  font-size: 12px;
+  color: var(--adm-muted);
+  margin: 0 0 14px;
+  line-height: 1.4;
+}
+
+.adm-quick-action-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--adm-amber);
+  letter-spacing: 0.1em;
+}
+
+.adm-quick-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  background: var(--adm-surface);
+  border: 1px solid var(--adm-border);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--adm-amber);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.adm-quick-action-btn:hover {
+  background: var(--adm-amber-bg);
+  border-color: var(--adm-amber);
+  transform: translateX(2px);
+}
+
+/* Theatre owner studio - Raleway Font & Light/Dark Theme Support */
 body:has(.owner-dashboard) > .navbar,
 body:has(.owner-dashboard) > .site-footer {
   display: none;
