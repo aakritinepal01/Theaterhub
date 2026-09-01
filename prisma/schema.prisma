@@ -38,6 +38,7 @@ model User {
   blogPosts    BlogPost[]
   sessions     Session[]
   bookings     Booking[]
+  passwordResetCode PasswordResetCode?
 }
 
 model Session {
@@ -46,6 +47,17 @@ model Session {
   userId    Int
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetCode {
+  id                  String   @id @default(cuid())
+  userId              Int      @unique
+  codeHash            String
+  pendingPasswordHash String
+  expiresAt           DateTime
+  attempts            Int      @default(0)
+  createdAt           DateTime @default(now())
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Site {
