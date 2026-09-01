@@ -34,14 +34,6 @@ export async function getFeaturedPlays() {
   });
 }
 
-export function getHeroPlays() {
-  return prisma.play.findMany({
-    where: { ...publishedWhere(), coverImage: { not: null } },
-    orderBy: [{ isFeatured: "desc" }, { launchedOn: "desc" }],
-    select: { id: true, coverImage: true },
-  });
-}
-
 export function getUpcomingShows() {
   return prisma.show.findMany({
     where: {
@@ -52,15 +44,4 @@ export function getUpcomingShows() {
     take: 10,
     include: { play: true, theatre: true },
   });
-}
-
-export async function getHomepageStats() {
-  const [plays, theatres, bookings, upcomingShows] = await Promise.all([
-    prisma.play.count({ where: publishedWhere() }),
-    prisma.theatre.count({ where: { status: "PUBLISHED" } }),
-    prisma.booking.count(),
-    prisma.show.count({ where: { showtime: { gt: new Date() } } }),
-  ]);
-
-  return { plays, theatres, bookings, upcomingShows };
 }

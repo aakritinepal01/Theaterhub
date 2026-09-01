@@ -271,7 +271,7 @@ export default async function Admin() {
       <aside className="adm-dock-side">
         <div className="adm-dock-header">
           <Link href="/" className="adm-dock-brand">
-            <img src="/brand-logo.png" alt="TheaterHub" className="adm-dock-logo" />
+            <img src="/brand-logo-light.png" alt="TheaterHub" className="adm-dock-logo" />
             <div className="adm-dock-title">
               <strong>TheaterHub</strong>
               <small>STUDIO CONSOLE</small>

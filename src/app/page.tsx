@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { mediaUrl, plainText } from "@/lib/content";
-import { getFeaturedPlays, getHeroPlays, getHomepageStats, getUpcomingShows } from "@/lib/home";
-import { Hero } from "@/components/Hero";
+import { getFeaturedPlays, getUpcomingShows } from "@/lib/home";
 import { LiveStageMarquee } from "@/components/LiveStageMarquee";
 
 export const revalidate = 300;
@@ -41,40 +40,24 @@ function renderPlayHeaderTitle(title: string) {
 
 export default async function Home() {
   let plays: Awaited<ReturnType<typeof getFeaturedPlays>> = [];
-  let heroPlays: Awaited<ReturnType<typeof getHeroPlays>> = [];
   let shows: Awaited<ReturnType<typeof getUpcomingShows>> = [];
-  let stats = { plays: 0, theatres: 0, bookings: 0, upcomingShows: 0 };
 
   try {
-    [plays, heroPlays, shows, stats] = await Promise.all([
+    [plays, shows] = await Promise.all([
       getFeaturedPlays(),
-      getHeroPlays(),
       getUpcomingShows(),
-      getHomepageStats(),
     ]);
   } catch (error) {
     console.error("Unable to load landing-page data", error);
   }
 
-  const heroImages = heroPlays.flatMap((play) => {
+  const ctaImage = plays.flatMap((play) => {
     const image = mediaUrl(play.coverImage);
     return image ? [image] : [];
-  });
-
-  const heroStats = [
-    { value: stats.plays, label: "Published plays" },
-    { value: stats.theatres, label: "Theatres" },
-    { value: stats.upcomingShows, label: "Upcoming shows" },
-    { value: stats.bookings, label: "Bookings" },
-  ];
-
-  const ctaImage = heroImages[0];
+  })[0];
 
   return (
-    <>
-      <Hero images={heroImages} stats={heroStats} />
-
-      <main>
+    <main>
         {/* ── 0. LIVE STAGE MARQUEE TICKER (Auto-scrolling Live Plays in Nepal) ── */}
         <LiveStageMarquee shows={shows} plays={plays} />
 
@@ -389,7 +372,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-      </main>
-    </>
+    </main>
   );
 }

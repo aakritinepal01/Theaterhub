@@ -96,7 +96,7 @@ export default async function Section({
       <aside className="adm-inner-dock">
         <div className="adm-inner-brand">
           <Link href="/" className="adm-inner-brand-link">
-            <img src="/brand-logo.png" alt="TheaterHub" className="adm-inner-brand-img" />
+            <img src="/brand-logo-light.png" alt="TheaterHub" className="adm-inner-brand-img" />
             <div>
               <strong>TheaterHub</strong>
               <small>STUDIO CONSOLE</small>
