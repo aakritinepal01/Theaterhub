@@ -1,10 +1,10 @@
 import path from "node:path";
 import fs from "node:fs";
 import AdmZip from "adm-zip";
-import { PrismaClient, ContentStatus } from "@prisma/client";
+import { ContentStatus } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
 type Legacy={model:string;pk:number;fields:Record<string,any>};
-const prisma=new PrismaClient();
 const zip=new AdmZip(path.resolve("backup.zip"));
 const records=JSON.parse(zip.readAsText("backup/online_data.json")) as Legacy[];
 const by=(model:string)=>records.filter(r=>r.model===model);
