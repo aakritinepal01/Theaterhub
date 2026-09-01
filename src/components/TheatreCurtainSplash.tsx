@@ -110,7 +110,7 @@ export function TheatreCurtainSplash() {
             <div className="splash-logo-halo splash-logo-halo-2" />
             <div className="splash-logo-halo splash-logo-halo-3" />
             <div className="splash-logo-inner">
-              <img src="/brand-logo.png" alt="TheaterHub" className="splash-logo-img" />
+              <img src="/brand-logo-light.png" alt="TheaterHub" className="splash-logo-img" />
             </div>
           </div>
 
