@@ -1,4 +1,5 @@
 import { currentUser } from "@/lib/auth";
+import { ClearCreateUserStatus } from "@/components/ClearCreateUserStatus";
 import { PasswordFields } from "@/components/PasswordFields";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
@@ -9,7 +10,7 @@ const errors: Record<string, string> = {
   mismatch: "Password and confirm password do not match.",
   duplicate: "An account with this email already exists.",
   claimed: "This theatre already has an owner account.",
-  email_mismatch: "The email does not match this existing theatre record.",
+  db_connection: "Failed to create user — database connection issue, please try again",
   failed: "The account could not be created. Please try again.",
 };
 
@@ -26,6 +27,7 @@ export default async function CreateUser({
 
   return (
     <main className="adm-inner-shell">
+      {(query.success || query.sent) && <ClearCreateUserStatus />}
       {/* Sidebar Navigation */}
       <aside className="adm-inner-dock">
         <div className="adm-inner-brand">
