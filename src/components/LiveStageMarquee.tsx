@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { mediaUrl } from "@/lib/content";
+import { getPlayPhoto } from "@/lib/content";
 
 type LiveShow = {
   id: number;
   showtime: Date;
   price: number | null;
   play: {
+    id?: number;
     title: string;
     slug: string | null;
     coverImage?: string | null;
@@ -32,17 +33,18 @@ export function LiveStageMarquee({
   shows?: LiveShow[];
   plays?: LivePlay[];
 }) {
-  // Combine shows and plays into detailed live ticker items
-  const items = shows.length
+  const hasScheduledShows = shows.length > 0;
+
+  const items = hasScheduledShows
     ? shows
-        .filter((s) => s.play.slug) // Only include items with valid slugs
+        .filter((s) => s.play.slug)
         .map((s) => ({
           id: `show-${s.id}`,
           title: s.play.title,
           slug: s.play.slug!,
           venue: s.theatre.title,
           price: s.price != null ? `NPR ${s.price.toLocaleString()}` : "Free RSVP",
-          image: mediaUrl(s.play.coverImage),
+          image: getPlayPhoto(s.play),
           timeText: new Intl.DateTimeFormat("en-NP", {
             weekday: "short",
             month: "short",
@@ -53,45 +55,37 @@ export function LiveStageMarquee({
           }).format(new Date(s.showtime)),
         }))
     : plays
-        .filter((p) => p.slug) // Only include items with valid slugs
+        .filter((p) => p.slug)
         .map((p) => ({
           id: `play-${p.id}`,
           title: p.title,
           slug: p.slug!,
-          venue: "Kathmandu Stages",
-          price: "Box Office",
-          image: mediaUrl(p.coverImage),
-          timeText: "On Stage Today",
+          venue: "Nepal theatre stages",
+          price: null,
+          image: getPlayPhoto(p),
+          timeText: "Featured production",
         }));
 
   if (!items.length) return null;
 
-  // Duplicate items for continuous smooth looping animation
   const loopItems = [...items, ...items, ...items];
+  const subtext = hasScheduledShows
+    ? `${items.length} scheduled performances with ticket details`
+    : `${items.length} theatre titles currently featured on TheaterHub`;
+  const cardAction = "View details";
 
   return (
     <section className="live-marquee-section" aria-label="Currently Playing Stage Productions in Nepal">
-      {/* Background Ambient Glow FX */}
       <div className="live-marquee-bg-glow" aria-hidden="true" />
 
       <div className="site-container">
         <div className="live-marquee-header-row">
           <div className="live-marquee-heading-group">
-            <div className="live-marquee-kicker">
-              <span className="live-dot-pulse" />
-              <span>LIVE STAGE FEED</span>
-            </div>
+            <div className="live-marquee-kicker">Stage spotlight</div>
             <h2 className="live-marquee-title-heading">Playing Now in Nepal</h2>
-            <p className="live-marquee-subtext">
-              🎭 {items.length} Stage Shows Active Across Nepal · Real-time Showtimes &amp; Box Office Tickets
-            </p>
+            <p className="live-marquee-subtext">{subtext}</p>
           </div>
 
-          <div className="live-marquee-header-meta">
-            <span className="live-marquee-status-pill">
-              📍 Active Kathmandu &amp; Regional Stages
-            </span>
-          </div>
         </div>
 
         <div className="live-marquee-container">
@@ -102,31 +96,27 @@ export function LiveStageMarquee({
                 href={`/play/${item.slug}/`}
                 className="live-marquee-card"
               >
-                {/* Card Poster Image with Status Pill */}
                 <div className="live-marquee-thumb">
                   {item.image ? (
                     <img src={item.image} alt={item.title} />
                   ) : (
                     <div className="live-marquee-thumb-fallback">
-                      <span>🎭</span>
+                      <span aria-hidden="true">TH</span>
                     </div>
                   )}
-                  <span className="live-thumb-live-tag">LIVE</span>
                 </div>
 
-                {/* Card Main Info */}
                 <div className="live-marquee-info">
                   <div className="live-marquee-meta-line">
-                    <span className="live-time-chip">🕒 {item.timeText}</span>
-                    <span className="live-price-pill">{item.price}</span>
+                    <span className="live-time-chip">{item.timeText}</span>
+                    {item.price ? <span className="live-price-pill">{item.price}</span> : null}
                   </div>
-
                   <h4 className="live-marquee-title">{item.title}</h4>
 
                   <div className="live-marquee-bottom-row">
-                    <p className="live-marquee-venue">📍 {item.venue}</p>
+                    <p className="live-marquee-venue">{item.venue}</p>
                     <span className="live-card-btn">
-                      Get Tickets <span aria-hidden="true">→</span>
+                      {cardAction} <span aria-hidden="true">-&gt;</span>
                     </span>
                   </div>
                 </div>

@@ -124,6 +124,18 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
     });
   }, [reviewsList, selectedCategory, searchQuery, sortBy]);
 
+  const reviewSummary = useMemo(() => {
+    const average = reviewsList.length
+      ? reviewsList.reduce((total, review) => total + review.rating, 0) / reviewsList.length
+      : 0;
+    const venueCount = new Set(reviewsList.map((review) => review.theatreName)).size;
+
+    return {
+      average: average.toFixed(1),
+      venueCount,
+    };
+  }, [reviewsList]);
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPlayTitle || !newReviewerName || !newTitle || !newContent) return;
@@ -167,6 +179,30 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
   return (
     <div className="reviews-view-wrapper">
       <div className="site-container">
+        <section className="reviews-intro" aria-labelledby="reviews-page-title">
+          <div className="reviews-intro-copy">
+            <span className="reviews-eyebrow">TheatreHub editorial desk</span>
+            <h1 id="reviews-page-title">Reviews that look beyond the curtain</h1>
+            <p>
+              Thoughtful criticism, audience reactions, and practical scorecards for the performances shaping Nepal&apos;s live theatre scene.
+            </p>
+          </div>
+          <div className="reviews-summary-grid" aria-label="Review overview">
+            <div className="reviews-summary-stat">
+              <strong>{reviewsList.length}</strong>
+              <span>Published reviews</span>
+            </div>
+            <div className="reviews-summary-stat reviews-summary-stat-accent">
+              <strong>{reviewSummary.average}</strong>
+              <span>Average audience score</span>
+            </div>
+            <div className="reviews-summary-stat">
+              <strong>{reviewSummary.venueCount}</strong>
+              <span>Venues covered</span>
+            </div>
+          </div>
+        </section>
+
         {/* ── 2. SPOTLIGHT / EDITOR'S CHOICE REVIEW ── */}
         {spotlightReview && (
           <section id="featured-spotlight" className="reviews-spotlight-section">
@@ -264,6 +300,13 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
 
         {/* ── 3. CONTROLS BAR (SEARCH & TABS & SORT) ── */}
         <section className="reviews-controls-bar">
+          <div className="section-heading-row">
+            <div>
+              <span className="section-kicker">The review library</span>
+              <h2>Explore every critique</h2>
+            </div>
+            <span className="results-count">Showing {filteredReviews.length} of {reviewsList.length}</span>
+          </div>
           <div className="controls-row">
             {/* Search Input */}
             <div className="reviews-search-wrap">

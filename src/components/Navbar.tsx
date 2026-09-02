@@ -4,13 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
-import { BackButton } from "@/components/BackButton";
 
 type NavLink = { label: string; href: string };
 type NavUser = { username: string; isStaff: boolean; isSuperuser: boolean } | null;
 type ThemeMode = "light" | "dark";
 
-export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: NavUser; logoutAction: () => Promise<void> }) {
+export function Navbar({ links }: { links: NavLink[]; user: NavUser; logoutAction: () => Promise<void> }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -60,13 +59,12 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
     pathname?.startsWith("/set-new-password") ||
     pathname?.startsWith("/admin") ||
     pathname?.startsWith("/theatre-dashboard");
-
   if (isStandalonePage) return null;
 
-  return <header className={`navbar${scrolled ? " is-scrolled" : ""}${open ? " menu-open" : ""}`}>
+  return (
+    <header className={`navbar${scrolled ? " is-scrolled" : ""}${open ? " menu-open" : ""}`}>
     <div className="site-container nav-inner">
       <div className="nav-logo-group">
-        <BackButton />
         <Logo />
       </div>
       <nav className="nav-desktop" aria-label="Primary navigation">
@@ -118,5 +116,6 @@ export function Navbar({ links, user, logoutAction }: { links: NavLink[]; user: 
         <Link href="/login" onClick={() => setOpen(false)}>Login<span aria-hidden="true">→</span></Link>
       </div>
     </nav>
-  </header>;
+    </header>
+  );
 }

@@ -25,9 +25,21 @@ export function Hero({ images, stats }: { images: string[]; stats: HeroStat[] })
         </p>
         <h1>Where Nepal&apos;s stories step into the light.</h1>
         <p className="landing-lead">Discover unforgettable performances, meet the artists behind them, and find your place in Nepal&apos;s living theatre scene.</p>
-        <div className="landing-actions">
-          <Link className="landing-button landing-button-primary" href="/play/">Explore Plays</Link>
-          <Link className="landing-button landing-button-ghost" href="/about-us/">About Us</Link>
+        <div className="landing-hero-action-row">
+          <form className="landing-hero-search" action="/search" method="get">
+            <label className="sr-only" htmlFor="landing-search">Search TheatreHub</label>
+            <input id="landing-search" name="q" type="search" placeholder="Search plays, artists, theatres..." />
+            <button type="submit" aria-label="Submit search" title="Search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-4-4" />
+              </svg>
+            </button>
+          </form>
+          <div className="landing-actions">
+            <Link className="landing-button landing-button-primary" href="/play/">Explore Plays</Link>
+            <Link className="landing-button landing-button-ghost" href="/about-us/">About Us</Link>
+          </div>
         </div>
       </div>
       <aside className="landing-hero-stats" aria-label="TheatreHub statistics">
