@@ -50,7 +50,7 @@ export default async function Home() {
 
       <main>
         {/* ── 0. LIVE STAGE MARQUEE TICKER (Auto-scrolling Live Plays in Nepal) ── */}
-        <LiveStageMarquee shows={shows} plays={plays} />
+        <LiveStageMarquee shows={shows.filter(show => show.play.status === "PUBLISHED")} plays={plays} />
 
         {/* ── 1. FEATURED PLAYS (Curated Showcase) ── */}
         <section className="landing-section landing-featured site-container">
