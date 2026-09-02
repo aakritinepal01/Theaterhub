@@ -51,16 +51,43 @@ export function getHeroPlays() {
   });
 }
 
-export function getUpcomingShows() {
-  return prisma.show.findMany({
+export async function getUpcomingShows() {
+  const scheduled = await prisma.show.findMany({
     where: {
       showtime: { gt: new Date() },
-      play: publishedWhere(),
+      play: { status: { in: ["PUBLISHED", "UPCOMING"] } },
     },
     orderBy: { showtime: "asc" },
     take: 10,
     include: { play: true, theatre: true },
   });
+
+  const scheduledPlayIds=new Set(scheduled.map(show=>show.playId));
+  const productions=await prisma.play.findMany({
+    where:{status:"UPCOMING",theatreId:{not:null}},
+    orderBy:[{launchedOn:"asc"},{updated:"desc"}],
+    take:10,
+    include:{theatre:true},
+  });
+
+  const unscheduled=productions.flatMap(play=>{
+    if(!play.theatre||scheduledPlayIds.has(play.id))return [];
+    return [{
+      id:-play.id,
+      playId:play.id,
+      theatreId:play.theatre.id,
+      showtime:play.launchedOn??new Date(),
+      totalSeats:0,
+      availableSeats:0,
+      price:null,
+      play,
+      theatre:play.theatre,
+    }];
+  });
+
+  return [...scheduled,...unscheduled]
+    .sort((a,b)=>a.showtime.getTime()-b.showtime.getTime())
+    .slice(0,10);
 }
 
 export async function getHomepageStats() {
