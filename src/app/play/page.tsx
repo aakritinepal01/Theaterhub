@@ -20,33 +20,46 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 600): P
   }
 }
 
-export default async function Plays({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  const raw = Number((await searchParams).page);
+export default async function Plays({ searchParams }: { searchParams: Promise<{ page?: string; theatre?: string; filter?: string }> }) {
+  const params = await searchParams;
+  const raw = Number(params.page);
   const requested = Number.isInteger(raw) && raw > 0 ? raw : 1;
+  const selectedTheatreId = Number(params.theatre);
+  const theatreId = Number.isInteger(selectedTheatreId) && selectedTheatreId > 0 ? selectedTheatreId : null;
+  const selectedFilter = params.filter === "showing" || params.filter === "archive" ? params.filter : "all";
   const now = new Date();
   const where = publishedWhere(now);
+  const filteredWhere = {
+    ...where,
+    ...(theatreId ? { theatreId } : {}),
+    ...(selectedFilter === "showing" ? { shows: { some: { showtime: { gt: now } } } } : {}),
+    ...(selectedFilter === "archive" ? { shows: { none: { showtime: { gt: now } } } } : {}),
+  };
 
   let count = 86;
   let totalTheatres = 25;
   let totalShows = 858;
   let plays: any[] = [];
+  let theatres: { id: number; title: string }[] = [];
 
   try {
-    const [c, tt, ts] = await Promise.all([
-      withRetry(() => prisma.play.count({ where })).catch(() => 86),
+    const [c, tt, ts, theatreOptions] = await Promise.all([
+      withRetry(() => prisma.play.count({ where: filteredWhere })).catch(() => 86),
       withRetry(() => prisma.theatre.count({ where: { status: "PUBLISHED" } })).catch(() => 25),
       withRetry(() => prisma.show.count()).catch(() => 858),
+      withRetry(() => prisma.theatre.findMany({ where: { status: "PUBLISHED" }, select: { id: true, title: true }, orderBy: { title: "asc" } })).catch(() => []),
     ]);
     count = c;
     totalTheatres = tt;
     totalShows = ts;
+    theatres = theatreOptions;
 
     const pages = Math.max(1, Math.ceil(count / PAGE_SIZE));
     const page = Math.min(requested, pages);
 
     plays = await withRetry(() =>
       prisma.play.findMany({
-        where,
+        where: filteredWhere,
         orderBy: { launchedOn: "desc" },
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
@@ -66,6 +79,16 @@ export default async function Plays({ searchParams }: { searchParams: Promise<{ 
 
   const pages = Math.max(1, Math.ceil(count / PAGE_SIZE));
   const page = Math.min(requested, pages);
+  const runningPlays = plays.filter((play) => play.shows?.length > 0);
+  const archivedPlays = plays.filter((play) => !play.shows?.length);
+  const pageHref = (nextPage: number) => {
+    const query = new URLSearchParams();
+    if (theatreId) query.set("theatre", String(theatreId));
+    if (selectedFilter !== "all") query.set("filter", selectedFilter);
+    if (nextPage > 1) query.set("page", String(nextPage));
+    const queryString = query.toString();
+    return `/play/${queryString ? `?${queryString}` : ""}`;
+  };
 
   return (
     <div className="play-page-unified-container">
@@ -132,23 +155,77 @@ export default async function Plays({ searchParams }: { searchParams: Promise<{ 
           </div>
         </section>
 
-        {plays.length ? (
+        <form className="play-filter-bar" method="get" aria-label="Filter plays">
+          <div className="play-filter-heading">
+            <strong>Filter productions</strong>
+            <span>Browse by venue or current availability</span>
+          </div>
+          <label>
+            <span className="sr-only">Theatre venue</span>
+            <select name="theatre" defaultValue={theatreId ? String(theatreId) : ""}>
+              <option value="">All theatres</option>
+              {theatres.map((theatre) => <option key={theatre.id} value={theatre.id}>{theatre.title}</option>)}
+            </select>
+          </label>
+          <label>
+            <span className="sr-only">Availability</span>
+            <select name="filter" defaultValue={selectedFilter}>
+              <option value="all">All productions</option>
+              <option value="showing">Currently showing</option>
+              <option value="archive">Archive</option>
+            </select>
+          </label>
+          <button type="submit" className="play-filter-submit">Apply filters</button>
+          {(theatreId || selectedFilter !== "all") && <Link href="/play/" className="play-filter-reset">Clear</Link>}
+        </form>
+
+        {selectedFilter === "all" ? (
+          <div className="play-collections">
+            <section className="play-collection-section" aria-labelledby="running-plays-title">
+              <div className="play-collection-heading">
+                <div>
+                  <span className="play-collection-kicker">On stage now</span>
+                  <h2 id="running-plays-title">Currently Running Plays</h2>
+                </div>
+                <span>{runningPlays.length} production{runningPlays.length === 1 ? "" : "s"}</span>
+              </div>
+              {runningPlays.length ? (
+                <div className="landing-play-grid play-list-grid-animated">
+                  {runningPlays.map((play) => <PlayCard key={play.id} play={play} />)}
+                </div>
+              ) : <div className="play-collection-empty">No currently running plays found.</div>}
+            </section>
+
+            <section className="play-collection-section" aria-labelledby="archive-plays-title">
+              <div className="play-collection-heading">
+                <div>
+                  <span className="play-collection-kicker">Past productions</span>
+                  <h2 id="archive-plays-title">Play Archive</h2>
+                </div>
+                <span>{archivedPlays.length} production{archivedPlays.length === 1 ? "" : "s"}</span>
+              </div>
+              {archivedPlays.length ? (
+                <div className="landing-play-grid play-list-grid-animated">
+                  {archivedPlays.map((play) => <PlayCard key={play.id} play={play} />)}
+                </div>
+              ) : <div className="play-collection-empty">No archived plays found.</div>}
+            </section>
+          </div>
+        ) : plays.length ? (
           <div className="landing-play-grid play-list-grid-animated">
-            {plays.map((play) => (
-              <PlayCard key={play.id} play={play} />
-            ))}
+            {plays.map((play) => <PlayCard key={play.id} play={play} />)}
           </div>
         ) : (
           <div className="landing-empty play-index-empty">
-            <h3>No plays yet</h3>
-            <p>Published plays will appear here.</p>
+            <h3>No matching plays</h3>
+            <p>Try changing the selected theatre or production filter.</p>
           </div>
         )}
 
         {count > PAGE_SIZE && (
           <nav className="theatre-pagination play-index-pagination" aria-label="Play pages">
             {page > 1 ? (
-              <Link className="theatre-page-btn" href={`/play/?page=${page - 1}`}>
+                <Link className="theatre-page-btn" href={pageHref(page - 1)}>
                 ← Prev
               </Link>
             ) : (
@@ -171,7 +248,7 @@ export default async function Plays({ searchParams }: { searchParams: Promise<{ 
                       {item}
                     </span>
                   ) : (
-                    <Link className="theatre-page-num" key={item} href={`/play/?page=${item}`}>
+                    <Link className="theatre-page-num" key={item} href={pageHref(item)}>
                       {item}
                     </Link>
                   )
@@ -180,7 +257,7 @@ export default async function Plays({ searchParams }: { searchParams: Promise<{ 
             </div>
 
             {page < pages ? (
-              <Link className="theatre-page-btn" href={`/play/?page=${page + 1}`}>
+                <Link className="theatre-page-btn" href={pageHref(page + 1)}>
                 Next →
               </Link>
             ) : (

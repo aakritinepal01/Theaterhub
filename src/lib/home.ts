@@ -16,7 +16,7 @@ const playCardInclude = {
   },
 };
 
-const FEATURED_PLAY_LIMIT = 6;
+const FEATURED_PLAY_LIMIT = 8;
 
 export async function getFeaturedPlays() {
   const featured = await prisma.play.findMany({

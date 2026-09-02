@@ -10,11 +10,6 @@ export function BackButton() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Only show on detail/sub pages — not on top-level listing pages
-  const topLevel = ["/", "/play", "/play/", "/theatre", "/theatre/", "/profile", "/profile/", "/blog", "/blog/", "/about-us", "/about-us/", "/contact-us", "/contact-us/", "/search", "/search/"];
-  const isTop = topLevel.includes(pathname) || topLevel.includes(pathname.replace(/\/$/, ""));
-  if (isTop) return null;
-
   // Derive sensible fallback parent from current path
   const segments = pathname.replace(/\/$/, "").split("/").filter(Boolean);
   const parentPath = segments.length > 1 ? `/${segments.slice(0, -1).join("/")}` : "/";

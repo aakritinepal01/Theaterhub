@@ -16,44 +16,8 @@ export function Footer() {
     pathname?.startsWith("/theatre-dashboard");
   if (isStandalonePage) return null;
 
-  const isBlogPage = pathname?.startsWith("/blog");
-
   return (
     <footer className="site-footer">
-      {/* ── Spotlight Hero Banner (Hidden on Blog pages) ── */}
-      {!isBlogPage && (
-        <div className="site-container footer-spotlight">
-          <div className="footer-spotlight-content">
-            <div className="footer-spotlight-badge">
-              <span className="footer-badge-dot" />
-              <span>Nepal Stage Archive &amp; Community</span>
-            </div>
-
-            <p className="footer-kicker">Built for Nepal&apos;s theatre community</p>
-            <h2>One place for plays, theatres, stories, and show announcements.</h2>
-            <p className="footer-spotlight-sub">
-              Empowering audiences to discover live theatre and giving every production team in Nepal a living digital stage.
-            </p>
-
-            <div className="footer-highlights-row">
-              <div className="footer-highlight-pill">🎭 50+ Plays</div>
-              <div className="footer-highlight-pill">🏛️ 20+ Venues</div>
-              <div className="footer-highlight-pill">⚡ Real-time Schedules</div>
-              <div className="footer-highlight-pill">✨ 100% Free</div>
-            </div>
-          </div>
-
-          <div className="footer-spotlight-links">
-            <Link href="/play/" className="about-btn about-btn-primary about-btn-lg">
-              Explore Plays <span aria-hidden="true">→</span>
-            </Link>
-            <Link href="/contact-us/" className="about-btn about-btn-ghost about-btn-lg">
-              Share Show Updates
-            </Link>
-          </div>
-        </div>
-      )}
-
       {/* ── Main Footer Grid ── */}
       <div className="site-container footer-grid">
 

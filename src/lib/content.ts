@@ -78,6 +78,31 @@ export function getArtistPhoto(artist: { id: number; profilePic?: string | null 
   return ARTIST_PORTRAITS[index];
 }
 
+const PLAY_POSTER_FALLBACKS = [
+  "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1504804884814-d58d4c9b0a35?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80",
+];
+
+export function getPlayPhoto(play: { id?: number; coverImage?: string | null }) {
+  if (play.coverImage) {
+    const filename = play.coverImage.split("/").pop() || "";
+    // Filter out legacy Django Mezzanine 'NO PIC' placeholder files prefixed with 4-digit numbers (e.g. 0015_, 0143_)
+    const isLegacyNoPic = /^\d{4}_/.test(filename);
+    if (!isLegacyNoPic) {
+      const url = mediaUrl(play.coverImage);
+      if (url) return url;
+    }
+  }
+  const index = Math.abs(play.id || 0) % PLAY_POSTER_FALLBACKS.length;
+  return PLAY_POSTER_FALLBACKS[index];
+}
+
 export function plainText(html: string) {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
