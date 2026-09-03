@@ -367,6 +367,38 @@ model BlogPostCategory {
   @@id([postId, categoryId])
 }
 
+model ReviewSubmission {
+  id              Int       @id @default(autoincrement())
+  playTitle       String    @map("play_title")
+  playSlug        String    @unique @map("play_slug")
+  playImage       String?   @map("play_image")
+  theatreName     String    @map("theatre_name")
+  reviewerName    String    @map("reviewer_name")
+  reviewerRole    String    @default("Audience Member") @map("reviewer_role")
+  reviewerAvatar  String    @map("reviewer_avatar")
+  performanceDate DateTime? @map("performance_date") @db.Date
+  viewingContext  String    @default("") @map("viewing_context")
+  rating          Float
+  verdictTag      String    @map("verdict_tag")
+  reviewTitle     String    @map("review_title")
+  excerpt         String
+  content         String
+  keyQuote        String    @map("key_quote")
+  acting          Float
+  direction       Float
+  stageDesign     Float     @map("stage_design")
+  script          Float
+  recommendation  String    @default("Strongly recommend")
+  status          String    @default("PENDING")
+  approvedAt      DateTime? @map("approved_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([status, createdAt])
+  @@index([status, approvedAt])
+  @@map("review_submissions")
+}
+
 model Form {
   id            Int         @id
   pageId        Int         @unique

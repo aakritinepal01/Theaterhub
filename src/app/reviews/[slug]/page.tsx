@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatDate, mediaUrl, publishedWhere } from "@/lib/content";
+import { getApprovedReviewItemBySlug } from "@/lib/reviews";
 import { DEFAULT_REVIEWS } from "@/app/reviews/page";
 import type { ReviewItem } from "@/components/ReviewsInteractiveView";
 
@@ -16,6 +17,10 @@ export default async function ReviewDetailPage({
   const curatedReview = DEFAULT_REVIEWS.find((review) => review.playSlug === slug);
 
   let review: ReviewItem | undefined = curatedReview;
+  if (!review) {
+    review = await getApprovedReviewItemBySlug(slug).catch(() => undefined);
+  }
+
   if (!review) {
     const play = await prisma.play.findFirst({
       where: { slug, ...publishedWhere() },

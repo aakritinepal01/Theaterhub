@@ -1,5 +1,6 @@
 import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getReviewModerationStats } from "@/lib/reviews";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -132,7 +133,7 @@ export default async function Admin() {
   if (!user || (!user.isStaff && !user.isSuperuser)) redirect("/login");
   if (!user.isPasswordChanged) redirect("/set-new-password");
 
-  const [plays, profiles, theatres, schedules, posts, entries, claimed, users, recentTheatres] = await Promise.all([
+  const [plays, profiles, theatres, schedules, posts, entries, claimed, users, reviewStats] = await Promise.all([
     prisma.play.count(),
     prisma.profile.count(),
     prisma.theatre.count(),
@@ -141,127 +142,169 @@ export default async function Admin() {
     prisma.formEntry.count(),
     prisma.theatre.count({ where: { ownerId: { not: null } } }),
     prisma.user.count({ where: { isActive: true } }),
-    prisma.theatre.findMany({
-      take: 5,
-      orderBy: [{ updated: "desc" }, { title: "asc" }],
-      select: {
-        id: true,
-        title: true,
-        address: true,
-        updated: true,
-        owner: { select: { username: true } },
-        _count: { select: { plays: true } },
-      },
-    }),
+    getReviewModerationStats(),
   ]);
 
   const unclaimed = theatres - claimed;
-  const claimedPercent = theatres ? Math.round((claimed / theatres) * 100) : 0;
+  const totalPublicRecords = theatres + plays + profiles + posts + reviewStats.approved;
+  const openWorkCount = reviewStats.pending + unclaimed + entries;
+  const recentReviews: Array<{ id: string; reviewTitle: string | null; playTitle: string; reviewerName: string; status: string }> = [];
+  const recentTheatres: Array<{ id: string; title: string; updated: Date | null; owner: { username: string } | null; _count: { plays: number } }> = [];
+  const firstAction = reviewStats.pending > 0
+    ? { href: "/admin/reviews", label: "Review submissions", icon: "sparkle" as const }
+    : unclaimed > 0
+      ? { href: "/admin/theatres?unclaimed=1", label: "Assign venue owners", icon: "theatre" as const }
+      : entries > 0
+        ? { href: "/admin/entries", label: "Open form inbox", icon: "inbox" as const }
+        : { href: "/admin/theatres", label: "Manage venues", icon: "theatre" as const };
 
   const stats = [
     {
-      label: "Theatre Venues",
-      value: theatres,
-      note: `${claimed} claimed · ${unclaimed} unclaimed`,
-      icon: "theatre" as const,
-      href: "/admin/theatres",
+      label: "Needs Attention",
+      value: openWorkCount,
+      note: "Reviews, venues and inbox",
+      icon: "bolt" as const,
+      href: reviewStats.pending > 0 ? "/admin/reviews" : unclaimed > 0 ? "/admin/theatres?unclaimed=1" : "/admin/entries",
       accent: "stat-amber",
-      progress: `${claimedPercent}% claimed`,
-      pct: claimedPercent,
     },
     {
-      label: "Play Productions",
-      value: plays,
-      note: "Published in stage archive",
-      icon: "play" as const,
-      href: "/admin/plays",
-      accent: "stat-crimson",
-      progress: "Catalog depth",
-      pct: 88,
+      label: "Public Records",
+      value: totalPublicRecords,
+      note: "Venues, plays, artists and articles",
+      icon: "layers" as const,
+      href: "/admin",
+      accent: "stat-blue",
     },
     {
-      label: "Artist Profiles",
-      value: profiles,
-      note: "Performers, directors & makers",
-      icon: "people" as const,
-      href: "/admin/profiles",
-      accent: "stat-violet",
-      progress: "Talent index",
-      pct: 95,
+      label: "Scheduled Shows",
+      value: schedules,
+      note: "Upcoming performance schedules",
+      icon: "calendar" as const,
+      href: "/admin/schedules",
+      accent: "stat-emerald",
     },
     {
-      label: "Registered Users",
+      label: "Team Accounts",
       value: users,
-      note: "Staff & theatre accounts",
+      note: "Staff and theatre owners",
       icon: "user" as const,
       href: "/admin/create-user",
-      accent: "stat-emerald",
-      progress: "Active accounts",
-      pct: 100,
+      accent: "stat-violet",
+    },
+  ];
+
+  const priorityItems = [
+    {
+      label: "Review approvals",
+      value: reviewStats.pending,
+      detail: reviewStats.pending > 0 ? "Audience critiques are waiting before public publish." : "No audience reviews waiting.",
+      href: "/admin/reviews",
+      icon: "sparkle" as const,
+      tone: reviewStats.pending > 0 ? "is-warning" : "is-clear",
+      action: reviewStats.pending > 0 ? "Open review queue" : "View reviews",
+    },
+    {
+      label: "Unclaimed venues",
+      value: unclaimed,
+      detail: unclaimed > 0 ? "Assign theatre owners so venues can manage schedules." : "Every venue has an owner assigned.",
+      href: "/admin/theatres?unclaimed=1",
+      icon: "theatre" as const,
+      tone: unclaimed > 0 ? "is-warning" : "is-clear",
+      action: unclaimed > 0 ? "Match owners" : "View venues",
+    },
+    {
+      label: "Form inbox",
+      value: entries,
+      detail: entries > 0 ? "Visitor messages and submissions need checking." : "No form messages in the inbox.",
+      href: "/admin/entries",
+      icon: "inbox" as const,
+      tone: entries > 0 ? "is-info" : "is-clear",
+      action: entries > 0 ? "Read inbox" : "Open inbox",
     },
   ];
 
   const modules = [
     {
-      title: "Theatre Venues",
-      desc: "Directory of performance halls, ownership verification, locations & stage specs.",
+      title: "Theatres",
+      desc: "Add or edit venue profiles, address details, images and owner assignment.",
       count: theatres,
       unit: "Venues",
       icon: "theatre" as const,
       href: "/admin/theatres",
       accent: "app-amber",
-      gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+      actionLabel: "Manage theatres",
     },
     {
-      title: "Play Archive",
-      desc: "Production database, directorial credits, cast profiles, synopses & posters.",
+      title: "Plays",
+      desc: "Manage production records, cast, synopsis, posters and public play pages.",
       count: plays,
       unit: "Plays",
       icon: "play" as const,
       href: "/admin/plays",
       accent: "app-crimson",
-      gradient: "linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)",
+      actionLabel: "Manage plays",
     },
     {
-      title: "Show Calendars",
-      desc: "Live performance schedules, active date ranges, recurring shows & tickets.",
+      title: "Schedules",
+      desc: "Update show dates, times, venue links and booking information.",
       count: schedules,
       unit: "Schedules",
       icon: "calendar" as const,
       href: "/admin/schedules",
       accent: "app-blue",
-      gradient: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+      actionLabel: "Manage schedules",
     },
     {
-      title: "Artist Directory",
-      desc: "Verified profiles of theatre performers, playwrights, stage crew & musicians.",
+      title: "Artists",
+      desc: "Manage performer, director, writer, crew and musician profiles.",
       count: profiles,
       unit: "Artists",
       icon: "people" as const,
       href: "/admin/profiles",
       accent: "app-violet",
-      gradient: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)",
+      actionLabel: "Manage artists",
     },
     {
-      title: "Editorial & News",
-      desc: "Theatre reviews, insightful articles, festival coverage & spotlight stories.",
+      title: "Editorial",
+      desc: "Create and edit news, articles, interviews and theatre stories.",
       count: posts,
       unit: "Articles",
       icon: "article" as const,
       href: "/admin/posts",
       accent: "app-teal",
-      gradient: "linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)",
+      actionLabel: "Manage posts",
+    },
+    {
+      title: "Reviews",
+      desc: "Approve or delete audience reviews before they appear on the website.",
+      count: reviewStats.total,
+      unit: "Reviews",
+      icon: "sparkle" as const,
+      href: "/admin/reviews",
+      accent: "app-amber",
+      badge: reviewStats.pending > 0 ? `${reviewStats.pending.toLocaleString()} Pending` : undefined,
+      actionLabel: "Moderate reviews",
     },
     {
       title: "Form Inbox",
-      desc: "Contact messages, venue listing submissions & audience feedback entries.",
+      desc: "Read contact messages, venue listing inquiries and audience feedback entries.",
       count: entries,
       unit: "Messages",
       icon: "inbox" as const,
       href: "/admin/entries",
       accent: "app-rose",
-      gradient: "linear-gradient(135deg, #fb7185 0%, #e11d48 100%)",
       badge: entries > 0 ? `${entries.toLocaleString()} New` : undefined,
+      actionLabel: "Open inbox",
+    },
+    {
+      title: "Users",
+      desc: "Create staff or theatre-owner accounts for the admin system.",
+      count: users,
+      unit: "Users",
+      icon: "user" as const,
+      href: "/admin/create-user",
+      accent: "app-emerald",
+      actionLabel: "Create user",
     },
   ];
 
@@ -315,6 +358,15 @@ export default async function Admin() {
               <span>Editorial</span>
               <span className="adm-dock-pill">{posts}</span>
             </Link>
+            <Link href="/admin/reviews" className="adm-dock-item">
+              <span className="adm-dock-icon"><Icon name="sparkle" /></span>
+              <span>Reviews</span>
+              {reviewStats.pending > 0 ? (
+                <span className="adm-dock-pill is-alert">{reviewStats.pending}</span>
+              ) : (
+                <span className="adm-dock-pill">{reviewStats.total}</span>
+              )}
+            </Link>
             <Link href="/admin/create-user" className="adm-dock-item">
               <span className="adm-dock-icon"><Icon name="plus" /></span>
               <span>Create User</span>
@@ -349,7 +401,7 @@ export default async function Admin() {
             <strong className="adm-bc-active">Dashboard</strong>
             <span className="adm-live-status-pill">
               <span className="adm-live-status-dot" />
-              <span>Logged in: @{user.username} (ID: #{user.id})</span>
+              <span>Signed in as @{user.username}</span>
             </span>
           </div>
 
@@ -370,97 +422,135 @@ export default async function Admin() {
 
         {/* Dashboard Content */}
         <div className="adm-dock-content">
-          {/* Header Row */}
-          <div className="adm-intro-row">
-            <div className="adm-intro-text">
-              <h1>
-                Good to see you, <em>{user.firstName || user.username}</em>
-              </h1>
-              <p>Platform telemetry and real-time operations across Nepal&apos;s performing arts archive.</p>
+          <section className="adm-clean-hero" aria-labelledby="admin-dashboard-heading">
+            <div>
+              <span className="adm-page-kicker">Admin Dashboard</span>
+              <h1 id="admin-dashboard-heading">Good morning, {user.username}</h1>
+              <p>Use this overview to clear pending tasks first, then manage the public theatre directory and editorial content.</p>
             </div>
+            <Link href={firstAction.href} className="adm-clean-hero-action">
+              <Icon name={firstAction.icon} />
+              <span>{firstAction.label}</span>
+            </Link>
+          </section>
 
-            <div className="adm-intro-cta">
-              <Link href="/admin/create-user" className="adm-primary-cta">
-                <Icon name="plus" />
-                <span>Provision Theatre Account</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* 4 Stats Cards */}
-          <div className="adm-stats-grid">
+          <div className="adm-summary-strip" aria-label="Admin summary">
             {stats.map((s) => (
-              <Link href={s.href} className={`adm-stat-box ${s.accent}`} key={s.label}>
-                <div className="adm-stat-box-top">
-                  <span className="adm-stat-icon-wrap"><Icon name={s.icon} /></span>
-                  <span className="adm-stat-badge-tag">{s.progress}</span>
-                </div>
-                <div className="adm-stat-number">{s.value.toLocaleString()}</div>
-                <div className="adm-stat-title">{s.label}</div>
-                <div className="adm-stat-subtitle">{s.note}</div>
-                <div className="adm-stat-spark">
-                  <div className="adm-stat-spark-bar" style={{ width: `${Math.max(12, Math.min(100, s.pct))}%` }} />
-                </div>
+              <Link href={s.href} className={`adm-summary-tile ${s.accent}`} key={s.label}>
+                <span className="adm-summary-icon"><Icon name={s.icon} /></span>
+                <span className="adm-summary-copy">
+                  <strong>{s.value.toLocaleString()}</strong>
+                  <span>{s.label}</span>
+                  <small>{s.note}</small>
+                </span>
               </Link>
             ))}
           </div>
 
+          <section className="adm-work-panel" aria-labelledby="priority-heading">
+            <div className="adm-section-header">
+              <div>
+                <h2 id="priority-heading">Pending Work</h2>
+                <p>These are the admin tasks that need action before public content is fully up to date.</p>
+              </div>
+              <span className={`adm-section-pill ${openWorkCount > 0 ? "is-alert" : "is-clear"}`}>{openWorkCount > 0 ? `${openWorkCount.toLocaleString()} to do` : "All clear"}</span>
+            </div>
+
+            <div className="adm-work-list">
+              {priorityItems.map((item) => (
+                <Link href={item.href} className={`adm-work-item ${item.tone}`} key={item.label}>
+                  <span className="adm-work-icon"><Icon name={item.icon} /></span>
+                  <span className="adm-work-copy">
+                    <strong>{item.label}</strong>
+                    <small>{item.detail}</small>
+                  </span>
+                  <span className="adm-work-count">
+                    <strong>{item.value.toLocaleString()}</strong>
+                    <small>{item.value > 0 ? "open" : "clear"}</small>
+                  </span>
+                  <span className="adm-work-action">
+                    <span>{item.action}</span>
+                    <Icon name="arrow" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
           {/* 2-Column Main Layout */}
-          <div className="adm-canvas-grid">
-            {/* Left: 6 Modules */}
+          <div className="adm-canvas-grid adm-canvas-grid-single">
+            {/* Left: Management Modules */}
             <div className="adm-canvas-modules">
               <div className="adm-section-header">
                 <div>
-                  <h2>Platform Subsystems</h2>
-                  <p>Direct navigation into database archives and controllers</p>
+                  <h2>Manage Platform Areas</h2>
+                  <p>Choose an area below to add, edit or review records.</p>
                 </div>
-                <span className="adm-section-pill">{modules.length} Core Modules</span>
+                <span className="adm-section-pill">{modules.length} modules</span>
               </div>
 
-              <div className="adm-subsystems-grid">
+              <div className="adm-admin-modules-grid">
                 {modules.map((m) => (
-                  <Link href={m.href} className={`adm-app-card ${m.accent}`} key={m.title}>
-                    <div className="adm-app-card-header">
-                      <div className="adm-app-icon-badge" style={{ background: m.gradient }}>
-                        <Icon name={m.icon} />
-                      </div>
-                      <div className="adm-app-count-tag">
-                        <strong>{m.count.toLocaleString()}</strong>
-                        <span>{m.unit}</span>
-                      </div>
-                    </div>
-
-                    <div className="adm-app-card-body">
-                      <div className="adm-app-title">
-                        <span>{m.title}</span>
-                        {m.badge && <span className="adm-app-badge-alert">{m.badge}</span>}
-                      </div>
-                      <p className="adm-app-desc">{m.desc}</p>
-                    </div>
-
-                    <div className="adm-app-card-footer">
-                      <span className="adm-app-action-label">Open module</span>
-                      <span className="adm-app-action-arrow"><Icon name="arrow" /></span>
-                    </div>
+                  <Link href={m.href} className={`adm-admin-module-card ${m.accent}`} key={m.title}>
+                    <span className="adm-admin-module-icon"><Icon name={m.icon} /></span>
+                    <span className="adm-admin-module-copy">
+                      <span className="adm-admin-module-title">
+                        <strong>{m.title}</strong>
+                        {m.badge && <em>{m.badge}</em>}
+                      </span>
+                      <small>{m.desc}</small>
+                    </span>
+                    <span className="adm-admin-module-action">
+                      {m.actionLabel}
+                      <Icon name="arrow" />
+                    </span>
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* Right: Activity Stream & Unclaimed Card */}
+            {/* Right: Recent activity */}
             <div className="adm-canvas-side">
+              <div className="adm-side-card">
+                <div className="adm-side-card-head">
+                  <div>
+                    <h2>Review Queue</h2>
+                    <p>Latest audience-submitted reviews</p>
+                  </div>
+                  <Link href="/admin/reviews" className="adm-side-action-link">Moderate</Link>
+                </div>
+
+                <div className="adm-review-queue">
+                  {recentReviews.length > 0 ? (
+                    recentReviews.map((review) => (
+                      <Link href="/admin/reviews" className="adm-review-queue-row" key={review.id}>
+                        <span className="adm-review-queue-main">
+                          <strong>{review.reviewTitle || review.playTitle}</strong>
+                          <small>{review.reviewerName} - {review.playTitle}</small>
+                        </span>
+                        <span className={`adm-queue-status is-${review.status.toLowerCase()}`}>
+                          {review.status.toLowerCase()}
+                        </span>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="adm-mini-empty">No audience reviews yet.</div>
+                  )}
+                </div>
+              </div>
+
               {/* Recently Updated Theatres */}
               <div className="adm-side-card">
                 <div className="adm-side-card-head">
                   <div>
                     <h2>Venue Activity</h2>
-                    <p>Recent database revisions</p>
+                    <p>Recently edited venue records</p>
                   </div>
-                  <Link href="/admin/theatres" className="adm-side-action-link">View all →</Link>
+                  <Link href="/admin/theatres" className="adm-side-action-link">View all</Link>
                 </div>
 
                 <div className="adm-activity-stream">
-                  {recentTheatres.map((t) => (
+                  {recentTheatres.length > 0 ? recentTheatres.map((t) => (
                     <Link href={`/admin/theatres/${t.id}`} className="adm-activity-row" key={t.id}>
                       <span className="adm-activity-avatar">{t.title.slice(0, 1).toUpperCase()}</span>
                       <div className="adm-activity-info">
@@ -475,24 +565,12 @@ export default async function Admin() {
                         {t.updated ? t.updated.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—"}
                       </time>
                     </Link>
-                  ))}
+                  )) : (
+                    <div className="adm-mini-empty">No venue activity yet.</div>
+                  )}
                 </div>
               </div>
 
-              {/* Action Banner */}
-              <div className="adm-spotlight-card">
-                <div className="adm-spotlight-glow" />
-                <div className="adm-spotlight-head">
-                  <span className="adm-spotlight-pill">ACTION REQUIRED</span>
-                  <span className="adm-spotlight-counter">{unclaimed} Pending</span>
-                </div>
-                <h3>{unclaimed} Unclaimed Venues</h3>
-                <p>Assign verified accounts so theatre administrators can manage their production schedules and box office.</p>
-                <Link href="/admin/theatres?unclaimed=1" className="adm-spotlight-btn">
-                  <span>Match Theatre Owners</span>
-                  <Icon name="arrow" />
-                </Link>
-              </div>
             </div>
           </div>
         </div>

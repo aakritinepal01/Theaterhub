@@ -1,8 +1,16 @@
-import { currentUser } from "@/lib/auth";
+import { currentUser, requireStaff } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import {
+  approveReviewSubmission,
+  deleteReviewSubmission,
+  getReviewModerationStats,
+  listReviewSubmissionsForAdmin,
+} from "@/lib/reviews";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
+import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
+import { getPlayPhoto } from "@/lib/content";
 
 const SECTION_META: Record<
   string,
@@ -53,6 +61,16 @@ const SECTION_META: Record<
       </svg>
     ),
   },
+  reviews: {
+    title: "Review Moderation",
+    subtitle: "Audience Reviews",
+    description: "Approve or delete audience-submitted stage reviews before they appear publicly",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z" />
+      </svg>
+    ),
+  },
   entries: {
     title: "Form Inbox",
     subtitle: "Submissions & Inquiries",
@@ -64,6 +82,44 @@ const SECTION_META: Record<
     ),
   },
 };
+
+function reviewIdFromForm(formData: FormData) {
+  const id = Number(formData.get("reviewId"));
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+async function approveReviewAction(formData: FormData) {
+  "use server";
+
+  await requireStaff();
+  const id = reviewIdFromForm(formData);
+  if (!id) return;
+
+  await approveReviewSubmission(id);
+  revalidatePath("/admin");
+  revalidatePath("/admin/reviews");
+  revalidatePath("/reviews");
+  revalidatePath("/reviews/[slug]", "page");
+}
+
+async function deleteReviewAction(formData: FormData) {
+  "use server";
+
+  await requireStaff();
+  const id = reviewIdFromForm(formData);
+  if (!id) return;
+
+  await deleteReviewSubmission(id);
+  revalidatePath("/admin");
+  revalidatePath("/admin/reviews");
+  revalidatePath("/reviews");
+  revalidatePath("/reviews/[slug]", "page");
+}
+
+function formatAdminDate(value: Date | null) {
+  if (!value) return "Not provided";
+  return value.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
 
 export default async function Section({
   params,
@@ -81,13 +137,14 @@ export default async function Section({
   if (!meta) notFound();
 
   // Counts for sidebar nav
-  const [totalTheatres, totalPlays, totalProfiles, totalSchedules, totalPosts, totalEntries] = await Promise.all([
+  const [totalTheatres, totalPlays, totalProfiles, totalSchedules, totalPosts, totalEntries, reviewStats] = await Promise.all([
     prisma.theatre.count(),
     prisma.play.count(),
     prisma.profile.count(),
     prisma.showsMeta.count(),
     prisma.blogPost.count(),
     prisma.formEntry.count(),
+    getReviewModerationStats(),
   ]);
 
   return (
@@ -135,6 +192,13 @@ export default async function Section({
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>
               <span>Editorial</span>
               <span className="adm-inner-nav-pill">{totalPosts}</span>
+            </Link>
+            <Link href="/admin/reviews" className={`adm-inner-nav-item${section === "reviews" ? " is-active" : ""}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/></svg>
+              <span>Reviews</span>
+              <span className={`adm-inner-nav-pill${reviewStats.pending > 0 ? " is-alert" : ""}`}>
+                {reviewStats.pending > 0 ? reviewStats.pending : reviewStats.total}
+              </span>
             </Link>
           </div>
 
@@ -193,6 +257,7 @@ export default async function Section({
           {section === "profiles" && <ProfilesSection />}
           {section === "schedules" && <SchedulesSection />}
           {section === "posts" && <PostsSection />}
+          {section === "reviews" && <ReviewsSection />}
           {section === "entries" && <EntriesSection />}
         </div>
       </section>
@@ -233,8 +298,51 @@ async function PlaysSection() {
         </div>
       </div>
 
+      <div className="adm-production-grid">
+        {plays.map((play) => {
+          const poster = getPlayPhoto(play);
+
+          return (
+          <article className="adm-production-card" key={play.id}>
+            <div className="adm-production-poster">
+              {poster ? (
+                <img src={poster} alt={`${play.title} poster`} loading="lazy" />
+              ) : (
+                <span>PRODUCTION</span>
+              )}
+              <span className={`adm-production-status ${play.status === "PUBLISHED" ? "is-published" : "is-draft"}`}>
+                {play.status || "PUBLISHED"}
+              </span>
+            </div>
+            <div className="adm-production-body">
+              <div className="adm-production-kicker">PRODUCTION #{play.id}</div>
+              <h2>{play.title}</h2>
+              <p className="adm-production-venue">{play.theatre ? play.theatre.title : "Standalone production"}</p>
+              <div className="adm-production-facts">
+                <span><small>Launched</small><strong>{play.launchedOn ? play.launchedOn.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Not provided"}</strong></span>
+                <span><small>Rating</small><strong className={play.ratingAverage ? "is-rated" : ""}>{play.ratingAverage ? `★ ${play.ratingAverage.toFixed(1)}` : "No ratings"}</strong></span>
+              </div>
+              <div className="adm-production-footer">
+                <span>{play.slug ? "Public page ready" : "No public slug"}</span>
+                {play.slug ? (
+                  <Link href={`/play/${play.slug}/`} target="_blank" rel="noopener noreferrer">View production <span aria-hidden="true">→</span></Link>
+                ) : (
+                  <span className="adm-inner-cell-muted">Unavailable</span>
+                )}
+              </div>
+            </div>
+          </article>
+          );
+        })}
+      </div>
+      {!plays.length && (
+        <div className="adm-inner-empty adm-production-empty">
+          <p>No play productions registered in database.</p>
+        </div>
+      )}
+
       {/* Plays Table */}
-      <div className="adm-inner-table-card">
+      <div className="adm-inner-table-card adm-productions-table-card">
         <div className="adm-inner-table-head-row">
           <span className="adm-inner-table-title">{plays.length} Production Records in Archive</span>
         </div>
@@ -546,6 +654,119 @@ async function PostsSection() {
 /* ══════════════════════════════════════════════════════════
    5. FORM INBOX ENTRIES DETAILED SECTION
    ══════════════════════════════════════════════════════════ */
+async function ReviewsSection() {
+  const [reviews, stats] = await Promise.all([
+    listReviewSubmissionsForAdmin(),
+    getReviewModerationStats(),
+  ]);
+
+  return (
+    <div>
+      <div className="adm-inner-stats">
+        <div className="adm-inner-stat-item">
+          <span className="adm-inner-stat-num">{stats.total}</span>
+          <span className="adm-inner-stat-lbl">Total Reviews</span>
+        </div>
+        <div className="adm-inner-stat-divider" />
+        <div className="adm-inner-stat-item">
+          <span className="adm-inner-stat-num" style={{ color: "var(--adm-amber)" }}>
+            {stats.pending}
+          </span>
+          <span className="adm-inner-stat-lbl">Pending Approval</span>
+        </div>
+        <div className="adm-inner-stat-divider" />
+        <div className="adm-inner-stat-item">
+          <span className="adm-inner-stat-num" style={{ color: "var(--adm-emerald)" }}>
+            {stats.approved}
+          </span>
+          <span className="adm-inner-stat-lbl">Approved Publicly</span>
+        </div>
+      </div>
+
+      <div className="adm-inner-table-card">
+        <div className="adm-inner-table-head-row">
+          <span className="adm-inner-table-title">{reviews.length} Audience Review Submissions</span>
+        </div>
+
+        {reviews.length ? (
+          <div className="adm-review-grid">
+            {reviews.map((review) => {
+              const isPending = review.status === "PENDING";
+
+              return (
+                <article className="adm-review-card" key={review.id}>
+                  <div className="adm-review-card-top">
+                    <span className={`adm-review-status ${isPending ? "is-pending" : "is-approved"}`}>
+                      {isPending ? "Pending approval" : "Approved"}
+                    </span>
+                    <time>{formatAdminDate(review.createdAt)}</time>
+                  </div>
+
+                  <div className="adm-review-title-row">
+                    <div>
+                      <h3>{review.playTitle}</h3>
+                      <p>{review.theatreName}</p>
+                    </div>
+                    <strong>{review.rating.toFixed(1)}</strong>
+                  </div>
+
+                  <div className="adm-review-meta">
+                    <span>By {review.reviewerName}</span>
+                    <span>{review.reviewerRole}</span>
+                    <span>{review.performanceDate ? `Watched ${formatAdminDate(review.performanceDate)}` : "Performance date not provided"}</span>
+                  </div>
+
+                  <h4>{review.reviewTitle}</h4>
+                  <p className="adm-review-excerpt">{review.excerpt}</p>
+
+                  <div className="adm-review-score-grid">
+                    <span>Acting <strong>{review.acting.toFixed(1)}</strong></span>
+                    <span>Direction <strong>{review.direction.toFixed(1)}</strong></span>
+                    <span>Stage <strong>{review.stageDesign.toFixed(1)}</strong></span>
+                    <span>Script <strong>{review.script.toFixed(1)}</strong></span>
+                  </div>
+
+                  <details className="adm-review-details">
+                    <summary>Read full critique</summary>
+                    <p>{review.content}</p>
+                    {review.viewingContext && <small>Viewing context: {review.viewingContext}</small>}
+                  </details>
+
+                  <div className="adm-review-actions">
+                    {isPending && (
+                      <form action={approveReviewAction}>
+                        <input type="hidden" name="reviewId" value={review.id} />
+                        <button type="submit" className="adm-review-action is-approve">
+                          Approve
+                        </button>
+                      </form>
+                    )}
+                    {review.status === "APPROVED" && (
+                      <Link href={`/reviews/${review.playSlug}/`} target="_blank" rel="noopener noreferrer" className="adm-review-action is-view">
+                        View public
+                      </Link>
+                    )}
+                    <form action={deleteReviewAction}>
+                      <input type="hidden" name="reviewId" value={review.id} />
+                      <button type="submit" className="adm-review-action is-delete">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="adm-inner-empty">
+            <p>No audience reviews submitted yet.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 async function EntriesSection() {
   const entries = await prisma.formEntry.findMany({
     include: {

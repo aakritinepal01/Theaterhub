@@ -37,6 +37,29 @@ const THEATRE_FALLBACKS = [
   "https://images.unsplash.com/photo-1504804884814-d58d4c9b0a35?auto=format&fit=crop&w=800&q=80",
 ];
 
+type ScoreKey = keyof ReviewItem["scores"];
+type RecommendationOption = "Strongly recommend" | "Worth watching" | "Mixed experience";
+
+const SCORE_INPUTS: { key: ScoreKey; label: string; note: string }[] = [
+  { key: "acting", label: "Acting", note: "Ensemble, voice, physicality" },
+  { key: "direction", label: "Direction", note: "Pacing, blocking, vision" },
+  { key: "stageDesign", label: "Stage Design", note: "Set, light, costume, sound" },
+  { key: "script", label: "Script", note: "Dialog, structure, theme" },
+];
+
+const RECOMMENDATION_OPTIONS: RecommendationOption[] = [
+  "Strongly recommend",
+  "Worth watching",
+  "Mixed experience",
+];
+
+const DEFAULT_SUBMIT_SCORES: ReviewItem["scores"] = {
+  acting: 5,
+  direction: 5,
+  stageDesign: 5,
+  script: 5,
+};
+
 function getReviewImage(review: ReviewItem, index: number): string {
   if (review.playImage) return review.playImage;
   return THEATRE_FALLBACKS[index % THEATRE_FALLBACKS.length];
@@ -76,7 +99,7 @@ function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md
 }
 
 export function ReviewsInteractiveView({ initialReviews }: { initialReviews: ReviewItem[] }) {
-  const [reviewsList, setReviewsList] = useState<ReviewItem[]>(initialReviews);
+  const reviewsList = initialReviews;
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<"highest" | "latest" | "popular">("highest");
@@ -85,14 +108,25 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
   const [activeModalReview, setActiveModalReview] = useState<ReviewItem | null>(null);
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string>("");
 
   // Submit form state
   const [newPlayTitle, setNewPlayTitle] = useState("");
   const [newTheatreName, setNewTheatreName] = useState("Mandala Theatre Nepal");
+  const [newCustomTheatreName, setNewCustomTheatreName] = useState("");
+  const [newPerformanceDate, setNewPerformanceDate] = useState("");
+  const [newSeatContext, setNewSeatContext] = useState("");
   const [newReviewerName, setNewReviewerName] = useState("");
-  const [newRating, setNewRating] = useState(5);
+  const [newReviewerRole, setNewReviewerRole] = useState("Audience Member");
+  const [newScores, setNewScores] = useState<ReviewItem["scores"]>({ ...DEFAULT_SUBMIT_SCORES });
+  const [newRecommendation, setNewRecommendation] = useState<RecommendationOption>("Strongly recommend");
   const [newTitle, setNewTitle] = useState("");
+  const [newKeyQuote, setNewKeyQuote] = useState("");
+  const [newSummary, setNewSummary] = useState("");
   const [newContent, setNewContent] = useState("");
+  const [newWhatWorked, setNewWhatWorked] = useState("");
+  const [newWhatCouldImprove, setNewWhatCouldImprove] = useState("");
 
   const spotlightReview = useMemo(() => {
     return reviewsList.find((r) => r.isSpotlight) || reviewsList[0];
@@ -136,44 +170,84 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
     };
   }, [reviewsList]);
 
-  const handleFormSubmit = (e: FormEvent) => {
+  const newOverallRating = useMemo(() => {
+    const values = Object.values(newScores);
+    return Number((values.reduce((total, score) => total + score, 0) / values.length).toFixed(1));
+  }, [newScores]);
+
+  const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!newPlayTitle || !newReviewerName || !newTitle || !newContent) return;
+    const trimmedPlayTitle = newPlayTitle.trim();
+    const selectedTheatreName = newTheatreName === "Other"
+      ? newCustomTheatreName.trim()
+      : newTheatreName.trim();
+    const trimmedReviewerName = newReviewerName.trim();
+    const trimmedTitle = newTitle.trim();
+    const trimmedKeyQuote = newKeyQuote.trim();
+    const trimmedSummary = newSummary.trim();
+    const trimmedContent = newContent.trim();
+    const trimmedSeatContext = newSeatContext.trim();
+    const trimmedWhatWorked = newWhatWorked.trim();
+    const trimmedWhatCouldImprove = newWhatCouldImprove.trim();
 
-    const newRevItem: ReviewItem = {
-      id: Date.now(),
-      playTitle: newPlayTitle,
-      playSlug: newPlayTitle.toLowerCase().replace(/\s+/g, "-"),
-      playImage: THEATRE_FALLBACKS[Math.floor(Math.random() * THEATRE_FALLBACKS.length)],
-      theatreName: newTheatreName || "Stage Theatre Nepal",
-      reviewerName: newReviewerName,
-      reviewerAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-      reviewerRole: "Theatre Viewer",
-      rating: newRating,
-      verdictTag: newRating >= 4.7 ? "Masterpiece" : newRating >= 4.0 ? "Highly Recommended" : "Audience Favorite",
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      title: newTitle,
-      excerpt: newContent.slice(0, 160) + "...",
-      content: newContent,
-      keyQuote: `"${newTitle}"`,
-      scores: {
-        acting: Math.min(5, newRating + 0.1),
-        direction: newRating,
-        stageDesign: Math.max(3.5, newRating - 0.2),
-        script: newRating,
-      },
-    };
+    if (!trimmedPlayTitle || !selectedTheatreName || !trimmedReviewerName || !trimmedTitle || !trimmedSummary || !trimmedContent) return;
 
-    setReviewsList((prev) => [newRevItem, ...prev]);
-    setSubmitSuccess(true);
-    setTimeout(() => {
-      setShowSubmitModal(false);
-      setSubmitSuccess(false);
-      setNewPlayTitle("");
-      setNewReviewerName("");
-      setNewTitle("");
-      setNewContent("");
-    }, 1800);
+    setSubmitError("");
+    setIsSubmittingReview(true);
+
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          playTitle: trimmedPlayTitle,
+          theatreName: selectedTheatreName,
+          performanceDate: newPerformanceDate,
+          viewingContext: trimmedSeatContext,
+          reviewerName: trimmedReviewerName,
+          reviewerRole: newReviewerRole,
+          scores: newScores,
+          title: trimmedTitle,
+          keyQuote: trimmedKeyQuote,
+          summary: trimmedSummary,
+          critique: trimmedContent,
+          whatWorked: trimmedWhatWorked,
+          whatCouldImprove: trimmedWhatCouldImprove,
+          recommendation: newRecommendation,
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as { error?: string } | null;
+
+      if (!response.ok) {
+        setSubmitError(result?.error || "Unable to submit review right now.");
+        return;
+      }
+
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        setShowSubmitModal(false);
+        setSubmitSuccess(false);
+        setNewPlayTitle("");
+        setNewTheatreName("Mandala Theatre Nepal");
+        setNewCustomTheatreName("");
+        setNewPerformanceDate("");
+        setNewSeatContext("");
+        setNewReviewerName("");
+        setNewReviewerRole("Audience Member");
+        setNewScores({ ...DEFAULT_SUBMIT_SCORES });
+        setNewRecommendation("Strongly recommend");
+        setNewTitle("");
+        setNewKeyQuote("");
+        setNewSummary("");
+        setNewContent("");
+        setNewWhatWorked("");
+        setNewWhatCouldImprove("");
+      }, 1800);
+    } catch {
+      setSubmitError("Network error. Please try again.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
   };
 
   return (
@@ -206,10 +280,6 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
         {/* ── 2. SPOTLIGHT / EDITOR'S CHOICE REVIEW ── */}
         {spotlightReview && (
           <section id="featured-spotlight" className="reviews-spotlight-section">
-            <div className="spotlight-header-label">
-              <span className="spotlight-star">✨</span> Editor&apos;s Choice Critique
-            </div>
-
             <div className="spotlight-card">
               <div className="spotlight-img-wrap">
                 <img
@@ -311,7 +381,10 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
                   <button
                     type="button"
                     className="about-btn about-btn-primary reviews-write-btn"
-                    onClick={() => setShowSubmitModal(true)}
+                    onClick={() => {
+                      setSubmitError("");
+                      setShowSubmitModal(true);
+                    }}
                   >
                     ✍️ Write Review
                   </button>
@@ -456,7 +529,10 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
           <button
             type="button"
             className="about-btn about-btn-primary about-btn-lg"
-            onClick={() => setShowSubmitModal(true)}
+            onClick={() => {
+              setSubmitError("");
+              setShowSubmitModal(true);
+            }}
           >
             Submit a Review ✍️
           </button>
@@ -585,115 +661,284 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
               type="button"
               className="modal-close-btn"
               onClick={() => setShowSubmitModal(false)}
+              aria-label="Close submit review form"
             >
               ✕
             </button>
 
             <div className="submit-modal-header">
-              <h2 id="submit-modal-title">✍️ Submit Play Review &amp; Rating</h2>
-              <p>Share your artistic critique and audience feedback for Nepal theatre productions.</p>
+              <span className="submit-modal-kicker">Audience review desk</span>
+              <h2 id="submit-modal-title">Submit a Review</h2>
+              <p>Share the production context, scorecard, and critique for Nepal theatre productions.</p>
+              <div className="submit-meta-strip" aria-label="Review form sections">
+                <span>Production</span>
+                <span>Scorecard</span>
+                <span>Critique</span>
+              </div>
             </div>
 
             {submitSuccess ? (
               <div className="submit-success-state">
                 <div className="success-icon">🎉</div>
-                <h3>Review Published!</h3>
-                <p>Thank you for contributing to Nepal&apos;s stage community!</p>
+                <h3>Review Submitted!</h3>
+                <p>Your critique is waiting for admin approval.</p>
               </div>
             ) : (
               <form onSubmit={handleFormSubmit} className="review-submit-form">
-                <div className="form-group">
-                  <label htmlFor="play-title-input">Play Title *</label>
-                  <input
-                    id="play-title-input"
-                    type="text"
-                    required
-                    placeholder="e.g. Degree Kaila, Sirumarani, Hamlet..."
-                    value={newPlayTitle}
-                    onChange={(e) => setNewPlayTitle(e.target.value)}
-                  />
-                </div>
+                <fieldset className="review-form-section">
+                  <legend>Production Details</legend>
 
-                <div className="form-row-2">
-                  <div className="form-group">
-                    <label htmlFor="theatre-name-input">Theatre Venue</label>
-                    <select
-                      id="theatre-name-input"
-                      value={newTheatreName}
-                      onChange={(e) => setNewTheatreName(e.target.value)}
-                    >
-                      <option value="Mandala Theatre Nepal">Mandala Theatre Nepal</option>
-                      <option value="Shilpee Theatre">Shilpee Theatre</option>
-                      <option value="Kausi Theatre">Kausi Theatre</option>
-                      <option value="Theatre Village">Theatre Village</option>
-                      <option value="Sarwanam Theatre">Sarwanam Theatre</option>
-                      <option value="Pokhara Theatre">Pokhara Theatre</option>
-                      <option value="Rastriya Nachghar">Rastriya Nachghar</option>
-                    </select>
+                  <div className="form-row-2">
+                    <div className="form-group">
+                      <label htmlFor="play-title-input">Play Title *</label>
+                      <input
+                        id="play-title-input"
+                        type="text"
+                        required
+                        placeholder="e.g. Degree Kaila, Sirumarani, Hamlet"
+                        value={newPlayTitle}
+                        onChange={(e) => setNewPlayTitle(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="theatre-name-input">Theatre Venue *</label>
+                      <select
+                        id="theatre-name-input"
+                        required
+                        value={newTheatreName}
+                        onChange={(e) => setNewTheatreName(e.target.value)}
+                      >
+                        <option value="Mandala Theatre Nepal">Mandala Theatre Nepal</option>
+                        <option value="Shilpee Theatre">Shilpee Theatre</option>
+                        <option value="Kausi Theatre">Kausi Theatre</option>
+                        <option value="Theatre Village">Theatre Village</option>
+                        <option value="Sarwanam Theatre">Sarwanam Theatre</option>
+                        <option value="Pokhara Theatre">Pokhara Theatre</option>
+                        <option value="Rastriya Nachghar">Rastriya Nachghar</option>
+                        <option value="Other">Other Theatre</option>
+                      </select>
+                    </div>
                   </div>
 
+                  {newTheatreName === "Other" && (
+                    <div className="form-group">
+                      <label htmlFor="custom-theatre-name-input">Theatre Name *</label>
+                      <input
+                        id="custom-theatre-name-input"
+                        type="text"
+                        required
+                        placeholder="Enter the theatre or venue name"
+                        value={newCustomTheatreName}
+                        onChange={(e) => setNewCustomTheatreName(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  <div className="form-row-2">
+                    <div className="form-group">
+                      <label htmlFor="performance-date-input">Performance Date</label>
+                      <input
+                        id="performance-date-input"
+                        type="date"
+                        value={newPerformanceDate}
+                        onChange={(e) => setNewPerformanceDate(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="seat-context-input">Seat / Viewing Context</label>
+                      <input
+                        id="seat-context-input"
+                        type="text"
+                        placeholder="e.g. Balcony left, opening night, matinee"
+                        value={newSeatContext}
+                        onChange={(e) => setNewSeatContext(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset className="review-form-section">
+                  <legend>Reviewer Details</legend>
+
+                  <div className="form-row-2">
+                    <div className="form-group">
+                      <label htmlFor="reviewer-name-input">Your Name *</label>
+                      <input
+                        id="reviewer-name-input"
+                        type="text"
+                        required
+                        placeholder="e.g. Aarav Sharma"
+                        value={newReviewerName}
+                        onChange={(e) => setNewReviewerName(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="reviewer-role-input">Reviewer Perspective</label>
+                      <select
+                        id="reviewer-role-input"
+                        value={newReviewerRole}
+                        onChange={(e) => setNewReviewerRole(e.target.value)}
+                      >
+                        <option value="Audience Member">Audience Member</option>
+                        <option value="Theatre Student">Theatre Student</option>
+                        <option value="Drama Practitioner">Drama Practitioner</option>
+                        <option value="Cultural Writer">Cultural Writer</option>
+                        <option value="Stage Critic">Stage Critic</option>
+                      </select>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset className="review-form-section">
+                  <legend>Score Breakdown</legend>
+
+                  <div className="score-summary-row">
+                    <span>Overall Rating</span>
+                    <strong>{newOverallRating.toFixed(1)} / 5.0</strong>
+                  </div>
+
+                  <div className="score-breakdown-grid">
+                    {SCORE_INPUTS.map((scoreInput) => (
+                      <div className="score-slider-row" key={scoreInput.key}>
+                        <label htmlFor={`score-${scoreInput.key}`}>
+                          <span>
+                            <strong>{scoreInput.label}</strong>
+                            <small>{scoreInput.note}</small>
+                          </span>
+                          <b>{newScores[scoreInput.key].toFixed(1)}</b>
+                        </label>
+                        <input
+                          id={`score-${scoreInput.key}`}
+                          className="score-range-input"
+                          type="range"
+                          min="1"
+                          max="5"
+                          step="0.1"
+                          value={newScores[scoreInput.key]}
+                          onChange={(e) =>
+                            setNewScores((prev) => ({
+                              ...prev,
+                              [scoreInput.key]: Number(e.target.value),
+                            }))
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <fieldset className="review-form-section">
+                  <legend>Written Critique</legend>
+
                   <div className="form-group">
-                    <label htmlFor="reviewer-name-input">Your Name *</label>
+                    <label htmlFor="review-title-input">Review Headline *</label>
                     <input
-                      id="reviewer-name-input"
+                      id="review-title-input"
                       type="text"
                       required
-                      placeholder="e.g. Aarav Sharma"
-                      value={newReviewerName}
-                      onChange={(e) => setNewReviewerName(e.target.value)}
+                      placeholder="e.g. A tightly paced performance with a memorable ensemble"
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
                     />
                   </div>
-                </div>
 
-                <div className="form-group">
-                  <label>Star Rating (1 to 5 Stars) *</label>
-                  <div className="star-picker">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        className={`star-pick-btn ${star <= newRating ? "is-selected" : ""}`}
-                        onClick={() => setNewRating(star)}
-                      >
-                        ★
-                      </button>
-                    ))}
-                    <span className="picker-score">{newRating}.0 Stars</span>
+                  <div className="form-group">
+                    <label htmlFor="review-key-quote-input">One-Line Verdict</label>
+                    <input
+                      id="review-key-quote-input"
+                      type="text"
+                      placeholder="A short quote readers can remember"
+                      value={newKeyQuote}
+                      onChange={(e) => setNewKeyQuote(e.target.value)}
+                    />
                   </div>
-                </div>
 
-                <div className="form-group">
-                  <label htmlFor="review-title-input">Review Headline *</label>
-                  <input
-                    id="review-title-input"
-                    type="text"
-                    required
-                    placeholder="e.g. A Breathtaking Masterpiece of Contemporary Acting"
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                  />
-                </div>
+                  <div className="form-group">
+                    <label htmlFor="review-summary-input">Short Summary *</label>
+                    <textarea
+                      id="review-summary-input"
+                      required
+                      rows={3}
+                      placeholder="Summarize the performance, tone, and audience impact."
+                      value={newSummary}
+                      onChange={(e) => setNewSummary(e.target.value)}
+                    />
+                  </div>
 
-                <div className="form-group">
-                  <label htmlFor="review-content-input">Detailed Critique &amp; Remarks *</label>
-                  <textarea
-                    id="review-content-input"
-                    required
-                    rows={5}
-                    placeholder="Write your thoughts on acting, directorial choices, scenography, sound, and emotional impact..."
-                    value={newContent}
-                    onChange={(e) => setNewContent(e.target.value)}
-                  />
-                </div>
+                  <div className="form-group">
+                    <label htmlFor="review-content-input">Detailed Critique *</label>
+                    <textarea
+                      id="review-content-input"
+                      required
+                      rows={7}
+                      className="textarea-tall"
+                      placeholder="Discuss acting, direction, staging, rhythm, sound, script, and emotional impact."
+                      value={newContent}
+                      onChange={(e) => setNewContent(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-row-2">
+                    <div className="form-group">
+                      <label htmlFor="review-worked-input">What Worked Best</label>
+                      <textarea
+                        id="review-worked-input"
+                        rows={3}
+                        placeholder="Mention a scene, actor, design choice, or directorial detail."
+                        value={newWhatWorked}
+                        onChange={(e) => setNewWhatWorked(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="review-improve-input">Could Be Stronger</label>
+                      <textarea
+                        id="review-improve-input"
+                        rows={3}
+                        placeholder="Add constructive notes about pacing, clarity, staging, or script."
+                        value={newWhatCouldImprove}
+                        onChange={(e) => setNewWhatCouldImprove(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Recommendation</label>
+                    <div className="recommendation-options" role="radiogroup" aria-label="Recommendation">
+                      {RECOMMENDATION_OPTIONS.map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          role="radio"
+                          aria-checked={newRecommendation === option}
+                          className={`recommend-chip ${newRecommendation === option ? "is-selected" : ""}`}
+                          onClick={() => setNewRecommendation(option)}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </fieldset>
+
+                {submitError && (
+                  <p className="review-submit-error" role="alert">
+                    {submitError}
+                  </p>
+                )}
 
                 <div className="form-actions">
-                  <button type="submit" className="about-btn about-btn-primary">
-                    Publish Review 🚀
+                  <button type="submit" className="about-btn about-btn-primary" disabled={isSubmittingReview}>
+                    {isSubmittingReview ? "Submitting..." : "Send for Approval"}
                   </button>
                   <button
                     type="button"
                     className="about-btn about-btn-ghost"
                     onClick={() => setShowSubmitModal(false)}
+                    disabled={isSubmittingReview}
                   >
                     Cancel
                   </button>

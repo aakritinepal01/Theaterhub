@@ -20,9 +20,22 @@ export default async function Theatres({
       title: search ? { contains: search, mode: "insensitive" } : undefined,
       ownerId: q.unclaimed === "1" ? null : undefined,
     },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      address: true,
+      description: true,
+      about: true,
+      email: true,
+      phone: true,
+      linkWebsite: true,
+      establishedOn: true,
+      status: true,
+      updated: true,
+      profilePic: true,
+      coverImage: true,
       owner: { select: { username: true, email: true } },
-      _count: { select: { plays: true } },
+      _count: { select: { plays: true, shows: true } },
     },
     orderBy: [{ updated: "desc" }, { title: "asc" }],
   });
@@ -179,8 +192,78 @@ export default async function Theatres({
             )}
           </form>
 
-          {/* Table */}
-          <div className="adm-inner-table-card">
+          <div className="adm-theatre-directory-head">
+            <div>
+              <span>VENUE COLLECTION</span>
+              <h2>{q.unclaimed === "1" ? "Unclaimed venues" : search ? `Search results for "${search}"` : "All theatre venues"}</h2>
+            </div>
+            <strong>{rows.length} {rows.length === 1 ? "venue" : "venues"} visible</strong>
+          </div>
+
+          {/* Visual venue directory */}
+          <div className="adm-theatre-grid">
+            {rows.map((t) => (
+              <article className="adm-theatre-card" key={t.id}>
+                <div className="adm-theatre-cover">
+                  {t.coverImage ? (
+                    <img src={t.coverImage} alt={`${t.title} cover`} loading="lazy" />
+                  ) : (
+                    <span className="adm-theatre-cover-fallback">THEATRE</span>
+                  )}
+                  <span className={`adm-theatre-status ${t.owner ? "is-claimed" : "is-unclaimed"}`}>
+                    {t.owner ? "Claimed" : "Unclaimed"}
+                  </span>
+                </div>
+                <div className="adm-theatre-card-body">
+                  <div className="adm-theatre-card-heading">
+                    <div>
+                      <h2>{t.title}</h2>
+                      <span>Venue ID #{t.id}</span>
+                    </div>
+                  </div>
+                  {t.profilePic && (
+                    <div className="adm-theatre-logo-strip">
+                      <img src={t.profilePic} alt={`${t.title} logo`} loading="lazy" />
+                      <span>Official venue logo</span>
+                    </div>
+                  )}
+                  <p className="adm-theatre-address">{t.address || "No location listed"}</p>
+                  {(t.description || t.about) && (
+                    <p className="adm-theatre-description">{t.description || t.about}</p>
+                  )}
+                  <div className="adm-theatre-details">
+                    <span><strong>{t._count.plays}</strong> plays</span>
+                    <span><strong>{t._count.shows}</strong> shows</span>
+                    <span><strong>{t.status.toLowerCase()}</strong></span>
+                  </div>
+                  {(t.email || t.phone || t.linkWebsite) && (
+                    <div className="adm-theatre-contact">
+                      {t.email && <span>{t.email}</span>}
+                      {t.phone && <span>{t.phone}</span>}
+                      {t.linkWebsite && <span>Website listed</span>}
+                    </div>
+                  )}
+                  <div className="adm-theatre-owner">
+                    <span className="adm-theatre-owner-mark">{t.owner ? t.owner.username.slice(0, 1).toUpperCase() : "!"}</span>
+                    <span>{t.owner ? t.owner.email : "No owner assigned"}</span>
+                  </div>
+                  <div className="adm-theatre-card-footer">
+                    <small>Updated {t.updated?.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) || "-"}</small>
+                    <Link href={`/admin/theatres/${t.id}`} className="adm-theatre-manage-link">Manage venue <span aria-hidden="true">→</span></Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          {!rows.length && (
+            <div className="adm-inner-empty adm-theatre-empty">
+              <p>No venues match your current filters.</p>
+              <Link href="/admin/theatres" className="adm-inner-empty-reset">Clear filters →</Link>
+            </div>
+          )}
+
+          {/* Accessible data table kept for wide-screen record comparison */}
+          <div className="adm-inner-table-card adm-theatre-table-card">
             <div className="adm-inner-table-head-row">
               <span className="adm-inner-table-title">
                 {rows.length} {rows.length === 1 ? "Venue" : "Venues"} {search ? `matching "${search}"` : q.unclaimed === "1" ? "— unclaimed" : ""}
