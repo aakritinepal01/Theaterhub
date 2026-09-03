@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatDate, mediaUrl, publishedWhere } from "@/lib/content";
+import { listApprovedReviewItems } from "@/lib/reviews";
 import { ReviewsInteractiveView, type ReviewItem } from "@/components/ReviewsInteractiveView";
 
 export const revalidate = 300;
@@ -168,6 +169,7 @@ export const DEFAULT_REVIEWS: ReviewItem[] = [
 
 export default async function ReviewsPage() {
   let dbPlays: ReviewPlay[] = [];
+  let approvedUserReviews: ReviewItem[] = [];
   
   try {
     const now = new Date();
@@ -183,6 +185,12 @@ export default async function ReviewsPage() {
     );
   } catch {
     dbPlays = [];
+  }
+
+  try {
+    approvedUserReviews = await listApprovedReviewItems();
+  } catch {
+    approvedUserReviews = [];
   }
 
   // Merge DB plays with rating information into ReviewItem list if available
@@ -225,7 +233,7 @@ export default async function ReviewsPage() {
     }
   });
 
-  const combinedReviews = Array.from(allReviewsMap.values());
+  const combinedReviews = [...approvedUserReviews, ...Array.from(allReviewsMap.values())];
 
   return (
     <main className="reviews-page-main">
