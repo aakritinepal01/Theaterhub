@@ -19,14 +19,16 @@ type PlayData = {
 export function PlayCard({
   play,
   showTeaser = true,
+  teaserLength = 140,
 }: {
   play: PlayData;
   showTeaser?: boolean;
+  teaserLength?: number;
 }) {
   const image = getPlayPhoto(play);
 
   const teaser =
-    plainText(play.description).slice(0, 140) ||
+    plainText(play.description).slice(0, teaserLength) ||
     "Discover this production on TheatreHub.";
 
   const venueName = play.theatre?.title;
