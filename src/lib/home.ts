@@ -55,7 +55,7 @@ export async function getUpcomingShows() {
   const scheduled = await prisma.show.findMany({
     where: {
       showtime: { gt: new Date() },
-      play: { status: { in: ["PUBLISHED", "UPCOMING"] } },
+      play: { status: "PUBLISHED" },
     },
     orderBy: { showtime: "asc" },
     take: 10,
@@ -64,7 +64,7 @@ export async function getUpcomingShows() {
 
   const scheduledPlayIds=new Set(scheduled.map(show=>show.playId));
   const productions=await prisma.play.findMany({
-    where:{status:"UPCOMING",theatreId:{not:null}},
+    where:{status:"PUBLISHED",theatreId:{not:null}},
     orderBy:[{launchedOn:"asc"},{updated:"desc"}],
     take:10,
     include:{theatre:true},

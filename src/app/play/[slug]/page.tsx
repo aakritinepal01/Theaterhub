@@ -22,7 +22,13 @@ const showTime = new Intl.DateTimeFormat("en-NP", {
 });
 
 function safeHtml(html: string) {
-  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&amp;/gi, "&");
 }
 
 function hasContent(html: string) {
@@ -87,6 +93,7 @@ export default async function PlayDetail({
   const crewRoles = groupRoles(play.crew);
   const synopsisHtml = safeHtml(play.abstract || play.description);
   const noteHtml = safeHtml(play.directorialNote);
+  const descriptionText = plainText(safeHtml(play.description));
   const runDate = formatRunDate(play.launchedOn, play.endedOn);
   const firstShow = play.shows[0];
   const ratingText = play.ratingCount ? `${play.ratingAverage.toFixed(1)} / 5` : "Not rated";
@@ -128,8 +135,8 @@ export default async function PlayDetail({
               </aside>
             )}
 
-            {hasContent(play.description) ? (
-              <p className="play-detail-lead">{plainText(play.description)}</p>
+            {descriptionText ? (
+              <p className="play-detail-lead">{descriptionText}</p>
             ) : null}
 
             <div className="play-detail-actions">

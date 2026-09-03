@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ChangeEvent, type FormEvent } from "react";
 import Link from "next/link";
 
 export type ReviewItem = {
@@ -136,7 +136,7 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
     };
   }, [reviewsList]);
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!newPlayTitle || !newReviewerName || !newTitle || !newContent) return;
 
@@ -228,49 +228,8 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
 
                 <h2 className="spotlight-play-title">{spotlightReview.playTitle}</h2>
                 <div className="spotlight-venue">🏛️ {spotlightReview.theatreName}</div>
-
                 <h3 className="spotlight-review-headline">&ldquo;{spotlightReview.title}&rdquo;</h3>
-
-                <blockquote className="spotlight-quote">
-                  &ldquo;{spotlightReview.keyQuote}&rdquo;
-                </blockquote>
-
-                <p className="spotlight-excerpt">{spotlightReview.excerpt}</p>
-
-                {/* Scorecard Breakdown */}
-                <div className="spotlight-scorecard">
-                  <div className="score-item">
-                    <span className="score-label">🎭 Acting</span>
-                    <div className="score-bar">
-                      <div className="score-fill" style={{ width: `${(spotlightReview.scores.acting / 5) * 100}%` }} />
-                    </div>
-                    <span className="score-val">{spotlightReview.scores.acting}</span>
-                  </div>
-
-                  <div className="score-item">
-                    <span className="score-label">🎬 Direction</span>
-                    <div className="score-bar">
-                      <div className="score-fill" style={{ width: `${(spotlightReview.scores.direction / 5) * 100}%` }} />
-                    </div>
-                    <span className="score-val">{spotlightReview.scores.direction}</span>
-                  </div>
-
-                  <div className="score-item">
-                    <span className="score-label">🎨 Stage Design</span>
-                    <div className="score-bar">
-                      <div className="score-fill" style={{ width: `${(spotlightReview.scores.stageDesign / 5) * 100}%` }} />
-                    </div>
-                    <span className="score-val">{spotlightReview.scores.stageDesign}</span>
-                  </div>
-
-                  <div className="score-item">
-                    <span className="score-label">📜 Script &amp; Dialog</span>
-                    <div className="score-bar">
-                      <div className="score-fill" style={{ width: `${(spotlightReview.scores.script / 5) * 100}%` }} />
-                    </div>
-                    <span className="score-val">{spotlightReview.scores.script}</span>
-                  </div>
-                </div>
+                <p className="spotlight-mini-note">{spotlightReview.excerpt}</p>
 
                 <div className="spotlight-footer">
                   <div className="reviewer-info">
@@ -285,199 +244,205 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
                     </div>
                   </div>
 
-                  <button
-                    type="button"
+                  <Link
+                    href={`/reviews/${spotlightReview.playSlug}/`}
                     className="read-full-btn"
-                    onClick={() => setActiveModalReview(spotlightReview)}
+                    aria-label={`Read full review for ${spotlightReview.playTitle}`}
                   >
                     Read Full Review →
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* ── 3. CONTROLS BAR (SEARCH & TABS & SORT) ── */}
-        <section className="reviews-controls-bar">
-          <div className="section-heading-row">
-            <div>
-              <span className="section-kicker">The review library</span>
-              <h2>Explore every critique</h2>
+        {/* ── 3. REVIEW LIBRARY: FILTERS + GRID ── */}
+        <section className="reviews-library-layout" aria-label="Review library">
+          <aside className="reviews-controls-bar" aria-label="Review filters">
+            <div className="section-heading-row reviews-library-toolbar">
+              <div>
+                <span className="section-kicker">The review library</span>
+                <h2>Explore every critique</h2>
+              </div>
+              <span className="results-count">Showing {filteredReviews.length} of {reviewsList.length}</span>
             </div>
-            <span className="results-count">Showing {filteredReviews.length} of {reviewsList.length}</span>
-          </div>
-          <div className="controls-row">
-            {/* Search Input */}
-            <div className="reviews-search-wrap">
-              <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                className="reviews-search-input"
-                placeholder="Search reviews by play, critic, theatre or keyword..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
+            <div className="reviews-library-filter-bar">
+              <div className="controls-row">
+                {/* Search Input */}
+                <div className="reviews-search-wrap">
+                  <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <input
+                    type="text"
+                    className="reviews-search-input"
+                    placeholder="Search by play, critic or theatre..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      className="search-clear-btn"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* Sort Dropdown & Submit Button */}
+                <div className="reviews-sort-wrap">
+                  <label htmlFor="review-sort-select">Sort by:</label>
+                  <select
+                    id="review-sort-select"
+                    value={sortBy}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                      setSortBy(e.target.value as "highest" | "latest" | "popular")
+                    }
+                    className="reviews-sort-select"
+                  >
+                    <option value="highest">⭐ Highest Rated</option>
+                    <option value="latest">📅 Latest Reviews</option>
+                    <option value="popular">🔥 Performance Score</option>
+                  </select>
+                  <button
+                    type="button"
+                    className="about-btn about-btn-primary reviews-write-btn"
+                    onClick={() => setShowSubmitModal(true)}
+                  >
+                    ✍️ Write Review
+                  </button>
+                </div>
+              </div>
+
+              <span className="reviews-filter-label">Browse by</span>
+              <div className="reviews-tabs" role="tablist">
                 <button
                   type="button"
-                  className="search-clear-btn"
-                  onClick={() => setSearchQuery("")}
+                  role="tab"
+                  aria-selected={selectedCategory === "all"}
+                  className={`reviews-tab-chip ${selectedCategory === "all" ? "is-active" : ""}`}
+                  onClick={() => setSelectedCategory("all")}
                 >
-                  ✕
+                  All Reviews ({reviewsList.length})
                 </button>
-              )}
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedCategory === "masterpiece"}
+                  className={`reviews-tab-chip ${selectedCategory === "masterpiece" ? "is-active" : ""}`}
+                  onClick={() => setSelectedCategory("masterpiece")}
+                >
+                  🏆 Masterpieces (4.7+)
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedCategory === "editors"}
+                  className={`reviews-tab-chip ${selectedCategory === "editors" ? "is-active" : ""}`}
+                  onClick={() => setSelectedCategory("editors")}
+                >
+                  ✨ Critic Choice
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedCategory === "audience"}
+                  className={`reviews-tab-chip ${selectedCategory === "audience" ? "is-active" : ""}`}
+                  onClick={() => setSelectedCategory("audience")}
+                >
+                  🗣️ Audience Reviews
+                </button>
+              </div>
             </div>
+          </aside>
 
-            {/* Sort Dropdown & Submit Button */}
-            <div className="reviews-sort-wrap">
-              <label htmlFor="review-sort-select">Sort by:</label>
-              <select
-                id="review-sort-select"
-                value={sortBy}
-                onChange={(e: any) => setSortBy(e.target.value)}
-                className="reviews-sort-select"
-              >
-                <option value="highest">⭐ Highest Rated</option>
-                <option value="latest">📅 Latest Reviews</option>
-                <option value="popular">🔥 Performance Score</option>
-              </select>
-              <button
-                type="button"
-                className="about-btn about-btn-primary"
-                style={{ padding: "8px 16px", fontSize: "0.85rem" }}
-                onClick={() => setShowSubmitModal(true)}
-              >
-                ✍️ Write Review
-              </button>
-            </div>
-          </div>
-
-          {/* Category Tabs */}
-          <div className="reviews-tabs" role="tablist">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={selectedCategory === "all"}
-              className={`reviews-tab-chip ${selectedCategory === "all" ? "is-active" : ""}`}
-              onClick={() => setSelectedCategory("all")}
-            >
-              All Reviews ({reviewsList.length})
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={selectedCategory === "masterpiece"}
-              className={`reviews-tab-chip ${selectedCategory === "masterpiece" ? "is-active" : ""}`}
-              onClick={() => setSelectedCategory("masterpiece")}
-            >
-              🏆 Masterpieces (4.7+)
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={selectedCategory === "editors"}
-              className={`reviews-tab-chip ${selectedCategory === "editors" ? "is-active" : ""}`}
-              onClick={() => setSelectedCategory("editors")}
-            >
-              ✨ Critic Choice
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={selectedCategory === "audience"}
-              className={`reviews-tab-chip ${selectedCategory === "audience" ? "is-active" : ""}`}
-              onClick={() => setSelectedCategory("audience")}
-            >
-              🗣️ Audience Reviews
-            </button>
-          </div>
-        </section>
-
-        {/* ── 4. REVIEWS GRID ── */}
-        {filteredReviews.length > 0 ? (
-          <section className="reviews-grid-section">
-            <div className="reviews-grid">
-              {filteredReviews.map((rev, idx) => (
-                <article key={rev.id} className="review-card">
-                  <div className="review-card-img-wrap">
-                    <img
-                      src={getReviewImage(rev, idx)}
-                      alt={rev.playTitle}
-                      className="review-card-img"
-                      loading="lazy"
-                    />
-                    <span className="review-card-verdict">{rev.verdictTag}</span>
-                    <div className="review-card-rating-badge">
-                      ★ {rev.rating.toFixed(1)}
-                    </div>
-                  </div>
-
-                  <div className="review-card-content">
-                    <div className="review-card-header">
-                      <span className="review-card-venue">🏛️ {rev.theatreName}</span>
-                      <span className="review-card-date">{rev.date}</span>
-                    </div>
-
-                    <h3 className="review-card-play-title">{rev.playTitle}</h3>
-                    <h4 className="review-card-title">&ldquo;{rev.title}&rdquo;</h4>
-
-                    <p className="review-card-excerpt">{rev.excerpt}</p>
-
-                    {/* Mini score pills */}
-                    <div className="review-mini-scores">
-                      <span title="Acting">🎭 {rev.scores.acting}</span>
-                      <span title="Direction">🎬 {rev.scores.direction}</span>
-                      <span title="Stage Design">🎨 {rev.scores.stageDesign}</span>
-                      <span title="Script">📜 {rev.scores.script}</span>
-                    </div>
-
-                    <div className="review-card-footer">
-                      <div className="reviewer-mini">
+          <div className="reviews-library-results">
+            {/* ── 4. REVIEWS GRID ── */}
+            {filteredReviews.length > 0 ? (
+              <section className="reviews-grid-section">
+                <div className="reviews-grid">
+                  {filteredReviews.map((rev, idx) => (
+                    <article key={rev.id} className="review-card">
+                      <div className="review-card-img-wrap">
                         <img
-                          src={rev.reviewerAvatar}
-                          alt={rev.reviewerName}
-                          className="reviewer-mini-avatar"
+                          src={getReviewImage(rev, idx)}
+                          alt={rev.playTitle}
+                          className="review-card-img"
+                          loading="lazy"
                         />
-                        <div className="reviewer-mini-text">
-                          <strong>{rev.reviewerName}</strong>
-                          <small>{rev.reviewerRole}</small>
+                        <span className="review-card-verdict">{rev.verdictTag}</span>
+                        <div className="review-card-rating-badge">
+                          ★ {rev.rating.toFixed(1)}
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        className="review-read-btn"
-                        onClick={() => setActiveModalReview(rev)}
-                      >
-                        Read Critique →
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        ) : (
-          <div className="reviews-empty-state">
-            <div className="empty-icon">🔍</div>
-            <h3>No reviews match your query</h3>
-            <p>Try searching for a different play name, theatre, or clearing filters.</p>
-            <button
-              type="button"
-              className="about-btn about-btn-primary"
-              onClick={() => {
-                setSelectedCategory("all");
-                setSearchQuery("");
-              }}
-            >
-              Reset Filters
-            </button>
+                      <div className="review-card-content">
+                        <div className="review-card-header">
+                          <span className="review-card-venue">🏛️ {rev.theatreName}</span>
+                          <span className="review-card-date">{rev.date}</span>
+                        </div>
+
+                        <h3 className="review-card-play-title">{rev.playTitle}</h3>
+                        <h4 className="review-card-title">&ldquo;{rev.title}&rdquo;</h4>
+
+                        <p className="review-card-excerpt">{rev.excerpt}</p>
+
+                        {/* Mini score pills */}
+                        <div className="review-mini-scores">
+                          <span title="Acting">🎭 {rev.scores.acting}</span>
+                          <span title="Direction">🎬 {rev.scores.direction}</span>
+                          <span title="Stage Design">🎨 {rev.scores.stageDesign}</span>
+                          <span title="Script">📜 {rev.scores.script}</span>
+                        </div>
+
+                        <div className="review-card-footer">
+                          <div className="reviewer-mini">
+                            <img
+                              src={rev.reviewerAvatar}
+                              alt={rev.reviewerName}
+                              className="reviewer-mini-avatar"
+                            />
+                            <div className="reviewer-mini-text">
+                              <strong>{rev.reviewerName}</strong>
+                              <small>{rev.reviewerRole}</small>
+                            </div>
+                          </div>
+
+                          <Link
+                            href={`/reviews/${rev.playSlug}/`}
+                            className="review-read-btn"
+                          >
+                            Read Critique →
+                          </Link>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : (
+              <div className="reviews-empty-state">
+                <div className="empty-icon">🔍</div>
+                <h3>No reviews match your query</h3>
+                <p>Try searching for a different play name, theatre, or clearing filters.</p>
+                <button
+                  type="button"
+                  className="about-btn about-btn-primary"
+                  onClick={() => {
+                    setSelectedCategory("all");
+                    setSearchQuery("");
+                  }}
+                >
+                  Reset Filters
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </section>
 
         {/* ── 5. SUBMIT REVIEW CALLOUT BANNER ── */}
         <section className="reviews-cta-banner">

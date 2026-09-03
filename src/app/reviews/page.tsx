@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatDate, mediaUrl, publishedWhere } from "@/lib/content";
 import { ReviewsInteractiveView, type ReviewItem } from "@/components/ReviewsInteractiveView";
@@ -11,6 +12,12 @@ export const metadata: Metadata = {
   description:
     "Explore performance reviews, expert theatrical critiques, audience ratings, and artistic scorecards from Nepal's living stage.",
 };
+
+type ReviewPlay = Prisma.PlayGetPayload<{
+  include: {
+    theatre: true;
+  };
+}>;
 
 // Retry helper for Neon DB transient connection issues
 async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 600): Promise<T> {
@@ -25,7 +32,7 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 600): P
   }
 }
 
-const DEFAULT_REVIEWS: ReviewItem[] = [
+export const DEFAULT_REVIEWS: ReviewItem[] = [
   {
     id: "spotlight-1",
     playTitle: "Yahapuri (याहापुरी)",
@@ -160,18 +167,20 @@ const DEFAULT_REVIEWS: ReviewItem[] = [
 ];
 
 export default async function ReviewsPage() {
-  let dbPlays: any[] = [];
+  let dbPlays: ReviewPlay[] = [];
   
   try {
     const now = new Date();
-    dbPlays = await prisma.play.findMany({
-      where: publishedWhere(now),
-      take: 10,
-      orderBy: { ratingAverage: "desc" },
-      include: {
-        theatre: true,
-      },
-    }).catch(() => []);
+    dbPlays = await withRetry(() =>
+      prisma.play.findMany({
+        where: publishedWhere(now),
+        take: 10,
+        orderBy: { ratingAverage: "desc" },
+        include: {
+          theatre: true,
+        },
+      })
+    );
   } catch {
     dbPlays = [];
   }
