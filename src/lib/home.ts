@@ -88,7 +88,7 @@ export function getHomepageTheatres() {
     where: { status: "PUBLISHED", slug: { not: null } },
     orderBy: { title: "asc" },
     take: 12,
-    select: { id: true, title: true, slug: true, profilePic: true },
+    select: { id: true, title: true, slug: true, profilePic: true, coverImage: true },
   });
 }
 
