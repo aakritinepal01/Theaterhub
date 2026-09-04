@@ -456,3 +456,20 @@ model SiteSetting {
   site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
   @@unique([siteId, name])
 }
+
+// Tracks every file uploaded to Cloudinary
+model Media {
+  id           Int      @id @default(autoincrement())
+  secureUrl    String                        // https://res.cloudinary.com/…
+  publicId     String   @unique              // Cloudinary public_id (used to delete/transform)
+  resourceType String   @default("image")   // "image" | "video" | "raw"
+  format       String   @default("")        // "jpg", "mp4", …
+  bytes        Int      @default(0)
+  width        Int?
+  height       Int?
+  folder       String   @default("theatrehub")
+  uploadedAt   DateTime @default(now())
+
+  @@index([resourceType])
+  @@index([uploadedAt])
+}
