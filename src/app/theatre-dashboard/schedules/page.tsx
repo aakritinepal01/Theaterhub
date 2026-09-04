@@ -8,7 +8,7 @@ export default async function TheatreSchedulesPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      <section className="owner-panel" id="schedules">
+      <section className="owner-panel" id="schedules" style={{ margin: 0 }}>
         <div className="owner-panel-head">
           <div>
             <p>Performance calendar</p>
@@ -18,7 +18,7 @@ export default async function TheatreSchedulesPage() {
         </div>
 
         {theatre.plays.length > 0 && (
-          <details className="owner-add-play" style={{ marginBottom: "24px" }}>
+          <details className="owner-add-play">
             <summary>+ Create new show schedule</summary>
             <form action="/api/theatre/schedules" method="post" className="manage-form" style={{ marginTop: "16px" }}>
               <label>

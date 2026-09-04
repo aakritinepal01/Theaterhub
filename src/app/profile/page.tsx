@@ -46,7 +46,7 @@ function getAvatarStyle(name: string) {
   return AVATAR_GRADIENTS[index];
 }
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 6;
 
 export default async function ArtistsPage({
   searchParams,
