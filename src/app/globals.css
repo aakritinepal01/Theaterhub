@@ -323,6 +323,7 @@ html[data-theme="dark"] .play-index-actions a.about-btn-ghost {
   }
 }
 
+
 .play-index-toolbar {
   max-width: 1080px;
   display: flex;
@@ -23779,5 +23780,73 @@ html[data-theme="dark"] .play-filter-reset-inline:hover { background: #2a1520; }
   }
   .pf-sidebar {
     position: static;
+  }
+}
+
+/* Compact theatre identity banner */
+.owner-dashboard .owner-cover {
+  min-height: 94px;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.owner-dashboard .owner-cover-copy > p {
+  margin-bottom: 3px;
+  font-size: 0.56rem;
+}
+
+.owner-dashboard .owner-cover-copy h1 {
+  font-size: clamp(1.1rem, 2vw, 1.55rem);
+  line-height: 1.08;
+}
+
+.owner-dashboard .owner-cover-copy > span {
+  margin-top: 3px;
+  font-size: 0.68rem;
+}
+
+.owner-dashboard .owner-cover-copy > div {
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.owner-dashboard .owner-cover-copy b {
+  padding: 2px 6px;
+  font-size: 0.52rem;
+}
+
+.owner-dashboard .owner-cover-copy small {
+  font-size: 0.64rem;
+}
+
+.owner-dashboard .owner-profile-score {
+  width: 118px;
+  padding: 7px 9px;
+  border-radius: 6px;
+}
+
+.owner-dashboard .owner-profile-score strong {
+  font-size: 1rem;
+}
+
+.owner-dashboard .owner-profile-score > span,
+.owner-dashboard .owner-profile-score > a {
+  font-size: 0.58rem;
+}
+
+.owner-dashboard .owner-profile-score > i {
+  height: 3px;
+  margin: 6px 0;
+}
+
+@media (max-width: 600px) {
+  .owner-dashboard .owner-cover {
+    min-height: 116px;
+    padding: 11px 13px;
+  }
+
+  .owner-dashboard .owner-profile-score {
+    width: 100%;
   }
 }
