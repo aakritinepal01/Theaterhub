@@ -63,15 +63,15 @@ export function LiveStageMarquee({
           venue: "Nepal theatre stages",
           price: null,
           image: getPlayPhoto(p),
-          timeText: "Featured production",
+          timeText: null,
         }));
 
   if (!items.length) return null;
 
   const loopItems = [...items, ...items, ...items];
   const subtext = hasScheduledShows
-    ? `${items.length} scheduled performances with ticket details`
-    : `${items.length} theatre titles currently featured on TheaterHub`;
+    ? `${items.length} scheduled on-stage performances with ticket details`
+    : `${items.length} theatre titles currently on stage on TheaterHub`;
   const cardAction = "View details";
 
   return (
@@ -104,13 +104,16 @@ export function LiveStageMarquee({
                       <span aria-hidden="true">TH</span>
                     </div>
                   )}
+                  <span className="live-marquee-badge">On Stage</span>
                 </div>
 
                 <div className="live-marquee-info">
-                  <div className="live-marquee-meta-line">
-                    <span className="live-time-chip">{item.timeText}</span>
-                    {item.price ? <span className="live-price-pill">{item.price}</span> : null}
-                  </div>
+                  {(item.timeText || item.price) && (
+                    <div className="live-marquee-meta-line">
+                      {item.timeText ? <span className="live-time-chip">{item.timeText}</span> : null}
+                      {item.price ? <span className="live-price-pill">{item.price}</span> : null}
+                    </div>
+                  )}
                   <h4 className="live-marquee-title">{item.title}</h4>
 
                   <div className="live-marquee-bottom-row">
