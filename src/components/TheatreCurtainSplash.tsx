@@ -9,22 +9,11 @@ export function TheatreCurtainSplash() {
 
   const [phase, setPhase] = useState<
     "closed" | "curtains-sliding" | "black-screen-welcome" | "fade-to-website" | "done"
-  >("done");
+  >(isHomePage ? "closed" : "done");
   const [flashActive, setFlashActive] = useState(false);
 
   useEffect(() => {
     if (!isHomePage) return;
-
-    try {
-      if (sessionStorage.getItem("hasSeenTheatreSplash")) {
-        return;
-      }
-      sessionStorage.setItem("hasSeenTheatreSplash", "true");
-    } catch {
-      // In case sessionStorage is restricted
-    }
-
-    setPhase("closed");
 
     const t1 = setTimeout(() => setPhase("curtains-sliding"), 350);
 
@@ -40,12 +29,11 @@ export function TheatreCurtainSplash() {
     const t4 = setTimeout(() => setPhase("done"), 6700);
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
-  }, [isHomePage]);
+  // Run only on the first app mount, so back/route changes never replay it.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSkip = () => {
-    try {
-      sessionStorage.setItem("hasSeenTheatreSplash", "true");
-    } catch {}
     if (phase === "fade-to-website" || phase === "done") return;
     setPhase("fade-to-website");
     setTimeout(() => setPhase("done"), 1100);
