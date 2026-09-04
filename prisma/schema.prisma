@@ -12,6 +12,7 @@ datasource db {
 enum ContentStatus {
   DRAFT
   PUBLISHED
+  UPCOMING
 }
 
 enum BookingStatus {
