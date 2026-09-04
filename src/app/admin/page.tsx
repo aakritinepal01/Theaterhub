@@ -388,6 +388,12 @@ export default async function Admin() {
             </div>
             <span className="adm-user-status-dot" title="Account Active" />
           </div>
+          <form action="/api/auth/logout" method="post" className="adm-dock-logout-form">
+            <button type="submit" className="adm-dock-logout-btn">
+              <span className="adm-dock-icon"><Icon name="logout" /></span>
+              <span>Log out</span>
+            </button>
+          </form>
         </div>
       </aside>
 
@@ -497,6 +503,9 @@ export default async function Admin() {
                       <span className="adm-admin-module-title">
                         <strong>{m.title}</strong>
                         {m.badge && <em>{m.badge}</em>}
+                      </span>
+                      <span className="adm-admin-module-mobile-meta">
+                        {m.count.toLocaleString()} {m.unit}
                       </span>
                       <small>{m.desc}</small>
                     </span>

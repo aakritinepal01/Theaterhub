@@ -11,6 +11,6 @@ export async function PATCH(request: Request) {
     const title = str("title");
     if (!title) return Response.json({ error: "Theatre name is required" }, { status: 400 });
     await prisma.theatre.update({ where: { id: theatre.id }, data: { title, status: str("status") === "DRAFT" ? "DRAFT" : "PUBLISHED", about: str("about"), profilePic: str("profilePic") || null, coverImage: str("coverImage") || null, email: str("email"), phone: str("phone"), address: str("address"), linkWebsite: str("linkWebsite"), linkFacebook: str("linkFacebook"), linkTwitter: str("linkTwitter"), linkInstagram: str("linkInstagram"), establishedOn: date("establishedOn"), closedOn: date("closedOn"), updated: new Date() } });
-    return NextResponse.redirect(new URL("/theatre-dashboard?saved=profile", request.url), 303);
+    return NextResponse.redirect(new URL("/theatre-dashboard/profile?saved=profile", request.url), 303);
   } catch { return Response.json({ error: "Unauthorized" }, { status: 401 }); }
 }

@@ -133,8 +133,11 @@ export default async function TheatreDetail({
         <div className="adm-inner-content">
           {/* Header Banner */}
           <div className="adm-inner-page-header">
-            <div className="adm-inner-page-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+            <div className="adm-inner-page-icon is-theatres">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M4 27.5h24M6.5 25.5h19M8 12h16v13.5H8z" fill="currentColor" opacity="0.08" />
+                <path d="M4 12h24L16 4zM8 12v13.5M24 12v13.5M11 15v7M16 15v7M21 15v7M6.5 25.5h19M4 28h24" />
+              </svg>
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

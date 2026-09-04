@@ -350,15 +350,18 @@ export async function getApprovedReviewItemBySlug(slug: string) {
   return review ? reviewSubmissionToReviewItem(review) : undefined;
 }
 
-export async function listReviewSubmissionsForAdmin(limit = 100) {
+export async function listReviewSubmissionsForAdmin(limit = 100, offset = 0) {
   await ensureReviewSubmissionTable();
+  const safeLimit = Math.max(1, Math.floor(limit));
+  const safeOffset = Math.max(0, Math.floor(offset));
   const rows = await prisma.$queryRawUnsafe<ReviewSubmissionRecord[]>(
     `${reviewSubmissionSelect}
      ORDER BY
        CASE WHEN status = 'PENDING' THEN 0 ELSE 1 END,
        created_at DESC
-     LIMIT $1`,
-    limit
+     LIMIT $1 OFFSET $2`,
+    safeLimit,
+    safeOffset
   );
 
   return rows.map((row) => normalizeReviewRow(row));
