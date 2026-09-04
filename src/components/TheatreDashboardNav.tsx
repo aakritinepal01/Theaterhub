@@ -20,7 +20,9 @@ export function TheatreDashboardNav({
   const isSchedules = pathname.startsWith("/theatre-dashboard/schedules");
 
   return (
-    <nav>
+    <details className="owner-mobile-nav">
+      <summary>Menu</summary>
+      <nav>
       <p>Workspace</p>
       <Link href="/theatre-dashboard" className={isOverview ? "is-active" : ""}>
         Overview
@@ -42,6 +44,7 @@ export function TheatreDashboardNav({
       ) : (
         <span className="owner-muted-link">Public page unavailable</span>
       )}
-    </nav>
+      </nav>
+    </details>
   );
 }

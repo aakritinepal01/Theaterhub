@@ -20,7 +20,7 @@ export default async function TheatreProfilePage() {
   const strength = Math.round((profileStrength / 7) * 100);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div className="owner-profile-page" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       <div className="owner-main-grid" style={{ gridTemplateColumns: "1fr 340px", alignItems: "start" }}>
         <section className="owner-panel owner-profile-panel" id="profile" style={{ margin: 0 }}>
           <div className="owner-panel-head">
@@ -33,7 +33,7 @@ export default async function TheatreProfilePage() {
           <ProfileForm theatre={theatre} />
         </section>
 
-        <aside className="owner-side-column" style={{ display: "flex", flexDirection: "column", gap: "14px", margin: 0 }}>
+        <aside className="owner-side-column owner-profile-sidebar" style={{ display: "flex", flexDirection: "column", gap: "14px", margin: 0 }}>
           <section className="owner-panel" style={{ margin: 0 }}>
             <div className="owner-panel-head" style={{ marginBottom: "16px" }}>
               <div>

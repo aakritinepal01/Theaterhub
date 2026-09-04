@@ -12,7 +12,7 @@ export default async function TheatreProductionsPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      <section className="owner-panel" id="plays">
+      <section className="owner-panel" id="plays" style={{ margin: 0 }}>
         <div className="owner-panel-head">
           <div>
             <p>Production archive</p>
@@ -23,7 +23,7 @@ export default async function TheatreProductionsPage() {
           </span>
         </div>
 
-        <details className="owner-add-play" id="add-play" style={{ marginBottom: "24px" }}>
+        <details className="owner-add-play" id="add-play">
           <summary>+ Add a new production</summary>
           <form action="/api/theatre/plays" method="post" className="manage-form">
             <label>

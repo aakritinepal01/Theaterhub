@@ -60,9 +60,22 @@ export default async function TheatreDashboardLayout({
                 View public page
               </Link>
             )}
-            <form action="/api/auth/logout" method="post">
-              <button>Log out</button>
-            </form>
+            <details className="owner-user-menu">
+              <summary
+                className="owner-user-avatar"
+                title={`Logged in as ${user.username}`}
+                aria-label={`Logged in as ${user.username}`}
+              >
+                {user.username.slice(0, 1).toUpperCase()}
+              </summary>
+              <div className="owner-user-dropdown">
+                <strong>{user.username}</strong>
+                <Link href="/theatre-dashboard/profile">View profile</Link>
+                <form action="/api/auth/logout" method="post">
+                  <button>Log out</button>
+                </form>
+              </div>
+            </details>
           </div>
         </header>
 
