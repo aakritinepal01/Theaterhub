@@ -18,6 +18,17 @@ const playCardInclude = {
 
 const FEATURED_PLAY_LIMIT = 8;
 
+function kathmanduToday() {
+  const parts = new Intl.DateTimeFormat("en-US-u-ca-gregory", {
+    timeZone: "Asia/Kathmandu",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const value = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((part) => part.type === type)?.value);
+  return new Date(Date.UTC(value("year"), value("month") - 1, value("day")));
+}
+
 export async function getFeaturedPlays() {
   const featured = await prisma.play.findMany({
     where: { ...publishedWhere(), isFeatured: true },
@@ -52,50 +63,60 @@ export function getHeroPlays() {
 }
 
 export async function getUpcomingShows() {
-  const scheduled = await prisma.show.findMany({
+  const now = new Date();
+  const today = kathmanduToday();
+
+  return prisma.show.findMany({
     where: {
-      showtime: { gt: new Date() },
-      play: { status: "PUBLISHED" },
+      showtime: { gt: now },
+      play: {
+        status: "PUBLISHED",
+        OR: [
+          { endedOn: null },
+          { endedOn: { gte: today } },
+        ],
+      },
     },
     orderBy: { showtime: "asc" },
     take: 10,
     include: { play: true, theatre: true },
   });
+}
 
-  const scheduledPlayIds=new Set(scheduled.map(show=>show.playId));
-  const productions=await prisma.play.findMany({
-    where:{status:"PUBLISHED",theatreId:{not:null}},
-    orderBy:[{launchedOn:"asc"},{updated:"desc"}],
-    take:10,
-    include:{theatre:true},
+export function getHomepageTheatres() {
+  return prisma.theatre.findMany({
+    where: { status: "PUBLISHED", slug: { not: null } },
+    orderBy: { title: "asc" },
+    take: 12,
+    select: { id: true, title: true, slug: true, profilePic: true },
   });
+}
 
-  const unscheduled=productions.flatMap(play=>{
-    if(!play.theatre||scheduledPlayIds.has(play.id))return [];
-    return [{
-      id:-play.id,
-      playId:play.id,
-      theatreId:play.theatre.id,
-      showtime:play.launchedOn??new Date(),
-      totalSeats:0,
-      availableSeats:0,
-      price:null,
-      play,
-      theatre:play.theatre,
-    }];
+export function getHomepagePhotoStories() {
+  return prisma.play.findMany({
+    where: { ...publishedWhere(), coverImage: { not: null }, slug: { not: null } },
+    orderBy: [{ updated: "desc" }, { launchedOn: "desc" }],
+    take: 10,
+    select: { id: true, title: true, slug: true, coverImage: true },
   });
-
-  return [...scheduled,...unscheduled]
-    .sort((a,b)=>a.showtime.getTime()-b.showtime.getTime())
-    .slice(0,10);
 }
 
 export async function getHomepageStats() {
+  const now = new Date();
+  const today = kathmanduToday();
   const [plays, theatres, bookings, upcomingShows] = await Promise.all([
     prisma.play.count({ where: publishedWhere() }),
     prisma.theatre.count({ where: { status: "PUBLISHED" } }),
     prisma.booking.count(),
-    prisma.show.count({ where: { showtime: { gt: new Date() } } }),
+    prisma.show.count({
+      where: {
+        showtime: { gt: now },
+        play: {
+          status: "PUBLISHED",
+          OR: [{ endedOn: null }, { endedOn: { gte: today } }],
+        },
+      },
+    }),
   ]);
 
   return { plays, theatres, bookings, upcomingShows };

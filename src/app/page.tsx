@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { mediaUrl } from "@/lib/content";
-import { getFeaturedPlays, getHeroPlays, getHomepageStats, getUpcomingShows } from "@/lib/home";
+import { getFeaturedPlays, getHeroPlays, getHomepagePhotoStories, getHomepageStats, getHomepageTheatres, getUpcomingShows } from "@/lib/home";
 import { Hero } from "@/components/Hero";
 import { LiveStageMarquee } from "@/components/LiveStageMarquee";
 import { PlayCard } from "@/components/PlayCard";
+import { ReelsSection } from "@/components/ReelsSection";
+import { PhotoStories } from "@/components/PhotoStories";
 
 export const revalidate = 300;
 
@@ -17,14 +19,18 @@ export default async function Home() {
   let plays: Awaited<ReturnType<typeof getFeaturedPlays>> = [];
   let heroPlays: Awaited<ReturnType<typeof getHeroPlays>> = [];
   let shows: Awaited<ReturnType<typeof getUpcomingShows>> = [];
+  let theatres: Awaited<ReturnType<typeof getHomepageTheatres>> = [];
+  let photoStories: Awaited<ReturnType<typeof getHomepagePhotoStories>> = [];
   let stats = { plays: 0, theatres: 0, bookings: 0, upcomingShows: 0 };
 
   try {
-    [plays, heroPlays, shows, stats] = await Promise.all([
+    [plays, heroPlays, shows, stats, theatres, photoStories] = await Promise.all([
       getFeaturedPlays(),
       getHeroPlays(),
       getUpcomingShows(),
       getHomepageStats(),
+      getHomepageTheatres(),
+      getHomepagePhotoStories(),
     ]);
   } catch (error) {
     console.error("Unable to load landing-page data", error);
@@ -41,8 +47,6 @@ export default async function Home() {
     { value: stats.upcomingShows, label: "Upcoming shows" },
     { value: stats.bookings, label: "Bookings" },
   ];
-
-  const ctaImage = heroImages[0];
 
   return (
     <>
@@ -86,6 +90,8 @@ export default async function Home() {
             </Link>
           </div>
         </section>
+
+        <ReelsSection />
 
         {/* ── 2. UPCOMING SHOWS (Stage Calendar & Tickets) ── */}
         <section className="landing-section landing-upcoming">
@@ -186,71 +192,93 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* ── 3. CTA SPOTLIGHT (Pure White Light Theme) ── */}
-        <section className="landing-cta landing-cta-white">
-          <div className="site-container landing-cta-inner">
-            <div className="landing-cta-copy">
-              <span className="landing-kicker">The Stage is Waiting</span>
-              <h2>Find your next unforgettable performance.</h2>
-              <p>
-                Whether you are looking for tonight&apos;s performance, following your favorite venue,
-                or writing about theatre — TheatreHub brings Nepal&apos;s stage community together.
-              </p>
-
-              <div className="landing-actions">
-                <Link className="about-btn about-btn-primary about-btn-lg" href="/play/">
-                  Explore Plays <span aria-hidden="true">→</span>
-                </Link>
-                <Link className="about-btn about-btn-outline about-btn-lg" href="/theatre/">
-                  Find Venues Across Nepal
-                </Link>
+        {theatres.length > 0 && (
+          <section className="landing-theatre-profiles" aria-labelledby="landing-theatres-title">
+            <div className="site-container">
+              <div className="landing-theatre-profiles-heading landing-photo-stories-heading">
+                <h2 id="landing-theatres-title">Explore Theatres</h2>
+                <Link href="/theatre/">View all <span aria-hidden="true">→</span></Link>
+              </div>
+              <div className="landing-theatre-profile-list">
+                {theatres.map((theatre) => {
+                  const profilePic = mediaUrl(theatre.profilePic);
+                  return (
+                    <Link className="landing-theatre-profile" href={`/theatre/${theatre.slug}/`} key={theatre.id}>
+                      <span className="landing-theatre-avatar">
+                        {profilePic ? <img src={profilePic} alt="" /> : <span aria-hidden="true">{theatre.title.slice(0, 1).toUpperCase()}</span>}
+                      </span>
+                      <strong>{theatre.title}</strong>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
+          </section>
+        )}
 
-            <div className="landing-cta-showcase landing-cta-showcase-white">
-              <div className="landing-cta-image">
-                {ctaImage ? (
-                  <img src={ctaImage} alt="TheatreHub stage preview" />
-                ) : (
-                  <div className="landing-cta-fallback">
-                    <span>🎭</span>
-                    <strong>TheatreHub Stage</strong>
-                  </div>
-                )}
-                <div className="landing-cta-image-badge">Nepal Performing Arts</div>
-              </div>
-
-              <div className="landing-cta-grid">
-                <article className="landing-cta-card">
-                  <div className="landing-cta-card-header">
-                    <span className="landing-cta-icon">🎟️</span>
-                    <span className="landing-cta-tag">For Audience</span>
-                  </div>
-                  <h3>Pick a story</h3>
-                  <p>Browse plays by genre, dates &amp; live activity.</p>
-                </article>
-
-                <article className="landing-cta-card">
-                  <div className="landing-cta-card-header">
-                    <span className="landing-cta-icon">🏛️</span>
-                    <span className="landing-cta-tag">For Venues</span>
-                  </div>
-                  <h3>Explore spaces</h3>
-                  <p>Discover theatre halls across Nepal.</p>
-                </article>
-
-                <article className="landing-cta-card">
-                  <div className="landing-cta-card-header">
-                    <span className="landing-cta-icon">✍️</span>
-                    <span className="landing-cta-tag">For Writers</span>
-                  </div>
-                  <h3>Stage stories</h3>
-                  <p>Read reviews, interviews &amp; essays.</p>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
+        <PhotoStories
+          groups={(() => {
+            const theatreStories = [
+              { id: 1000001, title: "Theatre at Kantipur", image: "/story-images/theatre-story-1.jpg", href: "/theatre/" },
+              { id: 1000002, title: "Theatre at Kantipur", image: "/story-images/theatre-story-2.jpg", href: "/theatre/" },
+              { id: 1000003, title: "Theatre at Kantipur", image: "/story-images/theatre-story-3.jpg", href: "/theatre/" },
+            ];
+            const secondStories = [
+              { id: 1000004, title: "Theatre Workshop", image: "/story-images/theatre-story-4.jpg", href: "/theatre/" },
+              { id: 1000005, title: "Theatre Workshop", image: "/story-images/theatre-story-5.jpg", href: "/theatre/" },
+              { id: 1000006, title: "Theatre Workshop", image: "/story-images/theatre-story-6.jpg", href: "/theatre/" },
+              { id: 1000007, title: "Theatre Workshop", image: "/story-images/theatre-story-7.jpg", href: "/theatre/" },
+              { id: 1000008, title: "Theatre Workshop", image: "/story-images/theatre-story-8.jpg", href: "/theatre/" },
+            ];
+            const thirdStories = [
+              { id: 1000009, title: "Theatre Production", image: "/story-images/theatre-story-9.jpg", href: "/theatre/" },
+              { id: 1000010, title: "Theatre Production", image: "/story-images/theatre-story-10.jpg", href: "/theatre/" },
+              { id: 1000011, title: "Theatre Production", image: "/story-images/theatre-story-11.jpg", href: "/theatre/" },
+              { id: 1000012, title: "Theatre Production", image: "/story-images/theatre-story-12.jpg", href: "/theatre/" },
+            ];
+            const fourthStories = [
+              { id: 1000013, title: "Theatre Spotlight", image: "/story-images/theatre-story-13.jpg", href: "/theatre/" },
+              { id: 1000014, title: "Theatre Spotlight", image: "/story-images/theatre-story-14.jpg", href: "/theatre/" },
+              { id: 1000015, title: "Theatre Spotlight", image: "/story-images/theatre-story-15.jpg", href: "/theatre/" },
+              { id: 1000016, title: "Theatre Spotlight", image: "/story-images/theatre-story-16.jpg", href: "/theatre/" },
+            ];
+            const fifthStories = [
+              { id: 1000017, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              { id: 1000018, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              { id: 1000019, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+            ];
+            const sixthStories = [
+              { id: 1000020, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              { id: 1000021, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              { id: 1000022, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+            ];
+            return [{
+              id: "photo-story-kantipur",
+              title: "TheaterHub Stories",
+              stories: theatreStories.slice(0, 3),
+            }, {
+              id: "photo-story-workshop",
+              title: "TheaterHub Stories",
+              stories: secondStories,
+            }, {
+              id: "photo-story-production",
+              title: "TheaterHub Stories",
+              stories: thirdStories,
+            }, {
+              id: "photo-story-spotlight",
+              title: "TheaterHub Stories",
+              stories: fourthStories,
+            }, {
+              id: "photo-story-spaces",
+              title: "TheaterHub Stories",
+              stories: fifthStories,
+            }, {
+              id: "photo-story-curtain",
+              title: "TheaterHub Stories",
+              stories: sixthStories,
+            }];
+          })()}
+        />
       </main>
     </>
   );
