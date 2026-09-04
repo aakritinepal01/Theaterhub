@@ -100,8 +100,13 @@ export default async function CreateUser({
         <div className="adm-inner-content">
           {/* Page Banner Header */}
           <div className="adm-inner-page-header adm-page-header-fancy">
-            <div className="adm-inner-page-icon adm-icon-glow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            <div className="adm-inner-page-icon is-create-user">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="9.5" r="5" fill="currentColor" opacity="0.1" />
+                <path d="M3.5 27c.8-6 3.5-9 8.5-9s7.7 3 8.5 9M12 4.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10z" />
+                <circle cx="24" cy="20" r="5.2" fill="currentColor" opacity="0.13" />
+                <path d="M24 17v6M21 20h6" />
+              </svg>
             </div>
             <div>
               <div className="adm-header-badge">

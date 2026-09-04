@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { Prisma } from "@prisma/client";
 import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
+const ADMIN_THEATRES_PAGE_SIZE = 15;
+
 export default async function Theatres({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; unclaimed?: string }>;
+  searchParams: Promise<{ search?: string; unclaimed?: string; page?: string }>;
 }) {
   const user = await currentUser();
   if (!user || (!user.isStaff && !user.isSuperuser)) redirect("/login");
@@ -15,11 +18,28 @@ export default async function Theatres({
 
   const q = await searchParams;
   const search = q.search?.trim();
+  const rawPage = Number(q.page);
+  const requestedPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  const theatreWhere: Prisma.TheatreWhereInput = {
+    title: search ? { contains: search, mode: "insensitive" } : undefined,
+    ownerId: q.unclaimed === "1" ? null : undefined,
+  };
+
+  const [filteredCount, totalTheatres, totalPlays, totalProfiles, totalSchedules, totalPosts, totalEntries, claimed] = await Promise.all([
+    prisma.theatre.count({ where: theatreWhere }),
+    prisma.theatre.count(),
+    prisma.play.count(),
+    prisma.profile.count(),
+    prisma.showsMeta.count(),
+    prisma.blogPost.count(),
+    prisma.formEntry.count(),
+    prisma.theatre.count({ where: { ownerId: { not: null } } }),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredCount / ADMIN_THEATRES_PAGE_SIZE));
+  const page = Math.min(requestedPage, totalPages);
   const rows = await prisma.theatre.findMany({
-    where: {
-      title: search ? { contains: search, mode: "insensitive" } : undefined,
-      ownerId: q.unclaimed === "1" ? null : undefined,
-    },
+    where: theatreWhere,
     select: {
       id: true,
       title: true,
@@ -38,19 +58,20 @@ export default async function Theatres({
       _count: { select: { plays: true, shows: true } },
     },
     orderBy: [{ updated: "desc" }, { title: "asc" }],
+    skip: (page - 1) * ADMIN_THEATRES_PAGE_SIZE,
+    take: ADMIN_THEATRES_PAGE_SIZE,
   });
-
-  const [totalTheatres, totalPlays, totalProfiles, totalSchedules, totalPosts, totalEntries] = await Promise.all([
-    prisma.theatre.count(),
-    prisma.play.count(),
-    prisma.profile.count(),
-    prisma.showsMeta.count(),
-    prisma.blogPost.count(),
-    prisma.formEntry.count(),
-  ]);
-
-  const claimed = await prisma.theatre.count({ where: { ownerId: { not: null } } });
   const unclaimed = totalTheatres - claimed;
+  const firstRecord = filteredCount ? (page - 1) * ADMIN_THEATRES_PAGE_SIZE + 1 : 0;
+  const lastRecord = Math.min(page * ADMIN_THEATRES_PAGE_SIZE, filteredCount);
+  const pageHref = (nextPage: number) => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (q.unclaimed === "1") params.set("unclaimed", "1");
+    if (nextPage > 1) params.set("page", String(nextPage));
+    const query = params.toString();
+    return `/admin/theatres${query ? `?${query}` : ""}`;
+  };
 
   return (
     <main className="adm-inner-shell">
@@ -143,8 +164,11 @@ export default async function Theatres({
         <div className="adm-inner-content">
           {/* Page Header */}
           <div className="adm-inner-page-header">
-            <div className="adm-inner-page-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+            <div className="adm-inner-page-icon is-theatres">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M4 27.5h24M6.5 25.5h19M8 12h16v13.5H8z" fill="currentColor" opacity="0.08" />
+                <path d="M4 12h24L16 4zM8 12v13.5M24 12v13.5M11 15v7M16 15v7M21 15v7M6.5 25.5h19M4 28h24" />
+              </svg>
             </div>
             <div>
               <span style={{ fontSize: "11px", fontWeight: 800, color: "var(--adm-amber)", letterSpacing: "0.08em", textTransform: "uppercase" }}>VENUE DIRECTORY</span>
@@ -171,8 +195,8 @@ export default async function Theatres({
             </div>
             <div className="adm-inner-stat-divider" />
             <div className="adm-inner-stat-item">
-              <span className="adm-inner-stat-num">{rows.length}</span>
-              <span className="adm-inner-stat-lbl">Showing</span>
+              <span className="adm-inner-stat-num">{filteredCount}</span>
+              <span className="adm-inner-stat-lbl">Matching</span>
             </div>
           </div>
 
@@ -197,7 +221,7 @@ export default async function Theatres({
               <span>VENUE COLLECTION</span>
               <h2>{q.unclaimed === "1" ? "Unclaimed venues" : search ? `Search results for "${search}"` : "All theatre venues"}</h2>
             </div>
-            <strong>{rows.length} {rows.length === 1 ? "venue" : "venues"} visible</strong>
+            <strong>{filteredCount} {filteredCount === 1 ? "venue" : "venues"} found</strong>
           </div>
 
           {/* Visual venue directory */}
@@ -262,11 +286,68 @@ export default async function Theatres({
             </div>
           )}
 
+          {totalPages > 1 && (
+            <nav className="adm-production-pagination adm-theatre-pagination" aria-label="Theatre venue pages">
+              <p>
+                Showing <strong>{firstRecord}&ndash;{lastRecord}</strong> of <strong>{filteredCount}</strong> venues
+              </p>
+              <div className="adm-production-pagination-controls">
+                {page > 1 ? (
+                  <Link className="adm-production-page-btn" href={pageHref(page - 1)}>
+                    <span aria-hidden="true">←</span> Previous
+                  </Link>
+                ) : (
+                  <span className="adm-production-page-btn is-disabled" aria-disabled="true">
+                    <span aria-hidden="true">←</span> Previous
+                  </span>
+                )}
+
+                <div className="adm-production-page-numbers">
+                  {(() => {
+                    let start = Math.max(1, page - 1);
+                    if (start + 2 > totalPages) start = Math.max(1, totalPages - 2);
+                    return Array.from({ length: Math.min(3, totalPages) }, (_, index) => start + index).map(
+                      (pageNumber) =>
+                        pageNumber === page ? (
+                          <span
+                            className="adm-production-page-num is-active"
+                            aria-current="page"
+                            key={pageNumber}
+                          >
+                            {pageNumber}
+                          </span>
+                        ) : (
+                          <Link
+                            className="adm-production-page-num"
+                            href={pageHref(pageNumber)}
+                            key={pageNumber}
+                          >
+                            {pageNumber}
+                          </Link>
+                        ),
+                    );
+                  })()}
+                </div>
+
+                {page < totalPages ? (
+                  <Link className="adm-production-page-btn" href={pageHref(page + 1)}>
+                    Next <span aria-hidden="true">→</span>
+                  </Link>
+                ) : (
+                  <span className="adm-production-page-btn is-disabled" aria-disabled="true">
+                    Next <span aria-hidden="true">→</span>
+                  </span>
+                )}
+              </div>
+              <span className="adm-production-page-status">Page {page} of {totalPages}</span>
+            </nav>
+          )}
+
           {/* Accessible data table kept for wide-screen record comparison */}
           <div className="adm-inner-table-card adm-theatre-table-card">
             <div className="adm-inner-table-head-row">
               <span className="adm-inner-table-title">
-                {rows.length} {rows.length === 1 ? "Venue" : "Venues"} {search ? `matching "${search}"` : q.unclaimed === "1" ? "— unclaimed" : ""}
+                {filteredCount} {filteredCount === 1 ? "Venue" : "Venues"} {search ? `matching "${search}"` : q.unclaimed === "1" ? "— unclaimed" : ""}
               </span>
             </div>
             <div className="adm-inner-table-wrap">

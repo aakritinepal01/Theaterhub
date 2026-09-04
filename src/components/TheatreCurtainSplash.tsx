@@ -9,11 +9,22 @@ export function TheatreCurtainSplash() {
 
   const [phase, setPhase] = useState<
     "closed" | "curtains-sliding" | "black-screen-welcome" | "fade-to-website" | "done"
-  >(isHomePage ? "closed" : "done");
+  >("done");
   const [flashActive, setFlashActive] = useState(false);
 
   useEffect(() => {
     if (!isHomePage) return;
+
+    try {
+      if (sessionStorage.getItem("hasSeenTheatreSplash")) {
+        return;
+      }
+      sessionStorage.setItem("hasSeenTheatreSplash", "true");
+    } catch {
+      // In case sessionStorage is restricted
+    }
+
+    setPhase("closed");
 
     const t1 = setTimeout(() => setPhase("curtains-sliding"), 350);
 
@@ -32,6 +43,9 @@ export function TheatreCurtainSplash() {
   }, [isHomePage]);
 
   const handleSkip = () => {
+    try {
+      sessionStorage.setItem("hasSeenTheatreSplash", "true");
+    } catch {}
     if (phase === "fade-to-website" || phase === "done") return;
     setPhase("fade-to-website");
     setTimeout(() => setPhase("done"), 1100);

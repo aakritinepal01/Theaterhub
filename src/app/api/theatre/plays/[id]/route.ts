@@ -16,7 +16,7 @@ export async function PATCH(request: Request, context: RouteContext<"/api/theatr
       ...d.getAll("offStage").map(value=>({name:String(value).trim(),kind:"crew" as const,role:"Off-stage artist"})),
     ].filter(credit=>credit.name);
     await prisma.$transaction(async tx=>{
-      const status=s("status")==="UPCOMING"?"UPCOMING":"PUBLISHED";
+      const status = (s("status") === "UPCOMING" ? "UPCOMING" : "PUBLISHED") as any;
       await tx.play.update({ where:{id:play.id}, data:{title:s("title"),abstract:s("abstract"),directorialNote:s("directorialNote"),description:s("description"),coverImage:s("coverImage")||null,duration:s("duration")?Number(s("duration")):null,launchedOn:s("launchedOn")?new Date(s("launchedOn")):null,endedOn:s("endedOn")?new Date(s("endedOn")):null,status,isFeatured:status==="PUBLISHED"||d.get("isFeatured")==="on",updated:now} });
       await Promise.all([tx.playMaker.deleteMany({where:{playId:play.id}}),tx.playCast.deleteMany({where:{playId:play.id}}),tx.playCrew.deleteMany({where:{playId:play.id}})]);
       let nextProfileId=((await tx.profile.aggregate({_max:{id:true}}))._max.id??0)+1;
