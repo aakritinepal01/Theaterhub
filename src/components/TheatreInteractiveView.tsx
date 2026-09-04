@@ -306,6 +306,7 @@ export function TheatreInteractiveView({
             const logoSrc = theatre.profilePic
               ? (theatre.profilePic.startsWith("http") ? theatre.profilePic : `/uploads/${theatre.profilePic.replace(/^\/?(?:uploads\/)?/, "")}`)
               : "/brand-logo.png";
+            const avatarSrc = theatre.coverImage || logoSrc;
 
             return (
             <article className="theatre-rich-card" key={theatre.id}>
@@ -322,7 +323,7 @@ export function TheatreInteractiveView({
                 {/* Theatre Logo Avatar - bottom left */}
                 <div className="theatre-rich-avatar">
                   <img
-                    src={logoSrc}
+                    src={avatarSrc}
                     alt={`${theatre.title} logo`}
                     onError={(e) => { (e.target as HTMLImageElement).src = "/brand-logo.png"; }}
                   />

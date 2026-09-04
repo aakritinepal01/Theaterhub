@@ -61,10 +61,37 @@ const GENERIC_THEATRE_PHOTOS = [
   "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",
 ];
 
-export function getTheatrePhoto(theatre: { id: number; coverImage?: string | null }) {
+export function getTheatrePhoto(theatre: { id: number; title?: string | null; coverImage?: string | null }) {
+  if (theatre.title?.toLowerCase().includes("mandala")) {
+    return "/uploads/theatre_logo/mandala-logo.png";
+  }
   if (theatre.coverImage) {
     const url = mediaUrl(theatre.coverImage);
     if (url) return url;
+  }
+  if (theatre.title?.toLowerCase().includes("jhorahat")) {
+    return "/uploads/theatre_logo/jhorahat-theatre.jpg";
+  }
+  if (theatre.title?.toLowerCase().includes("kadam")) {
+    return "/uploads/theatre_logo/kadam-theatre.jpg";
+  }
+  if (theatre.title?.toLowerCase().includes("kalalaya")) {
+    return "/uploads/theatre_logo/kalalaya-itahari.jpg";
+  }
+  if (theatre.title?.toLowerCase().includes("ojas")) {
+    return "/uploads/theatre_logo/ojas-theatre.jpg";
+  }
+  if (theatre.title?.toLowerCase().includes("one world")) {
+    return "/uploads/theatre_logo/one-world-theatre.jpg";
+  }
+  if (theatre.title?.toLowerCase().includes("pariwartan")) {
+    return "/uploads/theatre_logo/pariwartan-theatre.jpg";
+  }
+  if (theatre.title?.toLowerCase().includes("purano ghar")) {
+    return "/uploads/theatre_logo/purano-ghar.jpg";
+  }
+  if (theatre.title?.toLowerCase().includes("shailee")) {
+    return "/uploads/theatre_logo/shailee-theatre.jpg";
   }
   return THEATRE_PHOTOS[theatre.id] ?? GENERIC_THEATRE_PHOTOS[theatre.id % GENERIC_THEATRE_PHOTOS.length];
 }

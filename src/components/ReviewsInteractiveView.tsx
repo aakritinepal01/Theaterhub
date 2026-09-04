@@ -65,6 +65,17 @@ function getReviewImage(review: ReviewItem, index: number): string {
   return THEATRE_FALLBACKS[index % THEATRE_FALLBACKS.length];
 }
 
+function getTheatreLogo(name: string): string {
+  const value = name.toLowerCase();
+  if (value.includes("mandala")) return "/uploads/theatre_logo/mandala-logo.png";
+  if (value.includes("shilpee")) return "/uploads/theatre_logo/shilpee-logo.jpg";
+  if (value.includes("kausi")) return "/uploads/theatre_logo/kausi-theatre-logo.png";
+  if (value.includes("village")) return "/uploads/theatre_logo/theatre-village_logo.jpg";
+  if (value.includes("sarwanam")) return "/uploads/theatre_logo/sarwanam-logo.png";
+  if (value.includes("pokhara")) return "/uploads/theatre_logo/pokhara_theatre.jpg";
+  return "/brand-logo.png";
+}
+
 function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md" | "lg" }) {
   const fullStars = Math.floor(rating);
   const hasHalf = rating % 1 >= 0.4;
@@ -297,7 +308,10 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
                 </div>
 
                 <h2 className="spotlight-play-title">{spotlightReview.playTitle}</h2>
-                <div className="spotlight-venue">🏛️ {spotlightReview.theatreName}</div>
+                <div className="spotlight-venue">
+                  <img src={getTheatreLogo(spotlightReview.theatreName)} alt="" aria-hidden="true" />
+                  {spotlightReview.theatreName}
+                </div>
                 <h3 className="spotlight-review-headline">&ldquo;{spotlightReview.title}&rdquo;</h3>
                 <p className="spotlight-mini-note">{spotlightReview.excerpt}</p>
 
@@ -455,7 +469,10 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
 
                       <div className="review-card-content">
                         <div className="review-card-header">
-                          <span className="review-card-venue">🏛️ {rev.theatreName}</span>
+                          <span className="review-card-venue">
+                            <img src={getTheatreLogo(rev.theatreName)} alt="" aria-hidden="true" />
+                            {rev.theatreName}
+                          </span>
                           <span className="review-card-date">{rev.date}</span>
                         </div>
 

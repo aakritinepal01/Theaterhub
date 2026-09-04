@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { mediaUrl } from "@/lib/content";
+import { getTheatrePhoto, mediaUrl } from "@/lib/content";
 import { getFeaturedPlays, getHeroPlays, getHomepagePhotoStories, getHomepageStats, getHomepageTheatres, getUpcomingShows } from "@/lib/home";
 import { Hero } from "@/components/Hero";
 import { LiveStageMarquee } from "@/components/LiveStageMarquee";
@@ -201,7 +201,7 @@ export default async function Home() {
               </div>
               <div className="landing-theatre-profile-list">
                 {theatres.map((theatre) => {
-                  const profilePic = mediaUrl(theatre.profilePic);
+                  const profilePic = mediaUrl(theatre.profilePic) ?? mediaUrl(theatre.coverImage) ?? getTheatrePhoto(theatre);
                   return (
                     <Link className="landing-theatre-profile" href={`/theatre/${theatre.slug}/`} key={theatre.id}>
                       <span className="landing-theatre-avatar">

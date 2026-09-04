@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { mediaUrl, publishedWhere } from "@/lib/content";
+import { getTheatrePhoto, mediaUrl, publishedWhere } from "@/lib/content";
 import { prisma } from "@/lib/prisma";
 import { PageFrame } from "@/components/SiteShell";
 
@@ -42,8 +42,8 @@ export default async function TheatrePage({ params }: { params: Promise<{ slug: 
 
   if (!theatre) notFound();
 
-  const coverImg = mediaUrl(theatre.coverImage);
-  const profilePic = mediaUrl(theatre.profilePic);
+  const coverImg = mediaUrl(theatre.coverImage) ?? getTheatrePhoto(theatre);
+  const profilePic = mediaUrl(theatre.profilePic) ?? getTheatrePhoto(theatre);
   const establishedYear = theatre.establishedOn
     ? new Date(theatre.establishedOn).getFullYear()
     : null;
