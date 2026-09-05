@@ -1,6 +1,7 @@
 import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileAdminSidebarToggle } from "@/components/MobileAdminSidebarToggle";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
@@ -123,6 +124,7 @@ export default async function TheatreDetail({
             <strong>{theatre.title}</strong>
           </div>
           <div className="adm-inner-topbar-right">
+            <MobileAdminSidebarToggle />
             <ThemeToggle showLabel={false} />
             <Link href={`/theatre/${theatre.slug}`} target="_blank" rel="noopener noreferrer" className="adm-inner-action-btn">
               View Public Page ↗

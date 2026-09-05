@@ -7,6 +7,7 @@ import {
   listReviewSubmissionsForAdmin,
 } from "@/lib/reviews";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileAdminSidebarToggle } from "@/components/MobileAdminSidebarToggle";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
@@ -259,6 +260,7 @@ export default async function Section({
             <strong>{meta.title}</strong>
           </div>
           <div className="adm-inner-topbar-right">
+            <MobileAdminSidebarToggle />
             <ThemeToggle showLabel={false} />
             <Link href="/admin" className="adm-control-btn">
               ← Overview
@@ -752,12 +754,12 @@ async function SchedulesSection({ requestedPage }: { requestedPage?: string }) {
 
               <div className="adm-schedule-date-range">
                 <div>
-                  <small>STARTS</small>
+                  <small>ST</small>
                   <strong>{schedule.startDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</strong>
                 </div>
                 <span aria-hidden="true">→</span>
                 <div>
-                  <small>ENDS</small>
+                  <small>ED</small>
                   <strong>{schedule.endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</strong>
                 </div>
               </div>
@@ -882,7 +884,7 @@ async function PostsSection({ requestedPage }: { requestedPage?: string }) {
 
   return (
     <div>
-      <div className="adm-inner-stats">
+      <div className="adm-inner-stats adm-editorial-stats">
         <div className="adm-inner-stat-item">
           <span className="adm-inner-stat-num">{totalArticles}</span>
           <span className="adm-inner-stat-lbl">Total Articles</span>
@@ -1043,7 +1045,7 @@ async function ReviewsSection({ requestedPage }: { requestedPage?: string }) {
 
   return (
     <div>
-      <div className="adm-inner-stats">
+      <div className="adm-inner-stats adm-review-stats">
         <div className="adm-inner-stat-item">
           <span className="adm-inner-stat-num">{stats.total}</span>
           <span className="adm-inner-stat-lbl">Total Reviews</span>

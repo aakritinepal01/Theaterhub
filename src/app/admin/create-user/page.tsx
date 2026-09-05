@@ -2,6 +2,7 @@ import { currentUser } from "@/lib/auth";
 import { ClearCreateUserStatus } from "@/components/ClearCreateUserStatus";
 import { PasswordFields } from "@/components/PasswordFields";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileAdminSidebarToggle } from "@/components/MobileAdminSidebarToggle";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -93,6 +94,7 @@ export default async function CreateUser({
             <strong>Provision Account</strong>
           </div>
           <div className="adm-inner-topbar-right">
+            <MobileAdminSidebarToggle />
             <ThemeToggle showLabel={false} />
           </div>
         </header>
@@ -102,10 +104,8 @@ export default async function CreateUser({
           <div className="adm-inner-page-header adm-page-header-fancy">
             <div className="adm-inner-page-icon is-create-user">
               <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="9.5" r="5" fill="currentColor" opacity="0.1" />
-                <path d="M3.5 27c.8-6 3.5-9 8.5-9s7.7 3 8.5 9M12 4.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10z" />
-                <circle cx="24" cy="20" r="5.2" fill="currentColor" opacity="0.13" />
-                <path d="M24 17v6M21 20h6" />
+                <path d="M4 27h24M6 27V12l10-6 10 6v15M10 27V16h4v11M18 27V16h4v11M4 12h24" />
+                <path d="M12 12h8" />
               </svg>
             </div>
             <div>

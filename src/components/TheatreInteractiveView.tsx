@@ -303,10 +303,10 @@ export function TheatreInteractiveView({
         >
           {displayTheatres.map((theatre) => {
             // Resolve logo URL from profilePic field
-            const logoSrc = theatre.profilePic
+            const profileSrc = theatre.profilePic
               ? (theatre.profilePic.startsWith("http") ? theatre.profilePic : `/uploads/${theatre.profilePic.replace(/^\/?(?:uploads\/)?/, "")}`)
-              : "/brand-logo.png";
-            const avatarSrc = theatre.coverImage || logoSrc;
+              : null;
+            const avatarSrc = profileSrc || theatre.coverImage || "/brand-logo.png";
 
             return (
             <article className="theatre-rich-card" key={theatre.id}>

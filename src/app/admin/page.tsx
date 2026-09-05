@@ -148,6 +148,7 @@ export default async function Admin() {
   const unclaimed = theatres - claimed;
   const totalPublicRecords = theatres + plays + profiles + posts + reviewStats.approved;
   const openWorkCount = reviewStats.pending + unclaimed + entries;
+  const greetingName = user.username.split("@")[0] || user.username;
   const recentReviews: Array<{ id: string; reviewTitle: string | null; playTitle: string; reviewerName: string; status: string }> = [];
   const recentTheatres: Array<{ id: string; title: string; updated: Date | null; owner: { username: string } | null; _count: { plays: number } }> = [];
   const firstAction = reviewStats.pending > 0
@@ -431,7 +432,7 @@ export default async function Admin() {
           <section className="adm-clean-hero" aria-labelledby="admin-dashboard-heading">
             <div>
               <span className="adm-page-kicker">Admin Dashboard</span>
-              <h1 id="admin-dashboard-heading">Good morning, {user.username}</h1>
+              <h1 id="admin-dashboard-heading">Good morning, {greetingName}</h1>
               <p>Use this overview to clear pending tasks first, then manage the public theatre directory and editorial content.</p>
             </div>
             <Link href={firstAction.href} className="adm-clean-hero-action">

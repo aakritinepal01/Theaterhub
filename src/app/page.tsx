@@ -40,6 +40,7 @@ export default async function Home() {
     const image = mediaUrl(play.coverImage);
     return image ? [image] : [];
   });
+  const heroImage = "/hero-theatre-stage.png";
 
   const heroStats = [
     { value: stats.plays, label: "Published plays" },
@@ -50,7 +51,7 @@ export default async function Home() {
 
   return (
     <>
-      <Hero images={heroImages} stats={heroStats} />
+      <Hero images={heroImage ? [heroImage] : []} stats={heroStats} />
 
       <main>
         {/* ── 0. LIVE STAGE MARQUEE TICKER (Auto-scrolling Live Plays in Nepal) ── */}
