@@ -3,7 +3,9 @@ import { redirect } from "next/navigation";
 import type { Prisma } from "@prisma/client";
 import { currentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getTheatrePhoto, mediaUrl } from "@/lib/content";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileAdminSidebarToggle } from "@/components/MobileAdminSidebarToggle";
 
 const ADMIN_THEATRES_PAGE_SIZE = 15;
 
@@ -153,6 +155,7 @@ export default async function Theatres({
             <strong>Theatre Venues</strong>
           </div>
           <div className="adm-inner-topbar-right">
+            <MobileAdminSidebarToggle />
             <ThemeToggle showLabel={false} />
             <Link href="/admin/create-user" className="adm-inner-action-btn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -229,11 +232,7 @@ export default async function Theatres({
             {rows.map((t) => (
               <article className="adm-theatre-card" key={t.id}>
                 <div className="adm-theatre-cover">
-                  {t.coverImage ? (
-                    <img src={t.coverImage} alt={`${t.title} cover`} loading="lazy" />
-                  ) : (
-                    <span className="adm-theatre-cover-fallback">THEATRE</span>
-                  )}
+                  <img src={mediaUrl(t.coverImage) ?? getTheatrePhoto(t)} alt={`${t.title} cover`} loading="lazy" />
                   <span className={`adm-theatre-status ${t.owner ? "is-claimed" : "is-unclaimed"}`}>
                     {t.owner ? "Claimed" : "Unclaimed"}
                   </span>
@@ -245,12 +244,10 @@ export default async function Theatres({
                       <span>Venue ID #{t.id}</span>
                     </div>
                   </div>
-                  {t.profilePic && (
-                    <div className="adm-theatre-logo-strip">
-                      <img src={t.profilePic} alt={`${t.title} logo`} loading="lazy" />
-                      <span>Official venue logo</span>
-                    </div>
-                  )}
+                  <div className="adm-theatre-logo-strip">
+                    <img src={mediaUrl(t.profilePic) ?? getTheatrePhoto(t)} alt={`${t.title} logo`} loading="lazy" />
+                    <span>{t.profilePic ? "Official venue logo" : "Venue image fallback"}</span>
+                  </div>
                   <p className="adm-theatre-address">{t.address || "No location listed"}</p>
                   {(t.description || t.about) && (
                     <p className="adm-theatre-description">{t.description || t.about}</p>

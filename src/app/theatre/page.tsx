@@ -134,7 +134,7 @@ export default async function TheatresPage() {
       title: t.title,
       slug: t.slug || String(t.id),
       address: t.address,
-      coverImage: mediaUrl(t.profilePic) ?? getTheatrePhoto(t),
+      coverImage: mediaUrl(t.coverImage) ?? getTheatrePhoto(t),
       profilePic: mediaUrl(t.profilePic) ?? (t.title?.toLowerCase().includes("mandala") ? "/uploads/theatre_logo/mandala-logo.png" : null),
       phone: t.phone,
       email: t.email,
