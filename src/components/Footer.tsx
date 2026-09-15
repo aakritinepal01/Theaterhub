@@ -23,7 +23,7 @@ export function Footer() {
 
         {/* Logo + Description */}
         <div className="footer-brand">
-          <Logo />
+          <Logo src="/navbar-logo.png" />
           <p className="footer-brand-desc">
             Nepal&apos;s theatre scene, all in one place. Discover productions, artists, venues, and the stories that belong on stage.
           </p>

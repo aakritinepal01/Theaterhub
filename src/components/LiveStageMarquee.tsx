@@ -95,33 +95,18 @@ export function LiveStageMarquee({
                 key={`${item.id}-${index}`}
                 href={`/play/${item.slug}/`}
                 className="live-marquee-card"
+                title={item.title}
+                aria-label={item.title}
               >
                 <div className="live-marquee-thumb">
                   {item.image ? (
                     <img src={item.image} alt={item.title} />
                   ) : (
                     <div className="live-marquee-thumb-fallback">
-                      <span aria-hidden="true">TH</span>
+                      <span aria-hidden="true">{item.title.slice(0, 2).toUpperCase()}</span>
                     </div>
                   )}
-                  <span className="live-marquee-badge">On Stage</span>
-                </div>
-
-                <div className="live-marquee-info">
-                  {(item.timeText || item.price) && (
-                    <div className="live-marquee-meta-line">
-                      {item.timeText ? <span className="live-time-chip">{item.timeText}</span> : null}
-                      {item.price ? <span className="live-price-pill">{item.price}</span> : null}
-                    </div>
-                  )}
-                  <h4 className="live-marquee-title">{item.title}</h4>
-
-                  <div className="live-marquee-bottom-row">
-                    <p className="live-marquee-venue">{item.venue}</p>
-                    <span className="live-card-btn">
-                      {cardAction} <span aria-hidden="true">-&gt;</span>
-                    </span>
-                  </div>
+                  <span className="live-thumb-stage-tag">ON STAGE</span>
                 </div>
               </Link>
             ))}

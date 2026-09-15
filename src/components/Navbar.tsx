@@ -65,7 +65,7 @@ export function Navbar({ links }: { links: NavLink[]; user: NavUser; logoutActio
     <header className={`navbar${scrolled ? " is-scrolled" : ""}${open ? " menu-open" : ""}`}>
     <div className="site-container nav-inner">
       <div className="nav-logo-group">
-        <Logo />
+        <Logo src="/navbar-logo.png" />
       </div>
       <nav className="nav-desktop" aria-label="Primary navigation">
         {links.map(link => <Link aria-current={isActive(link.href) ? "page" : undefined} className={isActive(link.href) ? "is-active" : ""} href={link.href} key={link.href}>{link.label}</Link>)}

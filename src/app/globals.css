@@ -895,12 +895,23 @@ html[data-theme="dark"] .logo-img-dark,
 }
 
 .logo-wordmark strong {
-  color: #c58962;
+  color: #dc2626;
   font-weight: 700;
 }
 
 .navbar .logo {
   color: #211b18;
+  gap: 8px;
+}
+
+.navbar .logo-img-wrapper,
+.navbar .logo-img {
+  width: 27px;
+  height: 27px;
+}
+
+.navbar .logo-wordmark {
+  font-size: 15.5px;
 }
 
 .nav-desktop {
@@ -3604,7 +3615,7 @@ html[data-theme="dark"] .nav-login:hover {
 }
 
 html[data-theme="dark"] .logo-wordmark strong {
-  color: #e4a47b;
+  color: #ef4444;
 }
 
 html[data-theme="dark"] .nav-toggle {
@@ -4714,14 +4725,15 @@ html[data-theme="dark"] .landing-cta-grid h3 {
   }
 
   .live-marquee-card {
-    width: 250px;
-    padding: 10px;
-    gap: 8px;
+    width: 95px;
+    padding: 0;
+    gap: 0;
   }
 
   .live-marquee-thumb {
-    width: 56px;
-    height: 84px;
+    width: 95px;
+    height: 142px;
+    border-radius: 10px;
   }
 
   .live-marquee-title {
@@ -5114,7 +5126,7 @@ html[data-theme="dark"] .landing-cta-grid h3 {
   overflow: hidden;
   padding: 30px 22px;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 10px 30px rgba(83, 57, 43, 0.05);
   text-align: center;
@@ -9625,7 +9637,7 @@ html[data-theme="dark"] .theatre-type-examples span {
   pointer-events: none;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 960px) {
   .landing-reels {
     padding: 28px 0 34px;
   }
@@ -9650,29 +9662,38 @@ html[data-theme="dark"] .theatre-type-examples span {
   }
 
   .landing-reels-grid {
-    display: grid;
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: 30%;
-    gap: 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
     overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    padding-bottom: 8px;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    padding-bottom: 12px;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-inline: 4px;
+  }
+
+  .landing-reels-grid::-webkit-scrollbar {
+    display: none;
   }
 
   .landing-reel-card {
-    width: 100%;
-    border-radius: 13px;
+    flex: 0 0 clamp(135px, 40vw, 175px);
+    width: clamp(135px, 40vw, 175px);
+    min-width: clamp(135px, 40vw, 175px);
+    border-radius: 14px;
     scroll-snap-align: start;
+    aspect-ratio: 9 / 16;
   }
 
   .landing-reel-label {
     top: 8px;
     left: 50%;
-    padding: 3px 5px;
-    font-size: 7px;
+    padding: 3px 6px;
+    font-size: 8px;
     letter-spacing: .04em;
     white-space: nowrap;
     transform: translateX(-50%);
@@ -9687,18 +9708,17 @@ html[data-theme="dark"] .theatre-type-examples span {
   }
 
   .landing-reel-title .reel-brand {
-    gap: 3px;
-    font-size: 10px;
+    gap: 4px;
+    font-size: 11px;
   }
 
   .landing-reel-title .reel-brand img {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     padding: 1px;
     border-radius: 4px;
   }
-
-  .reel-modal-item {
+.reel-modal-item {
     padding: 10px;
   }
 
@@ -10086,7 +10106,7 @@ html[data-theme="dark"] .theatre-type-examples span {
   right: 12px;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 960px) {
   .landing-photo-stories {
     padding: 28px 0 34px;
   }
@@ -10096,22 +10116,30 @@ html[data-theme="dark"] .theatre-type-examples span {
   }
 
   .landing-photo-story-list {
-    display: grid;
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: 30%;
-    gap: 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
     overflow-x: auto;
-    scroll-snap-type: x proximity;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    margin-inline: 0;
-    padding: 2px 2px 10px;
+    -ms-overflow-style: none;
+    padding-bottom: 12px;
+    padding-inline: 4px;
+  }
+
+  .landing-photo-story-list::-webkit-scrollbar {
+    display: none;
   }
 
   .landing-photo-story {
-    width: 100%;
-    border-radius: 13px;
+    flex: 0 0 clamp(135px, 40vw, 175px);
+    width: clamp(135px, 40vw, 175px);
+    min-width: clamp(135px, 40vw, 175px);
+    border-radius: 14px;
     scroll-snap-align: start;
+    aspect-ratio: 9 / 16;
   }
 
   .landing-photo-story-count {
@@ -10119,23 +10147,24 @@ html[data-theme="dark"] .theatre-type-examples span {
     right: auto;
     bottom: auto;
     left: 50%;
-    padding: 0;
-    background: transparent;
+    padding: 2px 7px;
+    background: rgba(0, 0, 0, .55);
+    border-radius: 999px;
+    font-size: 9px;
     white-space: nowrap;
     transform: translateX(-50%);
   }
 
   .landing-photo-story strong {
-    right: 7px;
-    bottom: calc(7px + 0.1cm);
-    left: 7px;
-    font-size: 8px;
-    line-height: 1.2;
+    right: 8px;
+    bottom: 10px;
+    left: 8px;
+    font-size: 10px;
+    line-height: 1.25;
     text-align: center;
     -webkit-line-clamp: 2;
   }
-
-  .photo-story-modal {
+.photo-story-modal {
     padding: 10px;
   }
 
@@ -16248,7 +16277,7 @@ html[data-theme="dark"] .live-marquee-hint {
 
 .live-marquee-track {
   display: flex;
-  gap: 20px;
+  gap: 14px;
   width: max-content;
   animation: liveMarqueeScroll 28s linear infinite;
   padding: 8px 4px;
@@ -16268,86 +16297,89 @@ html[data-theme="dark"] .live-marquee-hint {
   }
 }
 
-/* Glassmorphism Ultra-Detailed Card */
+/* Poster-Only Live Marquee Cards */
 .live-marquee-card {
-  display: flex;
-  align-items: stretch;
-  gap: 18px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(228, 212, 200, 0.85);
-  border-radius: 16px;
+  display: block;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 14px;
   text-decoration: none;
-  width: 430px;
+  width: 125px;
   flex-shrink: 0;
   box-shadow: none;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease, background-color 0.28s ease;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .live-marquee-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--brand);
-  background: #ffffff;
-  box-shadow: none;
+  transform: translateY(-6px) scale(1.02);
   text-decoration: none;
-}
-
-html[data-theme="dark"] .live-marquee-card {
-  background: rgba(28, 22, 19, 0.95);
-  border-color: rgba(58, 47, 39, 0.9);
+  background: transparent;
   box-shadow: none;
 }
 
+html[data-theme="dark"] .live-marquee-card,
 html[data-theme="dark"] .live-marquee-card:hover {
-  border-color: #e0723e;
-  background: #241c17;
+  background: transparent;
+  border: none;
   box-shadow: none;
 }
 
 .live-marquee-thumb {
   position: relative;
-  width: 96px;
-  height: 144px;
+  width: 125px;
+  height: 188px;
   aspect-ratio: 2 / 3;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(135deg, #fdf5ef 0%, #f4e3d7 100%);
-  border: 1px solid rgba(230, 215, 203, 0.6);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: none;
+  transition: box-shadow 0.28s ease, border-color 0.28s ease;
 }
 
-.live-marquee-badge {
+.live-thumb-stage-tag {
   position: absolute;
   top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.84);
-  color: #ff3b30;
+  background: #ffffff;
+  color: #dc2626;
   font-size: 8.5px;
-  font-weight: 850;
-  letter-spacing: 0.06em;
+  font-weight: 900;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  z-index: 2;
+  line-height: 1.1;
   white-space: nowrap;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 59, 48, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
-  line-height: 1.2;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-html[data-theme="dark"] .live-marquee-badge {
-  background: rgba(0, 0, 0, 0.9);
-  color: #ff453a;
-  border-color: rgba(255, 69, 58, 0.45);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+.live-marquee-card:hover .live-marquee-thumb {
+  border-color: var(--brand);
+  box-shadow: 0 16px 38px rgba(157, 79, 54, 0.28);
+}
+
+html[data-theme="dark"] .live-marquee-thumb {
+  background: #1c1613;
+  border-color: rgba(65, 52, 44, 0.85);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="dark"] .live-marquee-card:hover .live-marquee-thumb {
+  border-color: #e0723e;
+  box-shadow: 0 16px 38px rgba(224, 114, 62, 0.32);
 }
 
 .live-marquee-thumb img {
@@ -16358,7 +16390,7 @@ html[data-theme="dark"] .live-marquee-badge {
 }
 
 .live-marquee-card:hover .live-marquee-thumb img {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
 .live-marquee-thumb-fallback {
@@ -16540,9 +16572,15 @@ html[data-theme="dark"] .live-card-btn {
 
 @media (max-width: 600px) {
   .live-marquee-card {
-    width: 280px;
-    padding: 12px;
-    gap: 10px;
+    width: 95px;
+    padding: 0;
+    gap: 0;
+    border-radius: 14px;
+  }
+
+  .live-marquee-thumb {
+    width: 95px;
+    height: 142px;
     border-radius: 14px;
   }
 
@@ -17178,8 +17216,8 @@ html[data-theme="dark"] .live-card-btn {
 /* ── Logo multi-halo ── */
 .splash-logo-wrap {
   position: relative;
-  width: 108px;
-  height: 108px;
+  width: 124px;
+  height: 124px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17238,8 +17276,8 @@ html[data-theme="dark"] .live-card-btn {
 }
 
 .splash-logo-inner {
-  width: 110px;
-  height: 110px;
+  width: 124px;
+  height: 124px;
   border-radius: 50%;
   border: 3px solid #ffffff;
   background: #ffffff;
@@ -17253,8 +17291,8 @@ html[data-theme="dark"] .live-card-btn {
 }
 
 .splash-logo-img {
-  width: 88px;
-  height: 88px;
+  width: 98px;
+  height: 98px;
   object-fit: contain;
   filter: none;
 }
@@ -32625,4 +32663,13 @@ html[data-theme="dark"] .play-filter-reset-inline:hover {
     content: "Open \2192";
     font-size: 5px;
   }
+}
+
+/* Keep the shared footer surface identical to the homepage on every public page. */
+body > .site-footer {
+  background-color: #ffffff;
+}
+
+html[data-theme="dark"] body > .site-footer {
+  background-color: #12100f;
 }
