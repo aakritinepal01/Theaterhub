@@ -5,22 +5,33 @@ type LogoProps = {
   compact?: boolean;
   href?: string;
   variant?: "auto" | "light" | "dark";
+  src?: string;
 };
 
-export function Logo({ className = "", compact = false, href = "/", variant = "auto" }: LogoProps) {
+export function Logo({ className = "", compact = false, href = "/", variant = "auto", src = "/navbar-logo.png" }: LogoProps) {
   const content = (
     <>
       <span className="logo-img-wrapper">
-        <img
-          src="/brand-logo-light.png"
-          alt="TheatreHub Logo"
-          className="logo-img logo-img-light"
-        />
-        <img
-          src="/brand-logo-dark.png"
-          alt="TheatreHub Logo"
-          className="logo-img logo-img-dark"
-        />
+        {src ? (
+          <img
+            src={src}
+            alt="TheatreHub Logo"
+            className="logo-img"
+          />
+        ) : (
+          <>
+            <img
+              src="/brand-logo-light.png"
+              alt="TheatreHub Logo"
+              className="logo-img logo-img-light"
+            />
+            <img
+              src="/brand-logo-dark.png"
+              alt="TheatreHub Logo"
+              className="logo-img logo-img-dark"
+            />
+          </>
+        )}
       </span>
       {!compact && (
         <span className="logo-wordmark">

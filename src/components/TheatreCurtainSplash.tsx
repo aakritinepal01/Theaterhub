@@ -106,13 +106,13 @@ export function TheatreCurtainSplash() {
             ✦&nbsp; NEPAL&apos;S PREMIERE STAGE &amp; THEATRE HUB &nbsp;✦
           </p>
 
-          {/* Logo with multi-ring glow */}
+          {/* Logo in circle with multi-ring glow */}
           <div className="splash-logo-wrap">
             <div className="splash-logo-halo splash-logo-halo-1" />
             <div className="splash-logo-halo splash-logo-halo-2" />
             <div className="splash-logo-halo splash-logo-halo-3" />
             <div className="splash-logo-inner">
-              <img src="/brand-logo-light.png" alt="TheaterHub" className="splash-logo-img" />
+              <img src="/brand-logo-parda.png" alt="TheaterHub" className="splash-logo-img" />
             </div>
           </div>
 

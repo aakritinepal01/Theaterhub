@@ -8,6 +8,7 @@ import {
 } from "@/lib/reviews";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileAdminSidebarToggle } from "@/components/MobileAdminSidebarToggle";
+import { AdminProductionManager } from "@/components/AdminProductionManager";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
@@ -309,12 +310,54 @@ async function PlaysSection({ requestedPage }: { requestedPage?: string }) {
 
   const totalPages = Math.max(1, Math.ceil(totalPlays / ADMIN_PLAYS_PAGE_SIZE));
   const page = Math.min(requested, totalPages);
-  const plays = await prisma.play.findMany({
-    include: { theatre: { select: { title: true } } },
-    orderBy: [{ launchedOn: "desc" }, { title: "asc" }],
-    skip: (page - 1) * ADMIN_PLAYS_PAGE_SIZE,
-    take: ADMIN_PLAYS_PAGE_SIZE,
-  });
+  const [plays, theatres] = await Promise.all([
+    prisma.play.findMany({
+      include: {
+        theatre: { select: { id: true, title: true } },
+        _count: { select: { makers: true, cast: true, crew: true, schedules: true, shows: true } },
+        shows: { select: { _count: { select: { bookings: true } } } },
+      },
+      orderBy: [{ launchedOn: "desc" }, { title: "asc" }],
+      skip: (page - 1) * ADMIN_PLAYS_PAGE_SIZE,
+      take: ADMIN_PLAYS_PAGE_SIZE,
+    }),
+    prisma.theatre.findMany({
+      select: { id: true, title: true },
+      orderBy: { title: "asc" },
+    }),
+  ]);
+  const productionRecords = plays.map((play) => ({
+    id: play.id,
+    title: play.title,
+    slug: play.slug,
+    status: play.status,
+    metaTitle: play.metaTitle,
+    description: play.description,
+    keywordsString: play.keywordsString,
+    abstract: play.abstract,
+    directorialNote: play.directorialNote,
+    coverImage: play.coverImage,
+    poster: getPlayPhoto(play),
+    duration: play.duration,
+    launchedOn: play.launchedOn?.toISOString() ?? null,
+    endedOn: play.endedOn?.toISOString() ?? null,
+    publishDate: play.publishDate?.toISOString() ?? null,
+    expiryDate: play.expiryDate?.toISOString() ?? null,
+    isFeatured: play.isFeatured,
+    inSitemap: play.inSitemap,
+    ratingAverage: play.ratingAverage,
+    ratingCount: play.ratingCount,
+    theatreId: play.theatreId,
+    theatre: play.theatre,
+    related: {
+      makers: play._count.makers,
+      cast: play._count.cast,
+      crew: play._count.crew,
+      schedules: play._count.schedules,
+      shows: play._count.shows,
+      bookings: play.shows.reduce((sum, show) => sum + show._count.bookings, 0),
+    },
+  }));
   const firstRecord = totalPlays ? (page - 1) * ADMIN_PLAYS_PAGE_SIZE + 1 : 0;
   const lastRecord = Math.min(page * ADMIN_PLAYS_PAGE_SIZE, totalPlays);
   const pageHref = (nextPage: number) =>
@@ -344,48 +387,7 @@ async function PlaysSection({ requestedPage }: { requestedPage?: string }) {
         </div>
       </div>
 
-      <div className="adm-production-grid">
-        {plays.map((play) => {
-          const poster = getPlayPhoto(play);
-
-          return (
-          <article className="adm-production-card" key={play.id}>
-            <div className="adm-production-poster">
-              {poster ? (
-                <img src={poster} alt={`${play.title} poster`} loading="lazy" />
-              ) : (
-                <span>PRODUCTION</span>
-              )}
-              <span className={`adm-production-status ${play.status === "PUBLISHED" ? "is-published" : "is-draft"}`}>
-                {play.status || "PUBLISHED"}
-              </span>
-            </div>
-            <div className="adm-production-body">
-              <div className="adm-production-kicker">PRODUCTION #{play.id}</div>
-              <h2>{play.title}</h2>
-              <p className="adm-production-venue">{play.theatre ? play.theatre.title : "Standalone production"}</p>
-              <div className="adm-production-facts">
-                <span><small>Launched</small><strong>{play.launchedOn ? play.launchedOn.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Not provided"}</strong></span>
-                <span><small>Rating</small><strong className={play.ratingAverage ? "is-rated" : ""}>{play.ratingAverage ? `★ ${play.ratingAverage.toFixed(1)}` : "No ratings"}</strong></span>
-              </div>
-              <div className="adm-production-footer">
-                <span>{play.slug ? "Public page ready" : "No public slug"}</span>
-                {play.slug ? (
-                  <Link href={`/play/${play.slug}/`} target="_blank" rel="noopener noreferrer">View production <span aria-hidden="true">→</span></Link>
-                ) : (
-                  <span className="adm-inner-cell-muted">Unavailable</span>
-                )}
-              </div>
-            </div>
-          </article>
-          );
-        })}
-      </div>
-      {!plays.length && (
-        <div className="adm-inner-empty adm-production-empty">
-          <p>No play productions registered in database.</p>
-        </div>
-      )}
+      <AdminProductionManager plays={productionRecords} theatres={theatres} totalPlays={totalPlays} />
 
       {totalPages > 1 && (
         <nav className="adm-production-pagination" aria-label="Production pages">
@@ -444,83 +446,6 @@ async function PlaysSection({ requestedPage }: { requestedPage?: string }) {
         </nav>
       )}
 
-      {/* Plays Table */}
-      <div className="adm-inner-table-card adm-productions-table-card">
-        <div className="adm-inner-table-head-row">
-          <span className="adm-inner-table-title">{totalPlays} Production Records in Archive</span>
-        </div>
-        <div className="adm-inner-table-wrap">
-          <table className="adm-inner-table">
-            <thead>
-              <tr>
-                <th style={{ width: "60px" }}>ID</th>
-                <th>Production Title & Venue</th>
-                <th>Status</th>
-                <th>Launch Date</th>
-                <th>Rating</th>
-                <th style={{ textAlign: "right" }}>Public Link</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plays.map((play) => (
-                <tr key={play.id}>
-                  <td>
-                    <span className="adm-inner-id-badge">#{play.id}</span>
-                  </td>
-                  <td>
-                    <div className="adm-inner-cell-primary">
-                      {play.coverImage ? (
-                        <img src={play.coverImage} alt="" style={{ width: "36px", height: "48px", objectFit: "cover", borderRadius: "6px" }} />
-                      ) : (
-                        <div className="adm-inner-record-avatar" style={{ width: "36px", height: "48px", borderRadius: "6px", background: "var(--adm-crimson-bg)", color: "var(--adm-crimson)" }}>
-                          🎭
-                        </div>
-                      )}
-                      <div>
-                        <strong className="adm-inner-link-strong">{play.title}</strong>
-                        <small className="adm-inner-cell-sub">{play.theatre ? `at ${play.theatre.title}` : "Standalone Production"}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      className="adm-inner-count-badge"
-                      style={{
-                        background: play.status === "PUBLISHED" ? "var(--adm-emerald-bg)" : "var(--adm-surface-subtle)",
-                        color: play.status === "PUBLISHED" ? "var(--adm-emerald)" : "var(--adm-muted)",
-                      }}
-                    >
-                      {play.status || "PUBLISHED"}
-                    </span>
-                  </td>
-                  <td className="adm-inner-cell-muted">
-                    {play.launchedOn ? play.launchedOn.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—"}
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700, color: play.ratingAverage ? "var(--adm-amber)" : "var(--adm-muted)" }}>
-                      ★ {play.ratingAverage ? play.ratingAverage.toFixed(1) : "0.0"}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: "right" }}>
-                    {play.slug ? (
-                      <Link href={`/play/${play.slug}/`} target="_blank" rel="noopener noreferrer" className="adm-inner-row-action">
-                        View Play ↗
-                      </Link>
-                    ) : (
-                      <span className="adm-inner-cell-muted">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {!plays.length && (
-            <div className="adm-inner-empty">
-              <p>No play productions registered in database.</p>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
