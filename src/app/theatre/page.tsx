@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ContentStatus } from "@prisma/client";
+import { ContentStatus, type Prisma } from "@prisma/client";
 import Link from "next/link";
 import { mediaUrl, plainText, publishedWhere, getTheatrePhoto } from "@/lib/content";
 import { prisma } from "@/lib/prisma";
@@ -74,6 +74,13 @@ const STAGE_TYPES = [
   },
 ];
 
+type TheatreDirectoryRow = Prisma.TheatreGetPayload<{
+  include: {
+    shows: { include: { play: { select: { title: true; slug: true } } } };
+    _count: { select: { plays: true; shows: true } };
+  };
+}>;
+
 async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 600): Promise<T> {
   try {
     return await fn();
@@ -91,7 +98,7 @@ export default async function TheatresPage() {
   const baseWhere = { status: ContentStatus.PUBLISHED };
   const liveWhere = { showtime: { gt: now }, play: publishedWhere(now) };
 
-  let dbTheatres: any[] = [];
+  let dbTheatres: TheatreDirectoryRow[] = [];
   try {
     // Fetch all venues with their counts and next show
     dbTheatres = await withRetry(() =>
@@ -214,8 +221,7 @@ export default async function TheatresPage() {
       <main className="site-container theatre-main-content">
         <TheatreInteractiveView theatres={theatres} />
 
-        {/* ── Stage Types Guide Section ── */}
-        <section className="theatre-guide-section">
+        {false && <section className="theatre-guide-section">
           <div className="about-section-heading">
             <p className="landing-kicker">Stage Architecture</p>
             <h2>Performance Spaces Across Nepal</h2>
@@ -235,7 +241,7 @@ export default async function TheatresPage() {
               </div>
             ))}
           </div>
-        </section>
+        </section>}
 
         {/* ── Venue Owner CTA ── */}
         <section className="theatre-register-cta">

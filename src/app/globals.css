@@ -12,6 +12,1285 @@
   --green: #64856c;
 }
 
+/* Admin theatre record detail */
+.adm-theatre-detail-page {
+  --venue-detail-radius: 14px;
+  max-width: 1480px;
+}
+
+.adm-theatre-detail-public-disabled {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  padding: 7px 12px;
+  border: 1px solid var(--adm-border);
+  border-radius: 8px;
+  background: var(--adm-surface-subtle);
+  color: var(--adm-muted);
+  font-size: 11.5px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-hero {
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  background: var(--adm-surface);
+  box-shadow: var(--adm-card-shadow);
+}
+
+.adm-theatre-detail-hero-image,
+.adm-theatre-detail-hero-shade {
+  display: none;
+}
+
+.adm-theatre-detail-hero-content {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px;
+}
+
+.adm-theatre-detail-logo {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--adm-amber) 24%, transparent);
+  border-radius: 12px;
+  background: var(--adm-amber-bg);
+}
+
+.adm-theatre-detail-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.adm-theatre-detail-logo span {
+  color: var(--adm-amber);
+  font-size: 21px;
+  font-weight: 850;
+}
+
+.adm-theatre-detail-title-block {
+  min-width: 0;
+}
+
+.adm-theatre-detail-eyebrow {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--adm-muted);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.adm-theatre-detail-title-block h1 {
+  margin: 0;
+  color: var(--adm-text);
+  font-size: 23px;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.adm-theatre-detail-title-block p {
+  margin: 3px 0 0;
+  color: var(--adm-muted);
+  font-size: 10.5px;
+  font-weight: 650;
+}
+
+.adm-theatre-detail-hero-badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.adm-theatre-detail-status,
+.adm-theatre-detail-record-status,
+.adm-theatre-detail-table-status,
+.adm-theatre-detail-owner-state {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.adm-theatre-detail-status {
+  gap: 7px;
+  padding: 6px 9px;
+  border: 0;
+  background: var(--adm-surface-subtle);
+  color: var(--adm-muted);
+  font-size: 9px;
+}
+
+.adm-theatre-detail-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.adm-theatre-detail-status.is-published,
+.adm-theatre-detail-status.is-linked {
+  background: var(--adm-emerald-bg);
+  color: var(--adm-emerald);
+}
+
+.adm-theatre-detail-status.is-draft,
+.adm-theatre-detail-status.is-unclaimed {
+  background: var(--adm-amber-bg);
+  color: var(--adm-amber);
+}
+
+.adm-theatre-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 12px 0 22px;
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  background: var(--adm-surface);
+  box-shadow: var(--adm-card-shadow);
+}
+
+.adm-theatre-detail-stat {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 18px;
+  border-right: 1px solid var(--adm-border-subtle);
+}
+
+.adm-theatre-detail-stat:last-child {
+  border-right: 0;
+}
+
+.adm-theatre-detail-stat > span {
+  min-width: 42px;
+  color: var(--adm-amber);
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+}
+
+.adm-theatre-detail-stat > span.is-crimson { color: var(--adm-crimson); }
+.adm-theatre-detail-stat > span.is-blue { color: var(--adm-blue); }
+.adm-theatre-detail-stat > span.is-violet { color: var(--adm-violet); }
+.adm-theatre-detail-stat > span.is-emerald { color: var(--adm-emerald); }
+
+.adm-theatre-detail-stat div {
+  min-width: 0;
+}
+
+.adm-theatre-detail-stat strong,
+.adm-theatre-detail-stat small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-stat strong {
+  color: var(--adm-text);
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.adm-theatre-detail-stat small {
+  margin-top: 2px;
+  color: var(--adm-muted);
+  font-size: 9.5px;
+}
+
+.adm-theatre-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(300px, 0.75fr);
+  align-items: start;
+  gap: 18px;
+}
+
+.adm-theatre-detail-main-column,
+.adm-theatre-detail-side-column {
+  min-width: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.adm-theatre-detail-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--adm-border);
+  border-radius: var(--venue-detail-radius);
+  background: var(--adm-surface);
+  box-shadow: var(--adm-card-shadow);
+}
+
+.adm-theatre-detail-card-head {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--adm-border-subtle);
+  background: linear-gradient(180deg, var(--adm-surface) 0%, var(--adm-surface-hover) 100%);
+}
+
+.adm-theatre-detail-card-head > div {
+  min-width: 0;
+}
+
+.adm-theatre-detail-kicker {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--adm-amber);
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.adm-theatre-detail-kicker.is-crimson { color: var(--adm-crimson); }
+.adm-theatre-detail-kicker.is-blue { color: var(--adm-blue); }
+.adm-theatre-detail-kicker.is-emerald { color: var(--adm-emerald); }
+.adm-theatre-detail-kicker.is-violet { color: var(--adm-violet); }
+
+.adm-theatre-detail-card-head h2 {
+  margin: 0;
+  color: var(--adm-text);
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.adm-theatre-detail-card-head h2 em {
+  display: inline-grid;
+  min-width: 21px;
+  height: 21px;
+  place-items: center;
+  margin-left: 5px;
+  border-radius: 999px;
+  background: var(--adm-surface-subtle);
+  color: var(--adm-muted);
+  font-size: 9px;
+  font-style: normal;
+  vertical-align: 1px;
+}
+
+.adm-theatre-detail-record-status,
+.adm-theatre-detail-table-status,
+.adm-theatre-detail-owner-state {
+  padding: 5px 8px;
+  background: var(--adm-surface-subtle);
+  color: var(--adm-muted);
+  font-size: 9px;
+  letter-spacing: 0.03em;
+}
+
+.adm-theatre-detail-record-status.is-published,
+.adm-theatre-detail-table-status.is-published,
+.adm-theatre-detail-owner-state.is-active {
+  background: var(--adm-emerald-bg);
+  color: var(--adm-emerald);
+}
+
+.adm-theatre-detail-record-status.is-draft,
+.adm-theatre-detail-table-status.is-draft {
+  background: var(--adm-amber-bg);
+  color: var(--adm-amber);
+}
+
+.adm-theatre-detail-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  padding: 1px;
+  background: var(--adm-border-subtle);
+}
+
+.adm-theatre-detail-field {
+  min-width: 0;
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 17px;
+  background: var(--adm-surface);
+}
+
+.adm-theatre-detail-field-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--adm-amber-bg);
+  color: var(--adm-amber);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.adm-theatre-detail-field > div {
+  min-width: 0;
+}
+
+.adm-theatre-detail-field small,
+.adm-theatre-detail-field strong,
+.adm-theatre-detail-field a {
+  display: block;
+}
+
+.adm-theatre-detail-field small {
+  margin-bottom: 3px;
+  color: var(--adm-muted);
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.adm-theatre-detail-field strong,
+.adm-theatre-detail-field a {
+  overflow: hidden;
+  color: var(--adm-text);
+  font-size: 11.5px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-field a {
+  color: var(--adm-amber);
+}
+
+.adm-theatre-detail-field.is-missing .adm-theatre-detail-field-icon {
+  background: var(--adm-surface-subtle);
+  color: var(--adm-subtle-text);
+}
+
+.adm-theatre-detail-field.is-missing strong {
+  color: var(--adm-subtle-text);
+  font-weight: 650;
+}
+
+.adm-theatre-detail-description {
+  margin: 18px;
+  padding: 15px 16px;
+  border: 1px solid var(--adm-border-subtle);
+  border-left: 3px solid var(--adm-amber);
+  border-radius: 8px;
+  background: var(--adm-surface-subtle);
+}
+
+.adm-theatre-detail-description small {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--adm-amber);
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.adm-theatre-detail-description p {
+  margin: 0;
+  color: var(--adm-muted);
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+
+.adm-theatre-detail-meta-footer {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--adm-border-subtle);
+}
+
+.adm-theatre-detail-meta-footer span {
+  min-width: 0;
+  padding: 12px 14px;
+  border-right: 1px solid var(--adm-border-subtle);
+  color: var(--adm-muted);
+  font-size: 8.5px;
+  text-align: center;
+}
+
+.adm-theatre-detail-meta-footer span:last-child {
+  border-right: 0;
+}
+
+.adm-theatre-detail-meta-footer strong {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--adm-text);
+  font-size: 10px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-head-link {
+  flex: 0 0 auto;
+  color: var(--adm-crimson) !important;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.adm-theatre-detail-head-link.is-blue {
+  color: var(--adm-blue) !important;
+}
+
+.adm-theatre-detail-head-link:hover {
+  text-decoration: underline !important;
+}
+
+.adm-theatre-detail-table-wrap {
+  overflow-x: auto;
+}
+
+.adm-theatre-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.adm-theatre-detail-table th {
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--adm-border-subtle);
+  background: var(--adm-surface-subtle);
+  color: var(--adm-subtle-text);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-table td {
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--adm-border-subtle);
+  color: var(--adm-text);
+  font-size: 10.5px;
+  vertical-align: middle;
+}
+
+.adm-theatre-detail-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.adm-theatre-detail-table tbody tr:hover td {
+  background: var(--adm-surface-hover);
+}
+
+.adm-theatre-detail-production-title {
+  min-width: 175px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-theatre-detail-production-title > span {
+  width: 31px;
+  height: 38px;
+  display: grid;
+  flex: 0 0 31px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--adm-crimson) 22%, transparent);
+  border-radius: 6px;
+  background: var(--adm-crimson-bg);
+  color: var(--adm-crimson);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.adm-theatre-detail-production-title div {
+  min-width: 0;
+}
+
+.adm-theatre-detail-production-title strong,
+.adm-theatre-detail-production-title small,
+.adm-theatre-detail-table-primary,
+.adm-theatre-detail-table-secondary {
+  display: block;
+}
+
+.adm-theatre-detail-production-title strong {
+  max-width: 240px;
+  overflow: hidden;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-production-title small,
+.adm-theatre-detail-table-secondary {
+  margin-top: 3px;
+  color: var(--adm-muted);
+  font-size: 8.5px;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-table-primary {
+  font-size: 10.5px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-rating {
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-rating b {
+  color: #f59e0b;
+}
+
+.adm-theatre-detail-row-link {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--adm-border);
+  border-radius: 6px;
+  color: var(--adm-amber) !important;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.adm-theatre-detail-row-link:hover {
+  border-color: var(--adm-amber);
+  background: var(--adm-amber-bg);
+}
+
+.adm-theatre-detail-row-link.is-disabled {
+  color: var(--adm-subtle-text) !important;
+}
+
+.adm-theatre-detail-empty {
+  display: flex;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 28px;
+  color: var(--adm-muted);
+  text-align: center;
+}
+
+.adm-theatre-detail-empty > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: var(--adm-surface-subtle);
+  color: var(--adm-subtle-text);
+  font-size: 16px;
+}
+
+.adm-theatre-detail-empty strong {
+  color: var(--adm-text);
+  font-size: 11.5px;
+}
+
+.adm-theatre-detail-empty p {
+  margin: 4px 0 0;
+  font-size: 9.5px;
+}
+
+.adm-theatre-detail-empty.is-compact {
+  min-height: 132px;
+}
+
+.adm-theatre-detail-schedule-list {
+  display: grid;
+}
+
+.adm-theatre-detail-schedule {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.1fr) minmax(170px, 1fr) minmax(170px, 1.2fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--adm-border-subtle);
+}
+
+.adm-theatre-detail-schedule:last-child {
+  border-bottom: 0;
+}
+
+.adm-theatre-detail-schedule > div:first-child {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.adm-theatre-detail-schedule > div:first-child > div,
+.adm-theatre-detail-schedule-dates {
+  min-width: 0;
+}
+
+.adm-theatre-detail-schedule-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: var(--adm-subtle-text);
+}
+
+.adm-theatre-detail-schedule-dot.is-active {
+  background: var(--adm-blue);
+  box-shadow: 0 0 7px var(--adm-blue);
+}
+
+.adm-theatre-detail-schedule strong,
+.adm-theatre-detail-schedule small {
+  display: block;
+}
+
+.adm-theatre-detail-schedule > div:first-child strong {
+  overflow: hidden;
+  color: var(--adm-text);
+  font-size: 10.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-schedule small {
+  margin-top: 2px;
+  color: var(--adm-muted);
+  font-size: 8px;
+}
+
+.adm-theatre-detail-schedule-dates strong {
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--adm-text);
+  font-size: 9px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-schedule-slots,
+.adm-theatre-detail-schedule-adjustments {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.adm-theatre-detail-schedule-slots span,
+.adm-theatre-detail-schedule-adjustments span {
+  padding: 4px 6px;
+  border-radius: 5px;
+  background: var(--adm-blue-bg);
+  color: var(--adm-blue);
+  font-size: 8px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-schedule-slots span.is-empty,
+.adm-theatre-detail-schedule-adjustments span {
+  background: var(--adm-surface-subtle);
+  color: var(--adm-muted);
+}
+
+.adm-theatre-detail-owner-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 18px 14px;
+  padding: 14px;
+  border: 1px solid var(--adm-border-subtle);
+  border-radius: 10px;
+  background: var(--adm-surface-subtle);
+}
+
+.adm-theatre-detail-owner-profile > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  flex: 0 0 42px;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--adm-emerald), #047857);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.adm-theatre-detail-owner-profile div {
+  min-width: 0;
+}
+
+.adm-theatre-detail-owner-profile strong,
+.adm-theatre-detail-owner-profile small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-owner-profile strong {
+  color: var(--adm-text);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.adm-theatre-detail-owner-profile small {
+  margin-top: 3px;
+  color: var(--adm-muted);
+  font-size: 9px;
+}
+
+.adm-theatre-detail-owner-facts {
+  margin: 0;
+  padding: 0 18px 14px;
+}
+
+.adm-theatre-detail-owner-facts div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--adm-border-subtle);
+}
+
+.adm-theatre-detail-owner-facts div:last-child {
+  border-bottom: 0;
+}
+
+.adm-theatre-detail-owner-facts dt,
+.adm-theatre-detail-owner-facts dd {
+  margin: 0;
+  font-size: 9px;
+}
+
+.adm-theatre-detail-owner-facts dt {
+  color: var(--adm-muted);
+}
+
+.adm-theatre-detail-owner-facts dd {
+  overflow-wrap: anywhere;
+  color: var(--adm-text);
+  font-weight: 750;
+  text-align: right;
+}
+
+.adm-theatre-detail-linked-note {
+  display: flex;
+  gap: 9px;
+  margin: 0 18px 18px;
+  padding: 11px 12px;
+  border: 1px solid color-mix(in srgb, var(--adm-emerald) 20%, transparent);
+  border-radius: 8px;
+  background: var(--adm-emerald-bg);
+}
+
+.adm-theatre-detail-linked-note > span {
+  width: 19px;
+  height: 19px;
+  display: grid;
+  flex: 0 0 19px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--adm-emerald);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.adm-theatre-detail-linked-note p {
+  margin: 0;
+  color: var(--adm-muted);
+  font-size: 8.5px;
+  line-height: 1.5;
+}
+
+.adm-theatre-detail-linked-note strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--adm-emerald);
+  font-size: 9.5px;
+}
+
+.adm-theatre-detail-unclaimed {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 25px 20px 22px;
+  text-align: center;
+}
+
+.adm-theatre-detail-unclaimed > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 9px;
+  border-radius: 50%;
+  background: var(--adm-amber-bg);
+  color: var(--adm-amber);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.adm-theatre-detail-unclaimed > strong {
+  color: var(--adm-text);
+  font-size: 12px;
+}
+
+.adm-theatre-detail-unclaimed p {
+  max-width: 330px;
+  margin: 6px 0 15px;
+  color: var(--adm-muted);
+  font-size: 9.5px;
+  line-height: 1.55;
+}
+
+.adm-theatre-detail-completeness-number,
+.adm-theatre-detail-upcoming-count {
+  color: var(--adm-violet);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.adm-theatre-detail-upcoming-count {
+  color: var(--adm-blue);
+}
+
+.adm-theatre-detail-progress {
+  height: 7px;
+  margin: 20px 18px 16px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--adm-surface-subtle);
+}
+
+.adm-theatre-detail-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--adm-violet), #8b5cf6);
+}
+
+.adm-theatre-detail-missing-list {
+  display: grid;
+  gap: 6px;
+  padding: 0 18px 18px;
+}
+
+.adm-theatre-detail-missing-list > small {
+  margin-bottom: 2px;
+  color: var(--adm-muted);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.adm-theatre-detail-missing-list > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--adm-text);
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.adm-theatre-detail-missing-list i {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--adm-violet-bg);
+  color: var(--adm-violet);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.adm-theatre-detail-missing-list em {
+  padding-left: 24px;
+  color: var(--adm-muted);
+  font-size: 8px;
+  font-style: normal;
+}
+
+.adm-theatre-detail-complete-note {
+  margin: 18px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--adm-emerald-bg);
+  color: var(--adm-emerald);
+  font-size: 9.5px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.adm-theatre-detail-upcoming-list {
+  display: grid;
+  padding: 5px 18px 12px;
+}
+
+.adm-theatre-detail-upcoming-list article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--adm-border-subtle);
+}
+
+.adm-theatre-detail-upcoming-list article:last-of-type {
+  border-bottom: 0;
+}
+
+.adm-theatre-detail-upcoming-list time {
+  display: grid;
+  min-height: 43px;
+  place-items: center;
+  align-content: center;
+  border: 1px solid color-mix(in srgb, var(--adm-blue) 22%, transparent);
+  border-radius: 8px;
+  background: var(--adm-blue-bg);
+  color: var(--adm-blue);
+}
+
+.adm-theatre-detail-upcoming-list time strong {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.adm-theatre-detail-upcoming-list time span {
+  margin-top: 2px;
+  font-size: 7px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.adm-theatre-detail-upcoming-list article > div {
+  min-width: 0;
+}
+
+.adm-theatre-detail-upcoming-list article > div strong,
+.adm-theatre-detail-upcoming-list article > div small,
+.adm-theatre-detail-upcoming-list article > div span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-theatre-detail-upcoming-list article > div strong {
+  color: var(--adm-text);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.adm-theatre-detail-upcoming-list article > div small {
+  margin-top: 2px;
+  color: var(--adm-blue);
+  font-size: 8.5px;
+  font-weight: 750;
+}
+
+.adm-theatre-detail-upcoming-list article > div span {
+  margin-top: 2px;
+  color: var(--adm-muted);
+  font-size: 7.5px;
+}
+
+.adm-theatre-detail-upcoming-list article > b {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--adm-surface-subtle);
+  color: var(--adm-muted);
+  font-size: 8px;
+}
+
+.adm-theatre-detail-more-shows {
+  margin: 8px 0 0;
+  color: var(--adm-blue);
+  font-size: 8.5px;
+  font-weight: 750;
+  text-align: center;
+}
+
+.adm-theatre-detail-public-list {
+  display: grid;
+  padding: 8px 18px;
+}
+
+.adm-theatre-detail-public-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--adm-border-subtle);
+  font-size: 9px;
+}
+
+.adm-theatre-detail-public-list > div:last-child {
+  border-bottom: 0;
+}
+
+.adm-theatre-detail-public-list span {
+  color: var(--adm-muted);
+}
+
+.adm-theatre-detail-public-list strong {
+  color: var(--adm-text);
+  font-weight: 800;
+}
+
+.adm-theatre-detail-public-list a {
+  color: var(--adm-amber) !important;
+  font-weight: 800;
+}
+
+.adm-theatre-detail-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 18px 18px;
+}
+
+.adm-theatre-detail-socials a {
+  padding: 5px 7px;
+  border-radius: 5px;
+  background: var(--adm-surface-subtle);
+  color: var(--adm-muted) !important;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.adm-theatre-detail-no-socials {
+  margin: 0 18px 18px;
+  padding: 9px;
+  border-radius: 7px;
+  background: var(--adm-surface-subtle);
+  color: var(--adm-muted);
+  font-size: 8.5px;
+  text-align: center;
+}
+
+@media (max-width: 1180px) {
+  .adm-theatre-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-theatre-detail-side-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adm-theatre-detail-schedule {
+    grid-template-columns: minmax(150px, 1.1fr) minmax(170px, 1fr) minmax(170px, 1fr);
+  }
+
+  .adm-theatre-detail-schedule-adjustments {
+    grid-column: 2 / -1;
+  }
+}
+
+@media (max-width: 820px) {
+  .adm-theatre-detail-hero-content {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 18px;
+  }
+
+  .adm-theatre-detail-hero-badges {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+
+  .adm-theatre-detail-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adm-theatre-detail-stat:nth-child(2) {
+    border-right: 0;
+  }
+
+  .adm-theatre-detail-stat:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--adm-border-subtle);
+  }
+
+  .adm-theatre-detail-side-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-theatre-detail-schedule {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adm-theatre-detail-schedule-adjustments {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .adm-theatre-detail-page {
+    --venue-detail-radius: 10px;
+  }
+
+  .adm-theatre-detail-public-disabled {
+    display: none;
+  }
+
+  .adm-theatre-detail-hero,
+  .adm-theatre-detail-hero-content {
+    min-height: 0;
+  }
+
+  .adm-theatre-detail-hero {
+    border-radius: 12px;
+  }
+
+  .adm-theatre-detail-hero-content {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .adm-theatre-detail-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+  }
+
+  .adm-theatre-detail-logo span {
+    font-size: 18px;
+  }
+
+  .adm-theatre-detail-title-block h1 {
+    font-size: 19px;
+  }
+
+  .adm-theatre-detail-title-block p {
+    font-size: 9px;
+  }
+
+  .adm-theatre-detail-status {
+    padding: 6px 8px;
+    font-size: 8px;
+  }
+
+  .adm-theatre-detail-stats {
+    margin: 10px 0 16px;
+  }
+
+  .adm-theatre-detail-stat {
+    gap: 7px;
+    padding: 11px;
+  }
+
+  .adm-theatre-detail-stat > span {
+    min-width: 34px;
+    font-size: 17px;
+  }
+
+  .adm-theatre-detail-stat strong {
+    font-size: 9px;
+  }
+
+  .adm-theatre-detail-stat small {
+    font-size: 7.5px;
+  }
+
+  .adm-theatre-detail-main-column,
+  .adm-theatre-detail-side-column,
+  .adm-theatre-detail-layout {
+    gap: 12px;
+  }
+
+  .adm-theatre-detail-card-head {
+    min-height: 62px;
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .adm-theatre-detail-card-head h2 {
+    font-size: 13px;
+  }
+
+  .adm-theatre-detail-head-link {
+    max-width: 94px;
+    font-size: 8px;
+    text-align: right;
+  }
+
+  .adm-theatre-detail-field-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-theatre-detail-field {
+    min-height: 66px;
+    padding: 12px 14px;
+  }
+
+  .adm-theatre-detail-description {
+    margin: 14px;
+  }
+
+  .adm-theatre-detail-meta-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adm-theatre-detail-meta-footer span:nth-child(2) {
+    border-right: 0;
+  }
+
+  .adm-theatre-detail-meta-footer span:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--adm-border-subtle);
+  }
+
+  .adm-theatre-detail-schedule {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 13px 14px;
+  }
+
+  .adm-theatre-detail-schedule-adjustments {
+    grid-column: auto;
+  }
+
+  .adm-theatre-detail-schedule-dates strong {
+    white-space: normal;
+  }
+}
+
 html {
   color-scheme: light;
 }
@@ -10574,7 +11853,7 @@ html[data-theme="dark"] .theatre-type-examples span {
 .footer-connect {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   align-self: start;
 }
 
@@ -11444,7 +12723,7 @@ html[data-theme="dark"] .footer-bottom-links a:hover {
     grid-column: auto;
     margin-top: 0;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
     padding-top: 0;
     border-top: 0;
   }
@@ -11480,28 +12759,6 @@ html[data-theme="dark"] .footer-bottom-links a:hover {
   }
 }
 
-@media (min-width: 769px) {
-  .site-footer .footer-connect {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    column-gap: 12px;
-    row-gap: 12px;
-    align-items: start;
-  }
-
-  .site-footer .footer-connect .footer-col-heading {
-    grid-column: 1;
-    margin-bottom: 0;
-  }
-
-  .site-footer .footer-connect .footer-connect-sub {
-    grid-column: 2;
-  }
-
-  .site-footer .footer-connect .footer-socials-row {
-    grid-column: 1 / -1;
-  }
-}
 
 .artists-hero {
   position: relative;
@@ -32672,4 +33929,63 @@ body > .site-footer {
 
 html[data-theme="dark"] body > .site-footer {
   background-color: #12100f;
+}
+
+/* Play archive: clean, edge-to-edge theatrical poster tiles. */
+.play-archive-section .landing-play-card {
+  border-radius: 2px;
+  border-color: #ddd7d2;
+  box-shadow: 0 8px 24px rgba(45, 32, 25, 0.08);
+}
+
+.play-archive-section .landing-play-card:hover {
+  border-color: #b9aaa1;
+  box-shadow: 0 16px 34px rgba(45, 32, 25, 0.15);
+}
+
+.play-archive-section .landing-play-poster-wrap {
+  height: auto !important;
+  aspect-ratio: 2 / 3;
+  border-radius: 2px 2px 0 0 !important;
+  background: #15110f;
+}
+
+.play-archive-section .landing-play-poster-wrap img {
+  object-position: center;
+}
+
+.play-archive-section .landing-play-card-body {
+  min-height: 86px;
+  padding: 11px 12px 12px !important;
+}
+
+.play-archive-section .landing-play-body-title {
+  display: -webkit-box;
+  margin-bottom: 8px !important;
+  overflow: hidden;
+  font-size: 14px !important;
+  line-height: 1.32 !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.play-archive-section .landing-play-card-action {
+  padding-top: 5px;
+  border-top: 0;
+}
+
+html[data-theme="dark"] .play-archive-section .landing-play-card {
+  border-color: #3a312c;
+}
+
+@media (max-width: 600px) {
+  .play-archive-section .landing-play-card-body {
+    min-height: 74px;
+    padding: 8px 9px 9px !important;
+  }
+
+  .play-archive-section .landing-play-body-title {
+    margin-bottom: 6px !important;
+    font-size: 11.5px !important;
+  }
 }

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -186,7 +186,6 @@ export function PlaysFilterSidebar({
 
       <FilterSection
         label="Plays Type"
-        defaultOpen
         hasValue={!!playType}
         onClear={() => {
           setPlayType("");
@@ -213,7 +212,6 @@ export function PlaysFilterSidebar({
 
       <FilterSection
         label="Theatre / Venue"
-        defaultOpen
         hasValue={!!theatreId}
         onClear={() => {
           setTheatreId(null);
@@ -240,7 +238,6 @@ export function PlaysFilterSidebar({
 
       <FilterSection
         label="Availability"
-        defaultOpen
         hasValue={filter !== "all"}
         onClear={() => {
           setFilter("all");

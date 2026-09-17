@@ -124,12 +124,7 @@ export function TheatreInteractiveView({
   }, [theatres]);
 
   // Exclude spotlight venue from the cards grid when spotlight banner is active
-  const allDisplayTheatres = useMemo(() => {
-    if (spotlightVenue && !searchQuery && activeCity === "all") {
-      return filteredTheatres.filter((t) => t.id !== spotlightVenue.id);
-    }
-    return filteredTheatres;
-  }, [filteredTheatres, spotlightVenue, searchQuery, activeCity]);
+  const allDisplayTheatres = filteredTheatres;
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(allDisplayTheatres.length / PAGE_SIZE));
@@ -149,7 +144,7 @@ export function TheatreInteractiveView({
   return (
     <div className="theatre-directory-root">
       {/* ── Spotlight Venue Banner ── */}
-      {spotlightVenue && !searchQuery && activeCity === "all" && (
+      {spotlightVenue && !searchQuery && activeCity === "all" && false && (
         <section className="theatre-spotlight-banner">
           <div className="theatre-spotlight-inner">
             <div className="theatre-spotlight-img-wrap">
@@ -170,7 +165,7 @@ export function TheatreInteractiveView({
                 </div>
                 <h2 className="theatre-spotlight-title">{spotlightVenue.title}</h2>
                 {spotlightVenue.address && (
-                  <p className="theatre-spotlight-loc">📍 {spotlightVenue.address.replace(/\r?\n/g, ", ")}</p>
+                  <p className="theatre-spotlight-loc">📍 {spotlightVenue.address?.replace(/\r?\n/g, ", ")}</p>
                 )}
               </div>
               <p className="theatre-spotlight-desc">{spotlightVenue.description}</p>
@@ -197,7 +192,7 @@ export function TheatreInteractiveView({
                 </Link>
                 {spotlightVenue.linkWebsite && (
                   <a
-                    href={spotlightVenue.linkWebsite}
+                    href={spotlightVenue.linkWebsite || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="theatre-link-btn"
