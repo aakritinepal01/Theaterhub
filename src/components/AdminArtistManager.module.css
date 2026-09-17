@@ -1,0 +1,205 @@
+.theme {
+  --adm-crimson: var(--adm-violet);
+  --adm-crimson-bg: color-mix(in srgb, var(--adm-violet) 10%, transparent);
+}
+
+.centeredOverlay {
+  right: 0;
+  left: 240px;
+  width: auto;
+}
+
+:global(.adm-inner-shell[data-sidebar-hidden]) .centeredOverlay {
+  left: 0;
+}
+
+.artistGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
+  gap: 15px;
+}
+
+.artistCard {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--adm-border);
+  border-radius: 14px;
+  background: var(--adm-surface);
+  box-shadow: var(--adm-card-shadow);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.artistCard:hover {
+  border-color: color-mix(in srgb, var(--adm-violet) 28%, var(--adm-border));
+  box-shadow: var(--adm-card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.portrait {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 auto;
+  border: 2px solid color-mix(in srgb, var(--adm-violet) 20%, var(--adm-border));
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--adm-surface-subtle);
+}
+
+.identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.identity > span {
+  color: var(--adm-violet);
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.identity h3 {
+  margin: 4px 0 3px;
+  overflow: hidden;
+  color: var(--adm-text);
+  font-size: 0.96rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity p {
+  margin: 0;
+  overflow: hidden;
+  color: var(--adm-muted);
+  font-size: 0.67rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status {
+  align-self: flex-start;
+  padding: 5px 7px;
+  border-radius: 999px;
+  color: var(--adm-muted);
+  background: var(--adm-surface-subtle);
+  font-size: 0.55rem;
+  font-weight: 900;
+}
+
+.statusPUBLISHED { color: var(--adm-emerald); background: var(--adm-emerald-bg); }
+.statusUPCOMING { color: var(--adm-blue); background: var(--adm-blue-bg); }
+.statusDRAFT { color: var(--adm-amber); background: var(--adm-amber-bg); }
+
+.bio {
+  min-height: 43px;
+  margin: 14px 0;
+  overflow: hidden;
+  color: var(--adm-muted);
+  display: -webkit-box;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.credits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-block: 1px solid var(--adm-border-subtle);
+}
+
+.credits span {
+  display: grid;
+  gap: 3px;
+  padding: 10px 5px;
+  color: var(--adm-subtle-text);
+  font-size: 0.56rem;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.credits span + span { border-left: 1px solid var(--adm-border-subtle); }
+.credits strong { color: var(--adm-text); font-size: 0.8rem; }
+
+.ownerLine {
+  margin: 10px 0 0;
+  overflow: hidden;
+  color: var(--adm-muted);
+  font-size: 0.63rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 11px;
+}
+
+.cardActions button,
+.cardActions a {
+  border: 0;
+  background: transparent;
+  color: var(--adm-violet);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.cardActions .editButton {
+  min-height: 31px;
+  padding: 0 11px;
+  border-radius: 7px;
+  color: var(--adm-surface);
+  background: var(--adm-text);
+}
+
+.cardActions .deleteButton {
+  margin-left: auto;
+  color: var(--adm-rose);
+}
+
+.socialGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.deleteImpactThree {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ownerWarning {
+  margin: -5px 0 17px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--adm-blue) 28%, var(--adm-border));
+  border-radius: 9px;
+  color: var(--adm-blue);
+  background: var(--adm-blue-bg);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .centeredOverlay { left: 72px; }
+}
+
+@media (max-width: 600px) {
+  .centeredOverlay { left: 56px; }
+  .socialGrid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 430px) {
+  .centeredOverlay { left: 0; padding: 0; }
+  .centeredOverlay > section { min-height: 100%; border-radius: 0; }
+  .artistGrid { grid-template-columns: minmax(0, 1fr); }
+}
