@@ -1,0 +1,146 @@
+.theme {
+  --adm-crimson: var(--adm-amber);
+  --adm-crimson-bg: var(--adm-amber-bg);
+  margin-top: 22px;
+  color: var(--adm-text);
+}
+
+.centeredOverlay {
+  right: 0;
+  left: 240px;
+  width: auto;
+  justify-items: center;
+  padding: 34px clamp(18px, 4vw, 54px);
+}
+
+.venueModal {
+  width: min(920px, 100%);
+  margin-inline: auto;
+  border-radius: 18px;
+}
+
+:global(.adm-inner-shell[data-sidebar-hidden]) .centeredOverlay {
+  left: 0;
+}
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(280px, 1.25fr);
+  gap: 14px;
+}
+
+.cardMeta,
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.cardMeta {
+  justify-content: space-between;
+  padding: 11px 0;
+  color: var(--adm-muted);
+  font-size: 0.64rem;
+}
+
+.cardMeta a {
+  color: var(--adm-amber) !important;
+  font-weight: 800;
+}
+
+.cardActions {
+  padding-top: 11px;
+  border-top: 1px solid var(--adm-border-subtle);
+}
+
+.cardActions button,
+.cardActions a {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--adm-amber) !important;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.editButton {
+  min-height: 31px;
+  padding: 0 11px;
+  border-radius: 7px !important;
+  background: var(--adm-text) !important;
+  color: var(--adm-surface) !important;
+}
+
+.deleteButton {
+  margin-left: auto;
+  color: var(--adm-rose) !important;
+}
+
+.detailActions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+}
+
+.detailEditButton,
+.detailDeleteButton {
+  min-height: 34px;
+  padding: 0 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.69rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.detailEditButton {
+  border: 1px solid var(--adm-amber);
+  background: var(--adm-amber-bg);
+  color: var(--adm-amber);
+}
+
+.detailDeleteButton {
+  border: 1px solid color-mix(in srgb, var(--adm-rose) 30%, var(--adm-border));
+  background: var(--adm-rose-bg);
+  color: var(--adm-rose);
+}
+
+@media (max-width: 860px) {
+  .centeredOverlay {
+    left: 72px;
+    padding: 22px 14px;
+  }
+}
+
+@media (max-width: 760px) {
+
+  .imageGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .centeredOverlay {
+    left: 56px;
+  }
+}
+
+@media (max-width: 430px) {
+  .centeredOverlay {
+    left: 0;
+    padding: 0;
+  }
+
+  .venueModal {
+    min-height: 100%;
+    border-radius: 0;
+  }
+
+  .cardActions {
+    flex-wrap: wrap;
+  }
+}

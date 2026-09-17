@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getTheatrePhoto, mediaUrl } from "@/lib/content";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileAdminSidebarToggle } from "@/components/MobileAdminSidebarToggle";
+import { AdminTheatreManager } from "@/components/AdminTheatreManager";
 
 const ADMIN_THEATRES_PAGE_SIZE = 15;
 
@@ -45,25 +46,70 @@ export default async function Theatres({
     select: {
       id: true,
       title: true,
+      slug: true,
+      metaTitle: true,
       address: true,
       description: true,
+      keywordsString: true,
       about: true,
       email: true,
       phone: true,
       linkWebsite: true,
+      linkFacebook: true,
+      linkTwitter: true,
+      linkInstagram: true,
       establishedOn: true,
+      closedOn: true,
+      publishDate: true,
+      expiryDate: true,
+      inSitemap: true,
       status: true,
       updated: true,
       profilePic: true,
       coverImage: true,
       owner: { select: { username: true, email: true } },
-      _count: { select: { plays: true, shows: true } },
+      shows: { select: { _count: { select: { bookings: true } } } },
+      _count: { select: { plays: true, shows: true, showsMeta: true } },
     },
     orderBy: [{ updated: "desc" }, { title: "asc" }],
     skip: (page - 1) * ADMIN_THEATRES_PAGE_SIZE,
     take: ADMIN_THEATRES_PAGE_SIZE,
   });
   const unclaimed = totalTheatres - claimed;
+  const theatreRecords = rows.map((theatre) => ({
+    id: theatre.id,
+    title: theatre.title,
+    slug: theatre.slug,
+    status: theatre.status,
+    metaTitle: theatre.metaTitle,
+    description: theatre.description,
+    keywordsString: theatre.keywordsString,
+    about: theatre.about,
+    profilePic: theatre.profilePic,
+    coverImage: theatre.coverImage,
+    coverUrl: mediaUrl(theatre.coverImage) ?? getTheatrePhoto(theatre),
+    logoUrl: mediaUrl(theatre.profilePic) ?? getTheatrePhoto(theatre),
+    establishedOn: theatre.establishedOn?.toISOString() ?? null,
+    closedOn: theatre.closedOn?.toISOString() ?? null,
+    publishDate: theatre.publishDate?.toISOString() ?? null,
+    expiryDate: theatre.expiryDate?.toISOString() ?? null,
+    inSitemap: theatre.inSitemap,
+    email: theatre.email,
+    phone: theatre.phone,
+    address: theatre.address,
+    linkWebsite: theatre.linkWebsite,
+    linkFacebook: theatre.linkFacebook,
+    linkTwitter: theatre.linkTwitter,
+    linkInstagram: theatre.linkInstagram,
+    updated: theatre.updated?.toISOString() ?? null,
+    owner: theatre.owner,
+    related: {
+      plays: theatre._count.plays,
+      schedules: theatre._count.showsMeta,
+      shows: theatre._count.shows,
+      bookings: theatre.shows.reduce((sum, show) => sum + show._count.bookings, 0),
+    },
+  }));
   const firstRecord = filteredCount ? (page - 1) * ADMIN_THEATRES_PAGE_SIZE + 1 : 0;
   const lastRecord = Math.min(page * ADMIN_THEATRES_PAGE_SIZE, filteredCount);
   const pageHref = (nextPage: number) => {
@@ -219,69 +265,7 @@ export default async function Theatres({
             )}
           </form>
 
-          <div className="adm-theatre-directory-head">
-            <div>
-              <span>VENUE COLLECTION</span>
-              <h2>{q.unclaimed === "1" ? "Unclaimed venues" : search ? `Search results for "${search}"` : "All theatre venues"}</h2>
-            </div>
-            <strong>{filteredCount} {filteredCount === 1 ? "venue" : "venues"} found</strong>
-          </div>
-
-          {/* Visual venue directory */}
-          <div className="adm-theatre-grid">
-            {rows.map((t) => (
-              <article className="adm-theatre-card" key={t.id}>
-                <div className="adm-theatre-cover">
-                  <img src={mediaUrl(t.coverImage) ?? getTheatrePhoto(t)} alt={`${t.title} cover`} loading="lazy" />
-                  <span className={`adm-theatre-status ${t.owner ? "is-claimed" : "is-unclaimed"}`}>
-                    {t.owner ? "Claimed" : "Unclaimed"}
-                  </span>
-                </div>
-                <div className="adm-theatre-card-body">
-                  <div className="adm-theatre-card-heading">
-                    <div>
-                      <h2>{t.title}</h2>
-                      <span>Venue ID #{t.id}</span>
-                    </div>
-                  </div>
-                  <div className="adm-theatre-logo-strip">
-                    <img src={mediaUrl(t.profilePic) ?? getTheatrePhoto(t)} alt={`${t.title} logo`} loading="lazy" />
-                    <span>{t.profilePic ? "Official venue logo" : "Venue image fallback"}</span>
-                  </div>
-                  <p className="adm-theatre-address">{t.address || "No location listed"}</p>
-                  {(t.description || t.about) && (
-                    <p className="adm-theatre-description">{t.description || t.about}</p>
-                  )}
-                  <div className="adm-theatre-details">
-                    <span><strong>{t._count.plays}</strong> plays</span>
-                    <span><strong>{t._count.shows}</strong> shows</span>
-                    <span><strong>{t.status.toLowerCase()}</strong></span>
-                  </div>
-                  {(t.email || t.phone || t.linkWebsite) && (
-                    <div className="adm-theatre-contact">
-                      {t.email && <span>{t.email}</span>}
-                      {t.phone && <span>{t.phone}</span>}
-                      {t.linkWebsite && <span>Website listed</span>}
-                    </div>
-                  )}
-                  <div className="adm-theatre-owner">
-                    <span className="adm-theatre-owner-mark">{t.owner ? t.owner.username.slice(0, 1).toUpperCase() : "!"}</span>
-                    <span>{t.owner ? t.owner.email : "No owner assigned"}</span>
-                  </div>
-                  <div className="adm-theatre-card-footer">
-                    <small>Updated {t.updated?.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) || "-"}</small>
-                    <Link href={`/admin/theatres/${t.id}`} className="adm-theatre-manage-link">Manage venue <span aria-hidden="true">→</span></Link>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-          {!rows.length && (
-            <div className="adm-inner-empty adm-theatre-empty">
-              <p>No venues match your current filters.</p>
-              <Link href="/admin/theatres" className="adm-inner-empty-reset">Clear filters →</Link>
-            </div>
-          )}
+          <AdminTheatreManager theatres={theatreRecords} totalTheatres={totalTheatres} />
 
           {totalPages > 1 && (
             <nav className="adm-production-pagination adm-theatre-pagination" aria-label="Theatre venue pages">
