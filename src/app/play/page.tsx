@@ -8,7 +8,7 @@ import { PlaysFilterSidebar } from "@/components/PlaysFilterSidebar";
 export const revalidate = 300;
 export const dynamic = "force-dynamic";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 12;
 
 type PlayListItem = Prisma.PlayGetPayload<{
   include: {
@@ -314,7 +314,7 @@ export default async function Plays({
                   {archivedPlays.length ? (
                     <div className="landing-play-grid play-list-grid-animated">
                       {archivedPlays.map((play) => (
-                        <PlayCard key={play.id} play={play} teaserLength={95} />
+                        <PlayCard key={play.id} play={play} showVenue={false} showTeaser={false} />
                       ))}
                     </div>
                   ) : (

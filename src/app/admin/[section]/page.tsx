@@ -9,10 +9,12 @@ import {
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileAdminSidebarToggle } from "@/components/MobileAdminSidebarToggle";
 import { AdminProductionManager } from "@/components/AdminProductionManager";
+import { AdminArtistManager } from "@/components/AdminArtistManager";
+import { AdminScheduleManager } from "@/components/AdminScheduleManager";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { getPlayPhoto, plainText } from "@/lib/content";
+import { getArtistPhoto, getPlayPhoto, plainText } from "@/lib/content";
 
 const SECTION_META: Record<
   string,
@@ -465,10 +467,45 @@ async function ProfilesSection({ requestedPage }: { requestedPage?: string }) {
   const totalPages = Math.max(1, Math.ceil(totalProfiles / ADMIN_PROFILES_PAGE_SIZE));
   const page = Math.min(requested, totalPages);
   const profiles = await prisma.profile.findMany({
+    include: {
+      owner: { select: { username: true, email: true } },
+      _count: { select: { makerCredits: true, castCredits: true, crewCredits: true } },
+    },
     orderBy: { name: "asc" },
     skip: (page - 1) * ADMIN_PROFILES_PAGE_SIZE,
     take: ADMIN_PROFILES_PAGE_SIZE,
   });
+  const artistRecords = profiles.map((artist) => ({
+    id: artist.id,
+    name: artist.name,
+    slug: artist.slug,
+    status: artist.status,
+    metaTitle: artist.metaTitle,
+    description: artist.description,
+    keywordsString: artist.keywordsString,
+    profilePic: artist.profilePic,
+    photoUrl: getArtistPhoto(artist),
+    email: artist.email,
+    mobile: artist.mobile,
+    dob: artist.dob?.toISOString() ?? null,
+    activeSince: artist.activeSince?.toISOString() ?? null,
+    linkWebsite: artist.linkWebsite,
+    linkFacebook: artist.linkFacebook,
+    linkTwitter: artist.linkTwitter,
+    linkInstagram: artist.linkInstagram,
+    bio: artist.bio,
+    address: artist.address,
+    publishDate: artist.publishDate?.toISOString() ?? null,
+    expiryDate: artist.expiryDate?.toISOString() ?? null,
+    inSitemap: artist.inSitemap,
+    owner: artist.owner,
+    related: {
+      maker: artist._count.makerCredits,
+      cast: artist._count.castCredits,
+      crew: artist._count.crewCredits,
+      total: artist._count.makerCredits + artist._count.castCredits + artist._count.crewCredits,
+    },
+  }));
   const firstRecord = totalProfiles ? (page - 1) * ADMIN_PROFILES_PAGE_SIZE + 1 : 0;
   const lastRecord = Math.min(page * ADMIN_PROFILES_PAGE_SIZE, totalProfiles);
   const pageHref = (nextPage: number) =>
@@ -491,51 +528,7 @@ async function ProfilesSection({ requestedPage }: { requestedPage?: string }) {
         </div>
       </div>
 
-      {/* Profiles Cards Grid */}
-      <div className="adm-subsystems-grid adm-artist-grid">
-        {profiles.map((artist) => (
-          <div key={artist.id} className="adm-app-card" style={{ padding: "20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "12px" }}>
-              {artist.profilePic ? (
-                <img src={artist.profilePic} alt="" style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover" }} />
-              ) : (
-                <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg, var(--adm-violet) 0%, #6d28d9 100%)", color: "#fff", display: "grid", placeItems: "center", fontWeight: 800, fontSize: "18px" }}>
-                  {artist.name.slice(0, 1).toUpperCase()}
-                </div>
-              )}
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 800, color: "var(--adm-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {artist.name}
-                </h3>
-                <small style={{ color: "var(--adm-muted)", fontSize: "11.5px" }}>Artist ID #{artist.id}</small>
-              </div>
-            </div>
-
-            <p style={{ margin: "0 0 16px", fontSize: "12.5px", color: "var(--adm-muted)", lineHeight: "1.5", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-              {artist.bio || "No public biography provided yet for this theatre artist."}
-            </p>
-
-            <div style={{ marginTop: "auto", paddingTop: "12px", borderTop: "1px solid var(--adm-border-subtle)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "11.5px", fontWeight: 700, color: "var(--adm-subtle-text)" }}>/{artist.slug || artist.id}</span>
-              {artist.slug ? (
-                <Link href={`/profile/${artist.slug}/`} target="_blank" rel="noopener noreferrer" className="adm-inner-row-action">
-                  View Profile ↗
-                </Link>
-              ) : (
-                <span className="adm-inner-cell-muted">—</span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {!profiles.length && (
-        <div className="adm-inner-table-card">
-          <div className="adm-inner-empty">
-            <p>No artist profiles registered yet.</p>
-          </div>
-        </div>
-      )}
+      <AdminArtistManager artists={artistRecords} totalArtists={totalProfiles} />
 
       {totalPages > 1 && (
         <nav className="adm-production-pagination adm-artist-pagination" aria-label="Artist profile pages">
@@ -606,12 +599,54 @@ async function SchedulesSection({ requestedPage }: { requestedPage?: string }) {
   ]);
   const totalPages = Math.max(1, Math.ceil(totalSchedules / ADMIN_SCHEDULES_PAGE_SIZE));
   const page = Math.min(requested, totalPages);
-  const schedules = await prisma.showsMeta.findMany({
-    include: { play: true, theatre: true, excludeDates: true, extraShows: true },
-    orderBy: [{ startDate: "desc" }, { id: "desc" }],
-    skip: (page - 1) * ADMIN_SCHEDULES_PAGE_SIZE,
-    take: ADMIN_SCHEDULES_PAGE_SIZE,
-  });
+  const [schedules, productions] = await Promise.all([
+    prisma.showsMeta.findMany({
+      include: {
+        play: { include: { shows: { select: { _count: { select: { bookings: true } } } } } },
+        theatre: true,
+        excludeDates: true,
+        extraShows: true,
+      },
+      orderBy: [{ startDate: "desc" }, { id: "desc" }],
+      skip: (page - 1) * ADMIN_SCHEDULES_PAGE_SIZE,
+      take: ADMIN_SCHEDULES_PAGE_SIZE,
+    }),
+    prisma.play.findMany({
+      select: {
+        id: true,
+        title: true,
+        theatre: { select: { id: true, title: true } },
+        _count: { select: { schedules: true } },
+      },
+      orderBy: { title: "asc" },
+    }),
+  ]);
+  const scheduleRecords = schedules.map((schedule) => ({
+    id: schedule.id,
+    playId: schedule.playId,
+    theatreId: schedule.theatreId,
+    startDate: schedule.startDate.toISOString(),
+    endDate: schedule.endDate.toISOString(),
+    sunday: schedule.sunday,
+    monday: schedule.monday,
+    tuesday: schedule.tuesday,
+    wednesday: schedule.wednesday,
+    thursday: schedule.thursday,
+    friday: schedule.friday,
+    saturday: schedule.saturday,
+    play: { id: schedule.play.id, title: schedule.play.title, slug: schedule.play.slug },
+    theatre: { id: schedule.theatre.id, title: schedule.theatre.title },
+    exclusions: schedule.excludeDates.length,
+    extras: schedule.extraShows.length,
+    shows: schedule.play.shows.length,
+    bookings: schedule.play.shows.reduce((sum, show) => sum + show._count.bookings, 0),
+  }));
+  const productionOptions = productions.map((production) => ({
+    id: production.id,
+    title: production.title,
+    theatre: production.theatre,
+    hasSchedule: production._count.schedules > 0,
+  }));
   const firstRecord = totalSchedules ? (page - 1) * ADMIN_SCHEDULES_PAGE_SIZE + 1 : 0;
   const lastRecord = Math.min(page * ADMIN_SCHEDULES_PAGE_SIZE, totalSchedules);
   const pageHref = (nextPage: number) =>
@@ -640,91 +675,7 @@ async function SchedulesSection({ requestedPage }: { requestedPage?: string }) {
         </div>
       </div>
 
-      <div className="adm-schedule-directory-head">
-        <div>
-          <span>PERFORMANCE CALENDAR</span>
-          <h2>Show schedule archive</h2>
-        </div>
-        <strong>{totalSchedules} schedule{totalSchedules === 1 ? "" : "s"}</strong>
-      </div>
-
-      <div className="adm-schedule-grid">
-        {schedules.map((schedule) => {
-          const isActive = schedule.endDate >= today;
-          const weeklySlots = [
-            ["Sun", schedule.sunday],
-            ["Mon", schedule.monday],
-            ["Tue", schedule.tuesday],
-            ["Wed", schedule.wednesday],
-            ["Thu", schedule.thursday],
-            ["Fri", schedule.friday],
-            ["Sat", schedule.saturday],
-          ].filter((slot) => slot[1]);
-
-          return (
-            <article className="adm-schedule-card" key={schedule.id}>
-              <div className="adm-schedule-card-accent" aria-hidden="true" />
-              <div className="adm-schedule-card-head">
-                <span className="adm-schedule-id">SCHEDULE #{schedule.id}</span>
-                <span className={`adm-schedule-status ${isActive ? "is-active" : "is-ended"}`}>
-                  <span aria-hidden="true" />
-                  {isActive ? "Active" : "Ended"}
-                </span>
-              </div>
-
-              <h3>{schedule.play.title}</h3>
-              <p className="adm-schedule-venue">
-                <span aria-hidden="true">⌂</span> {schedule.theatre.title}
-              </p>
-
-              <div className="adm-schedule-date-range">
-                <div>
-                  <small>ST</small>
-                  <strong>{schedule.startDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</strong>
-                </div>
-                <span aria-hidden="true">→</span>
-                <div>
-                  <small>ED</small>
-                  <strong>{schedule.endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</strong>
-                </div>
-              </div>
-
-              <div className="adm-schedule-slot-block">
-                <small>WEEKLY SHOWTIMES</small>
-                <div className="adm-schedule-slots">
-                  {weeklySlots.length ? (
-                    weeklySlots.map(([day, time]) => (
-                      <span key={day}><strong>{day}</strong>{time}</span>
-                    ))
-                  ) : (
-                    <span className="is-empty">No recurring showtimes</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="adm-schedule-card-foot">
-                <div>
-                  <span>{schedule.excludeDates.length} excluded</span>
-                  <span>{schedule.extraShows.length} extra</span>
-                </div>
-                {schedule.play.slug ? (
-                  <Link href={`/play/${schedule.play.slug}/`} target="_blank" rel="noopener noreferrer">
-                    View production <span aria-hidden="true">↗</span>
-                  </Link>
-                ) : (
-                  <span className="adm-inner-cell-muted">No public page</span>
-                )}
-              </div>
-            </article>
-          );
-        })}
-      </div>
-
-      {!schedules.length && (
-        <div className="adm-inner-empty adm-schedule-empty">
-          <p>No show performance schedules created yet.</p>
-        </div>
-      )}
+      <AdminScheduleManager schedules={scheduleRecords} productions={productionOptions} totalSchedules={totalSchedules} />
 
       {totalPages > 1 && (
         <nav className="adm-production-pagination adm-schedule-pagination" aria-label="Show schedule pages">

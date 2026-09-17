@@ -1,0 +1,119 @@
+.theme {
+  --adm-crimson: var(--adm-blue);
+  --adm-crimson-bg: var(--adm-blue-bg);
+}
+
+.centeredOverlay {
+  right: 0;
+  left: 240px;
+  width: auto;
+}
+
+:global(.adm-inner-shell[data-sidebar-hidden]) .centeredOverlay {
+  left: 0;
+}
+
+.scheduleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: 15px;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--adm-border-subtle);
+}
+
+.cardActions button,
+.cardActions a {
+  border: 0;
+  background: transparent;
+  color: var(--adm-blue);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.69rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.cardActions .editButton {
+  min-height: 31px;
+  padding: 0 11px;
+  border-radius: 7px;
+  color: var(--adm-surface);
+  background: var(--adm-text);
+}
+
+.cardActions .deleteButton {
+  margin-left: auto;
+  color: var(--adm-rose);
+}
+
+.scheduleFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 11px;
+}
+
+.scheduleFacts span {
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: var(--adm-muted);
+  background: var(--adm-surface-subtle);
+  font-size: 0.62rem;
+  font-weight: 750;
+}
+
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.dayHint,
+.bookingWarning {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 9px;
+  color: var(--adm-muted);
+  background: var(--adm-surface-subtle);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.bookingWarning {
+  border: 1px solid color-mix(in srgb, var(--adm-amber) 34%, var(--adm-border));
+  color: var(--adm-amber);
+  background: var(--adm-amber-bg);
+  font-weight: 700;
+}
+
+.deleteImpactThree {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 860px) {
+  .centeredOverlay { left: 72px; }
+}
+
+@media (max-width: 600px) {
+  .centeredOverlay { left: 56px; }
+  .dayGrid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 430px) {
+  .centeredOverlay {
+    left: 0;
+    padding: 0;
+  }
+
+  .centeredOverlay > section {
+    min-height: 100%;
+    border-radius: 0;
+  }
+}

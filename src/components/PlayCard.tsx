@@ -19,10 +19,12 @@ type PlayData = {
 export function PlayCard({
   play,
   showTeaser = true,
+  showVenue = true,
   teaserLength = 140,
 }: {
   play: PlayData;
   showTeaser?: boolean;
+  showVenue?: boolean;
   teaserLength?: number;
 }) {
   const image = getPlayPhoto(play);
@@ -51,7 +53,7 @@ export function PlayCard({
           <Link href={`/play/${play.slug}/`}>{play.title}</Link>
         </h3>
 
-        {venueName && (
+        {showVenue && venueName && (
           <div className="landing-play-venue" title={venueName}>
             {venueName}
           </div>
