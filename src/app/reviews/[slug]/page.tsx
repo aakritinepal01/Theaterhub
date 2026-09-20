@@ -61,33 +61,40 @@ export default async function ReviewDetailPage({
     <main className="review-detail-page">
       <div className="site-container review-detail-shell">
         <Link href="/reviews/" className="review-detail-back">← Back to Reviews</Link>
-        <div className="review-detail-hero">
-          <div className="review-detail-image-wrap">
-            <img src={review.playImage || "/images/placeholder-play.jpg"} alt={review.playTitle} />
-          </div>
-          <div className="review-detail-intro">
-            <span className="review-detail-verdict">{review.verdictTag}</span>
-            <div className="review-detail-rating">★ {review.rating.toFixed(1)} <span>/ 5.0</span></div>
-            <p className="review-detail-kicker">{review.theatreName} · {review.date}</p>
-            <h1>{review.playTitle}</h1>
-            <h2>&ldquo;{review.title}&rdquo;</h2>
-            <div className="review-detail-reviewer">
-              <img src={review.reviewerAvatar} alt={review.reviewerName} />
-              <span><strong>{review.reviewerName}</strong><small>{review.reviewerRole}</small></span>
+        <div className="review-detail-card">
+          <div className="review-detail-hero">
+            <div className="review-detail-image-wrap">
+              <img src={review.playImage || "/images/placeholder-play.jpg"} alt={review.playTitle} />
+            </div>
+            <div className="review-detail-intro">
+              <span className="review-detail-verdict">{review.verdictTag}</span>
+              <div className="review-detail-rating">★ {review.rating.toFixed(1)} <span>/ 5.0</span></div>
+              <p className="review-detail-kicker">{review.theatreName} · {review.date}</p>
+              <h1>{review.playTitle}</h1>
+              <h2>&ldquo;{review.title}&rdquo;</h2>
+              <div className="review-detail-reviewer">
+                <img src={review.reviewerAvatar} alt="" />
+                <span><strong>{review.reviewerName}</strong><small>{review.reviewerRole}</small></span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <article className="review-detail-content">
-          <blockquote>&ldquo;{review.keyQuote}&rdquo;</blockquote>
-          {review.content.split("\n\n").map((paragraph, index) => <p key={index}>{paragraph}</p>)}
-          <div className="review-detail-scores">
-            <div><span>Acting</span><strong>{review.scores.acting.toFixed(1)}</strong></div>
-            <div><span>Direction</span><strong>{review.scores.direction.toFixed(1)}</strong></div>
-            <div><span>Stage Design</span><strong>{review.scores.stageDesign.toFixed(1)}</strong></div>
-            <div><span>Script &amp; Dialog</span><strong>{review.scores.script.toFixed(1)}</strong></div>
-          </div>
-        </article>
+          <article className="review-detail-content">
+            <div className="review-detail-copy">
+              <span className="review-detail-content-label">Critic&apos;s take</span>
+              <blockquote>&ldquo;{review.keyQuote}&rdquo;</blockquote>
+              <div className="review-detail-prose">
+                {review.content.split("\n\n").map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+              </div>
+            </div>
+            <div className="review-detail-scores">
+              <div><span>Acting</span><strong>{review.scores.acting.toFixed(1)}</strong></div>
+              <div><span>Direction</span><strong>{review.scores.direction.toFixed(1)}</strong></div>
+              <div><span>Stage Design</span><strong>{review.scores.stageDesign.toFixed(1)}</strong></div>
+              <div><span>Script &amp; Dialog</span><strong>{review.scores.script.toFixed(1)}</strong></div>
+            </div>
+          </article>
+        </div>
       </div>
     </main>
   );

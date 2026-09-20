@@ -46,57 +46,6 @@ const TEAM = [
   },
 ];
 
-const VALUES = [
-  {
-    title: "Open to Everyone",
-    body: "We believe theatre belongs to all of Nepal — from grand Kathmandu stages to grassroots productions in far-flung towns.",
-    icon: (
-      <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--au-accent, #9d4f36)" aria-hidden="true">
-        <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.65 10.59 20 12 20s2.72-.35 4.34-1.09l1.9 1.9c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-.62-1.79C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9zm-3.5 8c-.83 0-1.5-.67-1.5-1.5S7.67 8 8.5 8s1.5.67 1.5 1.5S9.33 11 8.5 11zm7 0c-.83 0-1.5-.67-1.5-1.5S14.67 8 15.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-3.5 5c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/>
-      </svg>
-    ),
-    highlight: "Free & Accessible",
-    accent: "#9d4f36",
-    stat: "100% Free for Viewers",
-  },
-  {
-    title: "Always Up to Date",
-    body: "Show dates, cast updates, ticket prices — we push hard to keep every detail current so audiences never arrive at an empty stage.",
-    icon: (
-      <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--au-accent, #64856c)" aria-hidden="true">
-        <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
-      </svg>
-    ),
-    highlight: "Real-time Sync",
-    accent: "#64856c",
-    stat: "Live Showtime Status",
-  },
-  {
-    title: "Community First",
-    body: "Every feature we build serves the people making and watching theatre. Our roadmap is shaped by artists and directors, not ads.",
-    icon: (
-      <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--au-accent, #c58962)" aria-hidden="true">
-        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-      </svg>
-    ),
-    highlight: "Artist-Driven",
-    accent: "#c58962",
-    stat: "Built With Artists",
-  },
-  {
-    title: "Authentic Stories",
-    body: "We champion the craft behind every production. Our editorial journal goes beyond listings to celebrate the art of Nepal's stage.",
-    icon: (
-      <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--au-accent, #7a6a9e)" aria-hidden="true">
-        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-      </svg>
-    ),
-    highlight: "In-depth Coverage",
-    accent: "#7a6a9e",
-    stat: "Rich Stage Journal",
-  },
-];
-
 const MILESTONES = [
   {
     year: "2022",
@@ -367,36 +316,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ── CORE VALUES BENTO ── */}
-        <section className="au-values-section">
-          <div className="site-container">
-            <div className="au-section-head centered">
-              <p className="au-kicker">What drives us</p>
-              <h2>The core principles behind the platform.</h2>
-              <p className="au-section-sub">
-                Designed to empower artists, preserve cultural archives, and make theatre discovery seamless.
-              </p>
-            </div>
-
-            <div className="au-values-grid">
-              {VALUES.map((v, i) => (
-                <div
-                  className="au-value-card"
-                  key={v.title}
-                  style={{ "--au-accent": v.accent, animationDelay: `${i * 0.08}s` } as React.CSSProperties}
-                >
-                  <div className="au-value-top-row">
-                    <span className="au-value-icon-wrap">{v.icon}</span>
-                    <span className="au-value-tag">{v.highlight}</span>
-                  </div>
-                  <h3>{v.title}</h3>
-                  <p>{v.body}</p>
-                  <div className="au-value-stat-pill">{v.stat}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ── JOURNEY / TIMELINE ── */}
         <section className="au-section site-container">

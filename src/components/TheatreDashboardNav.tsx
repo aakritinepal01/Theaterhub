@@ -18,6 +18,7 @@ export function TheatreDashboardNav({
   const isProfile = pathname.startsWith("/theatre-dashboard/profile");
   const isProductions = pathname.startsWith("/theatre-dashboard/productions");
   const isSchedules = pathname.startsWith("/theatre-dashboard/schedules");
+  const isMedia = pathname.startsWith("/theatre-dashboard/media");
 
   return (
     <details className="owner-mobile-nav">
@@ -35,6 +36,9 @@ export function TheatreDashboardNav({
       </Link>
       <Link href="/theatre-dashboard/schedules" className={isSchedules ? "is-active" : ""}>
         Schedules <span>{schedulesCount}</span>
+      </Link>
+      <Link href="/theatre-dashboard/media" className={isMedia ? "is-active" : ""}>
+        Reels &amp; Stories
       </Link>
       <p>Public presence</p>
       {slug ? (
