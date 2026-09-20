@@ -11,6 +11,7 @@ import { MobileAdminSidebarToggle } from "@/components/MobileAdminSidebarToggle"
 import { AdminProductionManager } from "@/components/AdminProductionManager";
 import { AdminArtistManager } from "@/components/AdminArtistManager";
 import { AdminScheduleManager } from "@/components/AdminScheduleManager";
+import { AdminMediaManager } from "@/components/AdminMediaManager";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
@@ -101,6 +102,12 @@ const SECTION_META: Record<
       </svg>
     ),
   },
+  media: {
+    title: "Reels & Stories",
+    subtitle: "Homepage Media",
+    description: "Review theatre-owned reels and stories published to the TheaterHub homepage",
+    icon: <span className="admin-section-media-mark" aria-hidden="true">MEDIA</span>,
+  },
 };
 
 function reviewIdFromForm(formData: FormData) {
@@ -141,6 +148,17 @@ function formatAdminDate(value: Date | null) {
   return value.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
+function MediaSection({ reels, stories, theatres }: { reels: number; stories: number; theatres: { id: number; title: string }[] }) {
+  return <div className="admin-media-page">
+    <div className="admin-media-page-intro"><div><span className="admin-media-eyebrow">CONTENT MANAGEMENT</span><h2>Homepage media</h2><p>Publish theatre-owned reels and stories directly to the TheaterHub homepage.</p></div><Link href="/admin/theatres" className="admin-media-manage-link">Manage theatres <span>→</span></Link></div>
+    <div className="admin-media-summary">
+      <article><span className="admin-media-stat-label">THEATRE REELS</span><strong>{reels}</strong><span>Published videos</span></article>
+      <article><span className="admin-media-stat-label">THEATREHUB STORIES</span><strong>{stories}</strong><span>Published stories</span></article>
+    </div>
+    <AdminMediaManager theatres={theatres} />
+  </div>;
+}
+
 export default async function Section({
   params,
   searchParams,
@@ -160,7 +178,7 @@ export default async function Section({
   if (!meta) notFound();
 
   // Counts for sidebar nav
-  const [totalTheatres, totalPlays, totalProfiles, totalSchedules, totalPosts, totalEntries, reviewStats] = await Promise.all([
+  const [totalTheatres, totalPlays, totalProfiles, totalSchedules, totalPosts, totalEntries, reviewStats, totalReels, totalStories, mediaTheatres] = await Promise.all([
     prisma.theatre.count(),
     prisma.play.count(),
     prisma.profile.count(),
@@ -168,6 +186,9 @@ export default async function Section({
     prisma.blogPost.count(),
     prisma.formEntry.count(),
     getReviewModerationStats(),
+    prisma.theatreReel.count().catch(() => 0),
+    prisma.theatreStory.count().catch(() => 0),
+    prisma.theatre.findMany({ where: { status: "PUBLISHED" }, orderBy: { title: "asc" }, select: { id: true, title: true } }),
   ]);
 
   return (
@@ -215,6 +236,11 @@ export default async function Section({
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>
               <span>Editorial</span>
               <span className="adm-inner-nav-pill">{totalPosts}</span>
+            </Link>
+            <Link href="/admin/media" className={`adm-inner-nav-item${section === "media" ? " is-active" : ""}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 9 5 3-5 3V9Z"/></svg>
+              <span>Reels &amp; Stories</span>
+              <span className="adm-inner-nav-pill">{totalReels + totalStories}</span>
             </Link>
             <Link href="/admin/reviews" className={`adm-inner-nav-item${section === "reviews" ? " is-active" : ""}`}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/></svg>
@@ -289,6 +315,7 @@ export default async function Section({
           {section === "posts" && <PostsSection requestedPage={query.page} />}
           {section === "reviews" && <ReviewsSection requestedPage={query.page} />}
           {section === "entries" && <EntriesSection />}
+          {section === "media" && <MediaSection reels={totalReels} stories={totalStories} theatres={mediaTheatres} />}
         </div>
       </section>
     </main>

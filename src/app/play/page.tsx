@@ -293,7 +293,12 @@ export default async function Plays({
                   {runningPlays.length ? (
                     <div className="landing-play-grid play-list-grid-animated">
                       {runningPlays.map((play) => (
-                        <PlayCard key={play.id} play={play} />
+                        <PlayCard
+                          key={play.id}
+                          play={play}
+                          showTeaser={false}
+                          showAction={false}
+                        />
                       ))}
                     </div>
                   ) : (
@@ -314,7 +319,12 @@ export default async function Plays({
                   {archivedPlays.length ? (
                     <div className="landing-play-grid play-list-grid-animated">
                       {archivedPlays.map((play) => (
-                        <PlayCard key={play.id} play={play} showVenue={false} showTeaser={false} />
+                        <PlayCard
+                          key={play.id}
+                          play={play}
+                          showTeaser={false}
+                          showAction={false}
+                        />
                       ))}
                     </div>
                   ) : (
@@ -325,7 +335,12 @@ export default async function Plays({
             ) : plays.length ? (
               <div className="landing-play-grid play-list-grid-animated">
                 {plays.map((play) => (
-                  <PlayCard key={play.id} play={play} />
+                  <PlayCard
+                    key={play.id}
+                    play={play}
+                    showTeaser={false}
+                    showAction={false}
+                  />
                 ))}
               </div>
             ) : (

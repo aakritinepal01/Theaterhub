@@ -13,6 +13,7 @@ const reels = [
   { id: "reel-8", src: "/reels/8.mp4", title: "TheaterHub" },
   { id: "reel-9", src: "/reels/9.mp4", title: "TheaterHub" },
 ];
+export type TheatreReelItem = { id: number | string; title: string; videoUrl: string; theatreTitle?: string };
 
 function ReelBrand() {
   return (
@@ -62,7 +63,8 @@ function ReelCover({ src, title }: { src: string; title: string }) {
   );
 }
 
-export function ReelsSection() {
+export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
+  const feedReels: Array<{ id: string; src: string; title: string; theatreTitle?: string }> = items.length ? items.map((item) => ({ id: `theatre-reel-${item.id}`, src: item.videoUrl, title: item.title, theatreTitle: item.theatreTitle })) : reels.map((reel) => ({ ...reel }));
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
@@ -125,10 +127,10 @@ export function ReelsSection() {
           </div>
         </div>
         <div className="landing-reels-grid">
-          {reels.slice(0, 6).map((reel, index) => (
+          {feedReels.slice(0, 6).map((reel, index) => (
             <button className="landing-reel-card" key={reel.id} onClick={() => setActiveIndex(index)} type="button" aria-label={`Watch ${reel.title}`}>
               <ReelCover src={reel.src} title={reel.title} />
-              <span className="landing-reel-label">Featured Reel</span>
+              <span className="landing-reel-label">{reel.theatreTitle || "Featured Reel"}</span>
               <span className="landing-reel-title"><ReelBrand /></span>
             </button>
           ))}
@@ -139,7 +141,7 @@ export function ReelsSection() {
         <div className="reel-modal" role="dialog" aria-modal="true" aria-label="Theatre reels">
           <button className="reel-modal-close" onClick={() => setActiveIndex(null)} type="button" aria-label="Close reels">×</button>
           <div className="reel-modal-feed" ref={feedRef}>
-            {reels.map((reel, index) => (
+            {feedReels.map((reel, index) => (
               <article className="reel-modal-item" data-reel-index={index} key={reel.id}>
                 <div className="reel-player-card">
                   <video

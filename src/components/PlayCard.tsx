@@ -20,11 +20,13 @@ export function PlayCard({
   play,
   showTeaser = true,
   showVenue = true,
+  showAction = true,
   teaserLength = 140,
 }: {
   play: PlayData;
   showTeaser?: boolean;
   showVenue?: boolean;
+  showAction?: boolean;
   teaserLength?: number;
 }) {
   const image = getPlayPhoto(play);
@@ -61,17 +63,19 @@ export function PlayCard({
 
         {showTeaser && <p className="landing-play-body-teaser">{teaser}</p>}
 
-        <div className="landing-play-card-action">
-          <Link
-            className="landing-play-read-more"
-            href={`/play/${play.slug}/`}
-          >
-            <span>Read more</span>
-            <span className="landing-read-circle" aria-hidden="true">
-              →
-            </span>
-          </Link>
-        </div>
+        {showAction && (
+          <div className="landing-play-card-action">
+            <Link
+              className="landing-play-read-more"
+              href={`/play/${play.slug}/`}
+            >
+              <span>Read more</span>
+              <span className="landing-read-circle" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          </div>
+        )}
       </div>
     </article>
   );

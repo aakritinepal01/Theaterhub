@@ -51,7 +51,7 @@ export function PhotoStories({ groups }: { groups: PhotoStoryGroup[] }) {
     <section className="landing-photo-stories" aria-labelledby="photo-stories-title">
       <div className="site-container">
         <div className="landing-photo-stories-heading">
-          <h2 id="photo-stories-title">Web Stories</h2>
+          <h2 id="photo-stories-title">TheatreHub Stories</h2>
         </div>
         <div className="landing-photo-story-list">
           {groups.map((group) => {
