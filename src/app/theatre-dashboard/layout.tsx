@@ -30,7 +30,7 @@ export default async function TheatreDashboardLayout({
       <aside className="owner-sidebar">
         <Link className="owner-brand" href="/">
           <span>TH</span>
-          <strong>Owner Studio</strong>
+          <strong>{theatre.title}</strong>
         </Link>
         <TheatreDashboardNav
           playsCount={theatre.plays.length}
@@ -41,7 +41,7 @@ export default async function TheatreDashboardLayout({
           <span>{user.username.slice(0, 1).toUpperCase()}</span>
           <div>
             <strong>{user.username}</strong>
-            <small>ID: #{user.id} · {theatre.title}</small>
+            <small>{theatre.title}</small>
           </div>
         </div>
       </aside>
@@ -50,7 +50,7 @@ export default async function TheatreDashboardLayout({
         <header className="owner-topbar">
           <div>
             <span className="owner-status">
-              <i />Logged in as: <strong>{user.username}</strong> (ID: #{user.id})
+              <i />Logged in as: <strong>{user.username}</strong>
             </span>
             <small>Theatre: {theatre.title} · Last updated {formatDate(theatre.updated)}</small>
           </div>

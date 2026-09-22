@@ -295,7 +295,27 @@ export default async function Plays({
                     <div className="landing-play-grid play-list-grid-animated">
                       {runningPlays.map((play) => (
                         <PlayCard key={play.id} play={play} showTeaser={false} showAction={false} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="play-collection-empty">No currently running plays found.</div>
+                  )}
+                </section>
 
+                <section className="play-collection-section play-archive-section" aria-labelledby="archive-plays-title">
+                  <div className="play-collection-heading">
+                    <div>
+                      <span className="play-collection-kicker">Past productions</span>
+                      <h2 id="archive-plays-title">Play Archive</h2>
+                    </div>
+                    <span>
+                      {archivedPlays.length} production{archivedPlays.length === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  {archivedPlays.length ? (
+                    <div className="landing-play-grid play-list-grid-animated">
+                      {archivedPlays.map((play) => (
+                        <PlayCard key={play.id} play={play} showTeaser={false} showAction={false} />
                       ))}
                     </div>
                   ) : (

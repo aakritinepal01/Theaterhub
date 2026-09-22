@@ -33,10 +33,20 @@ function PeopleField({ name, title, description, names }: {
   );
 }
 
-export function ProductionCreditsFields({ onStage = [], offStage = [] }: { onStage?: string[]; offStage?: string[] }) {
+export function ProductionCreditsFields({ onStage = [], offStage = [], director = "" }: { onStage?: string[]; offStage?: string[]; director?: string }) {
   return (
     <section className={styles.credits} aria-label="Cast and crew">
       <div className={styles.heading}><h3>Cast &amp; crew</h3><p>Credit the people who bring your production to life.</p></div>
+      <fieldset className={styles.group}>
+        <legend>Director</legend>
+        <p>The director responsible for the production.</p>
+        <div className={styles.row}>
+          <label>
+            <span>Director name</span>
+            <input name="director" defaultValue={director} placeholder="Full name" />
+          </label>
+        </div>
+      </fieldset>
       <PeopleField name="onStage" title="On-stage" description="Actors and performers appearing on stage." names={onStage} />
       <PeopleField name="offStage" title="Off-stage" description="The creative and technical team behind the scenes." names={offStage} />
     </section>

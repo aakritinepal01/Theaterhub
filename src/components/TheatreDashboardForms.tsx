@@ -19,6 +19,7 @@ type Play = {
   endedOn: Date | string | null;
   status: ContentStatus;
   isFeatured: boolean;
+  makers: { profile: { name: string }; role: string }[];
   cast: { profile: { name: string } }[];
   crew: { profile: { name: string } }[];
 };
@@ -234,7 +235,11 @@ export function PlayEditor({ play }: { play: Play }) {
             Directorial note
             <textarea name="directorialNote" defaultValue={play.directorialNote} />
           </label>
-          <ProductionCreditsFields onStage={play.cast.map(credit => credit.profile.name)} offStage={play.crew.map(credit => credit.profile.name)} />
+          <ProductionCreditsFields
+            director={play.makers.find(m => m.role === "Director")?.profile.name ?? ""}
+            onStage={play.cast.map(credit => credit.profile.name)}
+            offStage={play.crew.map(credit => credit.profile.name)}
+          />
           <label className={styles.featured}>
             <input type="checkbox" name="isFeatured" defaultChecked={play.isFeatured} /> Featured play
           </label>

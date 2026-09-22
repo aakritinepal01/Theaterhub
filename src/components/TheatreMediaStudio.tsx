@@ -9,9 +9,25 @@ export type StudioPost = { id: string; kind: string; caption: string; createdAt:
 type Selection = { file: File; url: string };
 
 export function TheatreMediaStudio({ posts, theatreName }: { posts: StudioPost[]; theatreName: string }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("STORY");
   const [message, setMessage] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function deletePost(id: string) {
+    if (!confirm("Delete this post? This cannot be undone.")) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/theatre/posts/${id}`, { method: "DELETE" });
+      const result = await res.json().catch(() => null);
+      if (!res.ok) { setMessage(result?.error || "Unable to delete post."); return; }
+      setMessage("Post deleted.");
+      router.refresh();
+    } catch { setMessage("Unable to delete post. Check your connection."); }
+    finally { setDeletingId(null); }
+  }
+
   return <div className={`owner-media-page ${styles.studio}`}>
     <header className={styles.heading}>
       <div><span className={styles.eyebrow}>YOUR THEATRE, BEHIND THE SCENES</span><h1>Stories &amp; Reels</h1><p>Share a rehearsal, a stage moment or a new perspective.</p></div>
@@ -26,7 +42,19 @@ export function TheatreMediaStudio({ posts, theatreName }: { posts: StudioPost[]
       <button className={styles.newCard} type="button" onClick={() => setOpen(true)}><span>+</span><strong>Add {tab === "STORY" ? "a story" : "a reel"}</strong><small>Camera or gallery</small></button>
       {posts.filter(post => post.kind === tab).map(post => <article className={styles.post} key={post.id}>
         <div className={styles.postMedia}>{post.assets.map(asset => asset.mediaType === "video" ? <video key={asset.id} src={asset.url} controls playsInline preload="metadata" /> : <img key={asset.id} src={asset.url} alt={post.caption || `${theatreName} story`} loading="lazy" />)}</div>
-        <div className={styles.postCaption}><strong>{post.caption || theatreName}</strong><small>{new Date(post.createdAt).toLocaleDateString("en-NP", { timeZone: "Asia/Kathmandu", month: "short", day: "numeric", year: "numeric" })} · {post.assets.length} media</small></div>
+        <div className={styles.postCaption}>
+          <strong>{post.caption || theatreName}</strong>
+          <small>{new Date(post.createdAt).toLocaleDateString("en-NP", { timeZone: "Asia/Kathmandu", month: "short", day: "numeric", year: "numeric" })} · {post.assets.length} media</small>
+          <button
+            type="button"
+            className={styles.deleteBtn}
+            onClick={() => void deletePost(post.id)}
+            disabled={deletingId === post.id}
+            aria-label="Delete post"
+          >
+            {deletingId === post.id ? "Deleting…" : "Delete"}
+          </button>
+        </div>
       </article>)}
     </div>
     {!posts.some(post => post.kind === tab) && <p className={styles.empty}>Your {tab === "STORY" ? "stories" : "reels"} will appear here after you post.</p>}
