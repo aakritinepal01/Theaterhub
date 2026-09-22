@@ -1,6 +1,7 @@
+import { releasedPlayWhere } from "@/lib/production-visibility";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getTheatrePhoto, mediaUrl, publishedWhere } from "@/lib/content";
+import { getTheatrePhoto, mediaUrl } from "@/lib/content";
 import { prisma } from "@/lib/prisma";
 import { PageFrame } from "@/components/SiteShell";
 
@@ -28,12 +29,12 @@ export default async function TheatrePage({ params }: { params: Promise<{ slug: 
     where: { slug },
     include: {
       shows: {
-        where: { showtime: { gt: now }, play: publishedWhere(now) },
+        where: { showtime: { gt: now }, play: releasedPlayWhere(now) },
         orderBy: { showtime: "asc" },
         include: { play: true },
       },
       plays: {
-        where: publishedWhere(now),
+        where: releasedPlayWhere(now),
         take: 6,
         orderBy: { title: "asc" },
       },

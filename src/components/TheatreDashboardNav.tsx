@@ -21,9 +21,7 @@ export function TheatreDashboardNav({
   const isMedia = pathname.startsWith("/theatre-dashboard/media");
 
   return (
-    <details className="owner-mobile-nav">
-      <summary>Menu</summary>
-      <nav>
+      <nav aria-label="Theatre dashboard">
       <p>Workspace</p>
       <Link href="/theatre-dashboard" className={isOverview ? "is-active" : ""}>
         Overview
@@ -41,6 +39,9 @@ export function TheatreDashboardNav({
         Reels &amp; Stories
       </Link>
       <p>Public presence</p>
+      <Link href="/theatre-dashboard/media" className={pathname.startsWith("/theatre-dashboard/media") ? "is-active" : ""}>
+        Stories &amp; Reels <span>+</span>
+      </Link>
       {slug ? (
         <Link href={`/theatre/${slug}`} target="_blank" rel="noopener noreferrer">
           View theatre page ↗
@@ -49,6 +50,5 @@ export function TheatreDashboardNav({
         <span className="owner-muted-link">Public page unavailable</span>
       )}
       </nav>
-    </details>
   );
 }

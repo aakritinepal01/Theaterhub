@@ -1,7 +1,8 @@
+import { releasedPlayWhere } from "@/lib/production-visibility";
 import type { Metadata } from "next";
 import { ContentStatus, type Prisma } from "@prisma/client";
 import Link from "next/link";
-import { mediaUrl, plainText, publishedWhere, getTheatrePhoto } from "@/lib/content";
+import { mediaUrl, plainText, getTheatrePhoto } from "@/lib/content";
 import { prisma } from "@/lib/prisma";
 import { TheatreInteractiveView, type TheatreCardData } from "@/components/TheatreInteractiveView";
 
@@ -96,7 +97,7 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 600): P
 export default async function TheatresPage() {
   const now = new Date();
   const baseWhere = { status: ContentStatus.PUBLISHED };
-  const liveWhere = { showtime: { gt: now }, play: publishedWhere(now) };
+  const liveWhere = { showtime: { gt: now }, play: releasedPlayWhere(now) };
 
   let dbTheatres: TheatreDirectoryRow[] = [];
   try {

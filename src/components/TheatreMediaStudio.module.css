@@ -1,0 +1,117 @@
+.studio { color: var(--owner-text-main); width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+.heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 26px; }
+.eyebrow { color: var(--owner-accent); font-size: .65rem; font-weight: 800; letter-spacing: .13em; }
+.heading h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); margin: 8px 0; letter-spacing: -.04em; }
+.heading p, .empty { color: var(--owner-text-muted); font-size: .85rem; }
+.studio button, .dialog button { font: inherit; cursor: pointer; }
+.create, .publish { background: var(--owner-accent); color: white; border: 0; border-radius: 12px; padding: 12px 20px; font-weight: 750 !important; }
+.create { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.create > span { font-size: 1.5rem; }
+.tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--owner-line); margin-bottom: 24px; }
+.tabs button { background: none; color: var(--owner-text-muted); padding: 14px 18px; border: 0; border-bottom: 3px solid transparent; font-weight: 700; }
+.tabs button[aria-pressed="true"] { color: var(--owner-accent); border-color: var(--owner-accent); }
+.tabs small { margin-left: 8px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(190px,1fr)); gap: 20px; }
+.newCard { min-height: 290px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border: 1px dashed var(--owner-accent); border-radius: 16px; background: var(--owner-accent-light); color: var(--owner-accent); }
+.newCard > span { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--owner-card-bg); font-size: 2rem; }
+.post { min-width: 0; max-width: 100%; overflow: hidden; border: 1px solid var(--owner-line); border-radius: 16px; background: var(--owner-card-bg); }
+.postMedia { min-width: 0; width: 100%; max-width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #131018; }
+.postMedia > * { display: block; flex: 0 0 100%; width: 100%; min-width: 0; max-width: 100%; aspect-ratio: 4/5; object-fit: contain; scroll-snap-align: start; }
+.postCaption { display: grid; gap: 8px; padding: 14px; overflow-wrap: anywhere; }
+.postCaption small { color: var(--owner-text-muted); font-size: .7rem; }
+.notice { border-radius: 10px; padding: 14px; background: var(--owner-accent-light); color: var(--owner-accent); }
+.dialog { width: min(900px,calc(100vw - 24px)); max-height: calc(100dvh - 32px); margin: auto; padding: 0; border: 1px solid var(--owner-line); border-radius: 22px; background: var(--owner-card-bg); color: var(--owner-text-main); overflow: auto; }
+.dialog::backdrop { background: #0c0716bd; backdrop-filter: blur(6px); }
+.modalHeader { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--owner-line); }
+.modalHeader small { color: var(--owner-accent); }
+.modalHeader h2 { margin: 4px 0 0; font-size: 1.25rem; }
+.modalHeader button { background: var(--owner-input-bg); border: 0; color: var(--owner-text-main); border-radius: 50%; width: 36px; height: 36px; font-size: 1.6rem; }
+.composer { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; padding: 24px; }
+.camera { position: relative; background: #100d15; border-radius: 16px; overflow: hidden; aspect-ratio: 3/4; }
+.camera > video { width: 100%; height: 100%; object-fit: cover; }
+.cameraFallback { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; color: #ddd5e8; text-align: center; font-size: .85rem; line-height: 1.6; }
+.cameraFallback > span { font-size: 3rem; }
+.recording { position: absolute; top: 16px; left: 16px; padding: 6px 12px; border-radius: 24px; color: #fff; background: #c52236; font-size: .8rem; }
+.captureControls { display: flex; gap: 10px; margin: 12px 0; }
+.captureControls button { flex: 1; padding: 10px; border: 1px solid var(--owner-line); border-radius: 10px; color: var(--owner-text-main); background: var(--owner-input-bg); font-size: .8rem; }
+.modeSwitch { display: flex; justify-content: center; gap: 10px; padding: 8px; }
+.modeSwitch button { background: transparent; border: 0; border-radius: 20px; padding: 8px 20px; font-size: .75rem; font-weight: 800; color: var(--owner-text-muted); }
+.modeSwitch button[aria-pressed="true"] { color: var(--owner-accent); background: var(--owner-accent-light); }
+.details { display: flex; flex-direction: column; align-items: stretch; gap: 14px; min-width: 0; }
+.details h3 { margin: 0; font-size: 1.15rem; }
+.details > p { margin: 0; font-size: .85rem; line-height: 1.6; }
+.gallery { border: 1px dashed var(--owner-accent); color: var(--owner-accent); background: var(--owner-accent-light); padding: 20px 12px; border-radius: 12px; font-weight: 700 !important; }
+.hint { font-size: .7rem; line-height: 1.5; color: var(--owner-text-muted); }
+.textButton { border: 0; background: none; color: var(--owner-accent); font-size: .8rem !important; }
+.selected { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.selected > div { position: relative; min-width: 0; }
+.selected img, .selected video { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 8px; background: #18131d; }
+.selected button { position: absolute; right: 3px; top: 3px; border: 0; border-radius: 50%; background: #000b; color: #fff; width: 24px; height: 24px; }
+.caption { display: grid; gap: 8px; font-size: .8rem; font-weight: 650; }
+.caption textarea { width: 100%; box-sizing: border-box; background: var(--owner-input-bg); border: 1px solid var(--owner-input-border); border-radius: 10px; color: var(--owner-text-main); padding: 12px; font: inherit; resize: vertical; }
+.caption small { text-align: right; color: var(--owner-text-muted); }
+.error { color: #dc2626; }
+.studio button:focus-visible, .dialog button:focus-visible, .caption textarea:focus-visible { outline: 2px solid var(--owner-accent); outline-offset: 3px; }
+.dialog button:disabled { opacity: .45; cursor: not-allowed; }
+@media(max-width:650px) { .heading { align-items: flex-start; flex-direction: column; gap: 8px; } .composer { grid-template-columns: 1fr; padding: 16px; } .camera { aspect-ratio: 4/3; } .dialog { max-height: calc(100dvh - 12px); } .grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; } .tabs button { padding: 12px 8px; font-size: .8rem; } .newCard { min-height: 220px; } }
+
+.studio, .composer > *, .modalHeader > div { min-width: 0; }
+.dialog { overscroll-behavior: contain; }
+.modalHeader button { flex-shrink: 0; }
+@media (max-width: 800px) {
+  .heading { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+  .heading h1 { font-size: 1.35rem; margin: 6px 0; }
+  .heading p { margin: 0; line-height: 1.5; }
+  .create { justify-content: center; width: 100%; min-height: 44px; padding: 8px 14px; }
+  .tabs { gap: 4px; margin-bottom: 16px; }
+  .tabs button { flex: 1; min-width: 0; min-height: 44px; padding: 10px 6px; font-size: .8rem; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .newCard { min-height: 190px; gap: 8px; padding: 12px; }
+  .newCard > span { width: 44px; height: 44px; }
+  .postCaption { padding: 10px; font-size: .8rem; }
+  .composer { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 16px; }
+  .camera { aspect-ratio: 4/3; max-height: 34dvh; }
+  .cameraFallback { padding: 16px; font-size: .8rem; }
+  .cameraFallback > span { font-size: 2rem; }
+  .captureControls button, .modeSwitch button, .gallery, .publish, .textButton { min-height: 44px; }
+  .modeSwitch button { flex: 1; }
+  .caption textarea { font-size: 16px; min-height: 100px; }
+  .selected button { width: 36px; height: 36px; }
+  .details { gap: 12px; }
+  .gallery { padding: 14px 12px; }
+}
+@media (max-width: 650px) {
+  .dialog { width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; border: 0; border-radius: 0; }
+  .modalHeader { position: sticky; top: 0; z-index: 3; gap: 12px; padding: max(12px, env(safe-area-inset-top)) 16px 12px; background: var(--owner-card-bg); }
+  .modalHeader h2 { font-size: 1.1rem; }
+  .modalHeader small { overflow-wrap: anywhere; }
+  .modalHeader button { width: 44px; height: 44px; }
+  .composer { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+}
+
+/* Bound intrinsic video sizes so media cannot widen the dashboard grid. */
+.grid, .newCard, .heading > div, .tabs, .postCaption { min-width: 0; }
+.studio *, .dialog * { box-sizing: border-box; }
+.camera > video, .selected video, .selected img { display: block; min-width: 0; max-width: 100%; }
+.dialog { box-sizing: border-box; }
+@media (max-width: 800px) {
+  .studio { padding: 12px 10px; border: 1px solid var(--owner-line); border-radius: 8px; background: var(--owner-card-bg); }
+  .eyebrow { font-size: .58rem; letter-spacing: .08em; overflow-wrap: anywhere; }
+  .heading h1 { font-size: 1.15rem; }
+  .heading p { font-size: .78rem; }
+  .tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tabs button { width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .tabs small { margin-left: 4px; }
+  .grid[data-kind="REEL"] { grid-template-columns: minmax(0, 1fr); }
+  .grid[data-kind="REEL"] .newCard { min-height: 100px; flex-direction: row; flex-wrap: wrap; gap: 10px; }
+  .grid[data-kind="REEL"] .postMedia > * { aspect-ratio: 9 / 16; max-height: 60dvh; }
+  .captureControls, .modeSwitch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .captureControls button, .modeSwitch button { min-width: 0; padding-inline: 8px; white-space: normal; }
+  .details > *, .caption { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+  .camera { width: 100%; height: clamp(160px, 30dvh, 280px); aspect-ratio: auto; }
+}
+@media (max-width: 380px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .newCard { min-height: 120px; }
+  .selected { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

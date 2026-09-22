@@ -28,6 +28,9 @@ export async function POST(request:Request) {
     },{isolationLevel:Prisma.TransactionIsolationLevel.Serializable});
     await regenerateShows(scheduleId);
     revalidatePath("/theatre-dashboard/schedules");revalidatePath("/theatre-dashboard");revalidatePath("/");revalidatePath("/play");
+    revalidatePath("/play/[slug]", "page");
+    revalidatePath("/play/[slug]/shows", "page");
+    if(request.headers.get("accept")?.includes("application/json"))return NextResponse.json({ok:true});
     return NextResponse.redirect(new URL("/theatre-dashboard/schedules?saved=schedule",request.url),303);
   } catch {
     return Response.json({error:"Unable to create schedule"},{status:500});

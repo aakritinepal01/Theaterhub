@@ -1,3 +1,4 @@
+import { releasedPlayWhere } from "@/lib/production-visibility";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -209,7 +210,7 @@ export default async function SearchPage({
       const [plays, artists, theatres, posts] = await Promise.all([
         prisma.play.findMany({
           where: {
-            status: "PUBLISHED",
+            ...releasedPlayWhere(),
             slug: { not: null },
             OR: [
               { title: { contains: query, mode: "insensitive" } },

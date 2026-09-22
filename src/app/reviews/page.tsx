@@ -1,7 +1,8 @@
+import { releasedPlayWhere } from "@/lib/production-visibility";
 import type { Metadata } from "next";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { formatDate, mediaUrl, publishedWhere } from "@/lib/content";
+import { formatDate, mediaUrl } from "@/lib/content";
 import { listApprovedReviewItems } from "@/lib/reviews";
 import { ReviewsInteractiveView, type ReviewItem } from "@/components/ReviewsInteractiveView";
 
@@ -175,7 +176,7 @@ export default async function ReviewsPage() {
     const now = new Date();
     dbPlays = await withRetry(() =>
       prisma.play.findMany({
-        where: publishedWhere(now),
+        where: releasedPlayWhere(now),
         take: 10,
         orderBy: { ratingAverage: "desc" },
         include: {

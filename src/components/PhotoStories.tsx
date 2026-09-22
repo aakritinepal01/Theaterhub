@@ -3,16 +3,11 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-export type PhotoStory = {
-  id: number;
-  title: string;
-  image: string;
-  href: string;
-};
-
-export type PhotoStoryGroup = { id: string; title: string; stories: PhotoStory[] };
-
-export function PhotoStories({ groups }: { groups: PhotoStoryGroup[] }) {
+import type { TheatreMediaItem, TheatreMediaGroup } from "@/lib/theatre-post-groups";
+export type PhotoStory = TheatreMediaItem;
+export type PhotoStoryGroup = TheatreMediaGroup;
+export function PhotoStories({ groups, variant = "stories" }: { groups: PhotoStoryGroup[]; variant?: "stories" | "reels" }) {
+  const isReels = variant === "reels";
   const stories = groups.flatMap((group) => group.stories);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [activeStories, setActiveStories] = useState<PhotoStory[] | null>(null);
@@ -22,7 +17,7 @@ export function PhotoStories({ groups }: { groups: PhotoStoryGroup[] }) {
     if (activeIndex === null) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const timer = window.setTimeout(() => {
+    const timer = activeStories?.[activeIndex]?.mediaType === "video" ? undefined : window.setTimeout(() => {
       if (!activeStories || activeIndex + 1 >= activeStories.length) {
         setActiveIndex(null);
         setActiveStories(null);
@@ -48,17 +43,21 @@ export function PhotoStories({ groups }: { groups: PhotoStoryGroup[] }) {
   const activeStory = activeIndex === null || !activeStories ? null : activeStories[activeIndex];
 
   return (
-    <section className="landing-photo-stories" aria-labelledby="photo-stories-title">
+    <section className={isReels ? "landing-reels" : "landing-photo-stories"} aria-labelledby={`${variant}-title`}>
       <div className="site-container">
         <div className="landing-photo-stories-heading">
+<<<<<<< HEAD
+          <h2 id={`${variant}-title`}>{isReels ? "Theatre Reels" : "Theatre Stories"}</h2>
+=======
           <h2 id="photo-stories-title">TheatreHub Stories</h2>
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
         </div>
-        <div className="landing-photo-story-list">
-          {groups.map((group) => {
-            return <button className="landing-photo-story" key={group.id} type="button" onClick={() => { setActiveStories(group.stories); setActiveIndex(0); }}>
-              <span className="landing-photo-story-collage">{group.stories.map((story) => <img key={story.id} src={story.image} alt="" />)}</span>
-              <span className="landing-photo-story-count">{group.stories.length} stories</span>
-              <strong>{group.title}</strong>
+        <div className={isReels ? "landing-reels-grid" : "landing-photo-story-list"}>
+          {groups.slice(0, 6).map((group) => {
+            return <button className={isReels ? "landing-reel-card" : "landing-photo-story"} key={group.id} type="button" onClick={() => { setActiveStories(group.stories); setActiveIndex(0); }}>
+              <span className={isReels ? "theatre-reel-preview" : "landing-photo-story-collage"}>{group.stories.slice(0, isReels ? 1 : 3).map((story) => story.mediaType === "video" ? <video key={story.id} src={`${story.image}#t=0.1`} muted playsInline preload="metadata" aria-hidden="true" /> : <img key={story.id} src={story.image} alt="" loading="lazy" />)}</span>
+              <span className={isReels ? "landing-reel-label" : "landing-photo-story-count"}>{group.stories.length} {variant}</span>
+              <strong className={isReels ? "landing-reel-title" : undefined}>{group.title}</strong>
             </button>;
           })}
         </div>
@@ -80,16 +79,19 @@ export function PhotoStories({ groups }: { groups: PhotoStoryGroup[] }) {
           >
             <div className="photo-story-progress" aria-hidden="true">
               {activeStories.map((story, index) => (
-                <span key={story.id} className={index < activeIndex ? "is-complete" : index === activeIndex ? "is-active" : ""} />
+                <span key={`${story.id}-${activeIndex}`} className={index < activeIndex ? "is-complete" : index === activeIndex && activeStory.mediaType !== "video" ? "is-active" : ""} />
               ))}
             </div>
             <button className="photo-story-close" onClick={() => { setActiveIndex(null); setActiveStories(null); }} type="button" aria-label="Close story">×</button>
-            <img className="photo-story-full-image" src={activeStory.image} alt={activeStory.title} />
+            {activeStory.mediaType === "video" ? <video key={activeStory.id} className="photo-story-full-image theatre-story-video" src={activeStory.image} controls autoPlay muted playsInline onEnded={() => {
+              if (activeIndex + 1 < activeStories.length) setActiveIndex(activeIndex + 1);
+              else { setActiveIndex(null); setActiveStories(null); }
+            }} /> : <img key={activeStory.id} className="photo-story-full-image" src={activeStory.image} alt={activeStory.title} />}
             <div className="photo-story-shade" />
             <div className="photo-story-caption">
-              <span>Theater<strong>Hub</strong></span>
+              <span>{activeStory.theatreName}</span>
               <h3>{activeStory.title}</h3>
-              <Link href={activeStory.href}>View story →</Link>
+              <Link href={activeStory.href}>View theatre →</Link>
             </div>
             {activeIndex > 0 && <button className="photo-story-nav photo-story-prev" type="button" aria-label="Previous story" onClick={() => setActiveIndex(activeIndex - 1)}>‹</button>}
             {activeIndex < activeStories.length - 1 && <button className="photo-story-nav photo-story-next" type="button" aria-label="Next story" onClick={() => setActiveIndex(activeIndex + 1)}>›</button>}

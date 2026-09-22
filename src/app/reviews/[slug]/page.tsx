@@ -1,7 +1,8 @@
+import { releasedPlayWhere } from "@/lib/production-visibility";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { formatDate, mediaUrl, publishedWhere } from "@/lib/content";
+import { formatDate, mediaUrl } from "@/lib/content";
 import { getApprovedReviewItemBySlug } from "@/lib/reviews";
 import { DEFAULT_REVIEWS } from "@/app/reviews/page";
 import type { ReviewItem } from "@/components/ReviewsInteractiveView";
@@ -23,7 +24,7 @@ export default async function ReviewDetailPage({
 
   if (!review) {
     const play = await prisma.play.findFirst({
-      where: { slug, ...publishedWhere() },
+      where: { slug, ...releasedPlayWhere() },
       include: { theatre: true },
     });
 

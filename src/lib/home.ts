@@ -1,5 +1,15 @@
 import { prisma } from "@/lib/prisma";
-import { publishedWhere } from "@/lib/content";
+import { groupTheatrePosts } from "@/lib/theatre-post-groups";
+
+export async function getHomepageMedia() {
+  const posts = await prisma.theatrePost.findMany({
+    where: { theatre: { status: "PUBLISHED" } },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    include: { theatre: { select: { id: true, title: true, slug: true } }, assets: { orderBy: { position: "asc" } } },
+  });
+  return { stories: groupTheatrePosts(posts, "STORY"), reels: groupTheatrePosts(posts, "REEL") };
+}
+import { releasedPlayWhere, playingNowWhere, upcomingPlayWhere } from "@/lib/production-visibility";
 
 const playCardInclude = {
   shows: {
@@ -18,20 +28,9 @@ const playCardInclude = {
 
 const FEATURED_PLAY_LIMIT = 8;
 
-function kathmanduToday() {
-  const parts = new Intl.DateTimeFormat("en-US-u-ca-gregory", {
-    timeZone: "Asia/Kathmandu",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const value = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((part) => part.type === type)?.value);
-  return new Date(Date.UTC(value("year"), value("month") - 1, value("day")));
-}
-
 export async function getFeaturedPlays() {
   const featured = await prisma.play.findMany({
-    where: { ...publishedWhere(), isFeatured: true },
+    where: { ...releasedPlayWhere(), isFeatured: true },
     orderBy: { launchedOn: "desc" },
     take: FEATURED_PLAY_LIMIT,
     include: playCardInclude,
@@ -41,7 +40,7 @@ export async function getFeaturedPlays() {
 
   const fallback = await prisma.play.findMany({
     where: {
-      ...publishedWhere(),
+      ...releasedPlayWhere(),
       coverImage: { not: null },
       id: { notIn: featured.map((play) => play.id) },
     },
@@ -55,7 +54,7 @@ export async function getFeaturedPlays() {
 
 export function getHeroPlays() {
   return prisma.play.findMany({
-    where: { ...publishedWhere(), coverImage: { not: null } },
+    where: { ...releasedPlayWhere(), coverImage: { not: null } },
     orderBy: [{ isFeatured: "desc" }, { launchedOn: "desc" }],
     take: 1,
     select: { id: true, coverImage: true },
@@ -64,22 +63,36 @@ export function getHeroPlays() {
 
 export async function getUpcomingShows() {
   const now = new Date();
-  const today = kathmanduToday();
-
-  return prisma.show.findMany({
-    where: {
-      showtime: { gt: now },
-      play: {
-        status: "PUBLISHED",
-        OR: [
-          { endedOn: null },
-          { endedOn: { gte: today } },
-        ],
-      },
-    },
-    orderBy: { showtime: "asc" },
+  const productions = await prisma.play.findMany({
+    where: { ...upcomingPlayWhere(now), isFeatured: true, slug: { not: null }, theatreId: { not: null } },
+    orderBy: [{ launchedOn: "asc" }, { title: "asc" }],
     take: 10,
-    include: { play: true, theatre: true },
+    include: { theatre: true, shows: { where: { showtime: { gt: now } }, orderBy: { showtime: "asc" }, take: 1 } },
+  });
+  return productions.filter(play => play.theatre).map(play => ({
+    id: play.id,
+    play,
+    theatre: play.theatre!,
+    showtime: play.launchedOn,
+    price: play.shows[0]?.price ?? null,
+  }));
+}
+
+export function getPlayingNowPlays() {
+  return prisma.play.findMany({
+    where: { ...playingNowWhere(), slug: { not: null } },
+    orderBy: [{ isFeatured: "desc" }, { launchedOn: "desc" }],
+    take: 10,
+    include: playCardInclude,
+  });
+}
+
+export function getRecentPlays() {
+  return prisma.play.findMany({
+    where: { ...releasedPlayWhere(), slug: { not: null }, coverImage: { not: null } },
+    orderBy: [{ launchedOn: "desc" }, { updated: "desc" }],
+    take: 8,
+    include: playCardInclude,
   });
 }
 
@@ -94,7 +107,7 @@ export function getHomepageTheatres() {
 
 export function getHomepagePhotoStories() {
   return prisma.play.findMany({
-    where: { ...publishedWhere(), coverImage: { not: null }, slug: { not: null } },
+    where: { ...releasedPlayWhere(), coverImage: { not: null }, slug: { not: null } },
     orderBy: [{ updated: "desc" }, { launchedOn: "desc" }],
     take: 10,
     select: { id: true, title: true, slug: true, coverImage: true },
@@ -121,20 +134,11 @@ export function getHomepageTheatreStories() {
 
 export async function getHomepageStats() {
   const now = new Date();
-  const today = kathmanduToday();
   const [plays, theatres, bookings, upcomingShows] = await Promise.all([
-    prisma.play.count({ where: publishedWhere() }),
+    prisma.play.count({ where: releasedPlayWhere() }),
     prisma.theatre.count({ where: { status: "PUBLISHED" } }),
     prisma.booking.count(),
-    prisma.show.count({
-      where: {
-        showtime: { gt: now },
-        play: {
-          status: "PUBLISHED",
-          OR: [{ endedOn: null }, { endedOn: { gte: today } }],
-        },
-      },
-    }),
+    prisma.play.count({ where: { ...upcomingPlayWhere(now), isFeatured: true, slug: { not: null }, theatreId: { not: null } } }),
   ]);
 
   return { plays, theatres, bookings, upcomingShows };

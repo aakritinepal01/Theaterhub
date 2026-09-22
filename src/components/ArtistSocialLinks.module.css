@@ -1,0 +1,9 @@
+.links { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+.link { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; color: #fff; transition: transform .15s ease, box-shadow .15s ease; }
+.facebook { background: #1877f2; }
+.instagram { background: radial-gradient(circle at 25% 110%, #ffdc80 0%, #fcaf45 22%, #f77737 35%, #e1306c 55%, #c13584 70%, #833ab4 90%); }
+.twitter { background: #101010; border: 1px solid #555; }
+.website { background: #0369a1; }
+.link:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 5px 12px #0002; }
+.link:focus-visible { outline: 3px solid #f59e0b; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .link { transition: none; } .link:hover { transform: none; } }

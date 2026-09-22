@@ -1,8 +1,9 @@
+import { publicPlayWhere } from "@/lib/production-visibility";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { formatDate, getPlayPhoto, plainText, publishedWhere } from "@/lib/content";
+import { formatDate, getPlayPhoto, plainText } from "@/lib/content";
 import { groupRoles } from "@/lib/roles";
 import { RoleList } from "@/components/RoleList";
 
@@ -20,6 +21,12 @@ const showTime = new Intl.DateTimeFormat("en-NP", {
   minute: "2-digit",
   timeZone: "Asia/Kathmandu",
 });
+
+const scheduleDays = [
+  ["sunday", "Sunday"], ["monday", "Monday"], ["tuesday", "Tuesday"],
+  ["wednesday", "Wednesday"], ["thursday", "Thursday"],
+  ["friday", "Friday"], ["saturday", "Saturday"],
+] as const;
 
 function safeHtml(html: string) {
   return html
@@ -49,7 +56,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const play = await prisma.play.findFirst({
-    where: { slug, ...publishedWhere() },
+    where: { slug, ...publicPlayWhere() },
     select: { id: true, title: true, description: true, coverImage: true },
   });
 
@@ -75,13 +82,14 @@ export default async function PlayDetail({
 }) {
   const { slug } = await params;
   const play = await prisma.play.findFirst({
-    where: { slug, ...publishedWhere() },
+    where: { slug, ...publicPlayWhere() },
     include: {
       theatre: true,
       makers: { orderBy: { order: "asc" }, include: { profile: true } },
       cast: { orderBy: { order: "asc" }, include: { profile: true } },
       crew: { orderBy: { order: "asc" }, include: { profile: true } },
       shows: { where: { showtime: { gt: new Date() } }, orderBy: { showtime: "asc" } },
+      schedules: { orderBy: { startDate: "asc" } },
     },
   });
 
@@ -95,7 +103,6 @@ export default async function PlayDetail({
   const noteHtml = safeHtml(play.directorialNote);
   const descriptionText = plainText(safeHtml(play.description));
   const runDate = formatRunDate(play.launchedOn, play.endedOn);
-  const firstShow = play.shows[0];
   const ratingText = play.ratingCount ? `${play.ratingAverage.toFixed(1)} / 5` : "Not rated";
 
   return (
@@ -235,14 +242,34 @@ export default async function PlayDetail({
             </dl>
           </section>
 
+          {play.schedules.length ? (
+            <section className="play-detail-side-panel">
+              <h2>Performance Schedule</h2>
+              <p>All times are Nepal time.</p>
+              {play.schedules.map(schedule => (
+                <div key={schedule.id}>
+                  <h3>{formatRunDate(schedule.startDate, schedule.endDate)}</h3>
+                  <dl className="play-detail-facts">
+                    {scheduleDays.filter(([day]) => schedule[day].trim()).map(([day, label]) => (
+                      <div key={day}>
+                        <dt>{label}</dt>
+                        <dd>{schedule[day]}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </section>
+          ) : null}
+
           {play.shows.length ? (
             <section className="play-detail-side-panel">
               <div className="play-detail-side-head">
-                <h2>Upcoming Shows</h2>
+                <h2>Show Dates &amp; Times</h2>
                 <Link href={`/play/${play.slug}/shows/`}>All</Link>
               </div>
               <div className="play-detail-show-list">
-                {play.shows.slice(0, 5).map((show) => (
+                {play.shows.map((show) => (
                   <div className="play-detail-show-chip" key={show.id}>
                     <span>{showDate.format(show.showtime)}</span>
                     <strong>{showTime.format(show.showtime)}</strong>

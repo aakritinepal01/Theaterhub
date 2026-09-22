@@ -83,6 +83,12 @@ export default async function TheatreOverviewPage() {
         </article>
       </section>
 
+        <section className="owner-overview-grid">
+          <article className="owner-panel"><div className="owner-panel-head"><div><p>Recent activity</p><h2>Latest productions</h2></div><Link href="/theatre-dashboard/productions">View all</Link></div>{theatre.plays.slice(0,3).map(play=><div className="overview-list-row" key={play.id}><span>{play.title.slice(0,1)}</span><div><strong>{play.title}</strong><small>{play.status} · {formatDate(play.updated)}</small></div></div>)}</article>
+          <article className="owner-panel"><div className="owner-panel-head"><div><p>Coming up</p><h2>Next performances</h2></div><Link href="/theatre-dashboard/schedules">Manage</Link></div>{theatre.shows.filter(show=>show.showtime>=new Date()).sort((a,b)=>a.showtime.getTime()-b.showtime.getTime()).slice(0,3).map(show=><div className="overview-list-row" key={show.id}><span>{show.showtime.toLocaleDateString("en-US",{month:"short",day:"2-digit"})}</span><div><strong>{show.play.title}</strong><small>{show.showtime.toLocaleString()}</small></div></div>)}{!upcoming&&<p className="owner-small-empty">No upcoming performances scheduled.</p>}</article>
+          <article className="owner-panel owner-quick-actions"><div className="owner-panel-head"><div><p>Shortcuts</p><h2>Quick actions</h2></div></div><Link href="/theatre-dashboard/productions">Add production</Link><Link href="/theatre-dashboard/schedules">Create schedule</Link><Link href="/theatre-dashboard/profile">Update theatre profile</Link>{theatre.slug&&<Link href={`/theatre/${theatre.slug}`}>View public page</Link>}</article>
+        </section>
+
       <div className="owner-main-grid">
         <section className="owner-panel">
           <div className="owner-panel-head">

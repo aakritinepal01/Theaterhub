@@ -1,5 +1,6 @@
+import { releasedPlayWhere, playingNowWhere, isPlayingNow } from "@/lib/production-visibility";
 ﻿import Link from "next/link";
-import { publishedWhere } from "@/lib/content";
+
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PlayCard } from "@/components/PlayCard";
@@ -74,7 +75,7 @@ export default async function Plays({
 
   // ── Build Prisma where clause ───────────────────────────────────
   const now = new Date();
-  const base = publishedWhere(now);
+  const base = releasedPlayWhere(now);
 
   const durationRange: { gte?: number; lte?: number; gt?: number } | undefined =
     selectedDuration === "short"
@@ -108,8 +109,8 @@ export default async function Plays({
   const filteredWhere: Prisma.PlayWhereInput = {
     ...base,
     ...(theatreId ? { theatreId } : {}),
-    ...(selectedFilter === "showing" ? { shows: { some: { showtime: { gt: now } } } } : {}),
-    ...(selectedFilter === "archive" ? { shows: { none: { showtime: { gt: now } } } } : {}),
+    ...(selectedFilter === "showing" ? playingNowWhere(now) : {}),
+    ...(selectedFilter === "archive" ? { NOT: playingNowWhere(now) } : {}),
     ...(durationRange ? { duration: durationRange } : {}),
     ...(ratingMin ? { ratingAverage: { gte: ratingMin } } : {}),
     ...(selectedFeatured === "yes" ? { isFeatured: true } : {}),
@@ -167,8 +168,8 @@ export default async function Plays({
 
   const pages = Math.max(1, Math.ceil(count / PAGE_SIZE));
   const page = Math.min(requested, pages);
-  const runningPlays = plays.filter((play) => play.shows?.length > 0);
-  const archivedPlays = plays.filter((play) => !play.shows?.length);
+  const runningPlays = plays.filter((play) => isPlayingNow(play, now));
+  const archivedPlays = plays.filter((play) => !isPlayingNow(play, now));
 
   const hasFilters =
     !!theatreId ||
@@ -293,12 +294,16 @@ export default async function Plays({
                   {runningPlays.length ? (
                     <div className="landing-play-grid play-list-grid-animated">
                       {runningPlays.map((play) => (
+<<<<<<< HEAD
+                        <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
+=======
                         <PlayCard
                           key={play.id}
                           play={play}
                           showTeaser={false}
                           showAction={false}
                         />
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
                       ))}
                     </div>
                   ) : (
@@ -319,12 +324,16 @@ export default async function Plays({
                   {archivedPlays.length ? (
                     <div className="landing-play-grid play-list-grid-animated">
                       {archivedPlays.map((play) => (
+<<<<<<< HEAD
+                        <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
+=======
                         <PlayCard
                           key={play.id}
                           play={play}
                           showTeaser={false}
                           showAction={false}
                         />
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
                       ))}
                     </div>
                   ) : (
@@ -335,12 +344,16 @@ export default async function Plays({
             ) : plays.length ? (
               <div className="landing-play-grid play-list-grid-animated">
                 {plays.map((play) => (
+<<<<<<< HEAD
+                  <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
+=======
                   <PlayCard
                     key={play.id}
                     play={play}
                     showTeaser={false}
                     showAction={false}
                   />
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
                 ))}
               </div>
             ) : (
