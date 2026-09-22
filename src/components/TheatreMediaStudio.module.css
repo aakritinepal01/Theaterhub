@@ -19,6 +19,9 @@
 .postMedia > * { display: block; flex: 0 0 100%; width: 100%; min-width: 0; max-width: 100%; aspect-ratio: 4/5; object-fit: contain; scroll-snap-align: start; }
 .postCaption { display: grid; gap: 8px; padding: 14px; overflow-wrap: anywhere; }
 .postCaption small { color: var(--owner-text-muted); font-size: .7rem; }
+.deleteBtn { justify-self: start; padding: 5px 12px; border: 1px solid #e05252; border-radius: 7px; color: #c0392b; background: #fff5f5; font-size: .7rem; font-weight: 700; cursor: pointer; transition: background .18s, color .18s; }
+.deleteBtn:hover { background: #c0392b; color: #fff; }
+.deleteBtn:disabled { opacity: .5; cursor: not-allowed; }
 .notice { border-radius: 10px; padding: 14px; background: var(--owner-accent-light); color: var(--owner-accent); }
 .dialog { width: min(900px,calc(100vw - 24px)); max-height: calc(100dvh - 32px); margin: auto; padding: 0; border: 1px solid var(--owner-line); border-radius: 22px; background: var(--owner-card-bg); color: var(--owner-text-main); overflow: auto; }
 .dialog::backdrop { background: #0c0716bd; backdrop-filter: blur(6px); }

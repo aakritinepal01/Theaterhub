@@ -1,7 +1,7 @@
 import { featuredStoryGroups, featuredReelGroups } from "@/lib/featured-theatre-media";
 import Link from "next/link";
 import { getTheatrePhoto, mediaUrl } from "@/lib/content";
-import { getFeaturedPlays, getPlayingNowPlays, getHeroPlays, getHomepageStats, getHomepageTheatres, getUpcomingShows, getHomepageTheatreReels, getHomepageTheatreStories } from "@/lib/home";
+import { getFeaturedPlays, getPlayingNowPlays, getHeroPlays, getHomepageStats, getHomepageTheatres, getUpcomingShows, getHomepageTheatreReels, getHomepageTheatreStories, getHomepageMedia } from "@/lib/home";
 import { Hero } from "@/components/Hero";
 import { LiveStageMarquee } from "@/components/LiveStageMarquee";
 import { PlayCard } from "@/components/PlayCard";
@@ -23,10 +23,11 @@ export default async function Home() {
   let theatres: Awaited<ReturnType<typeof getHomepageTheatres>> = [];
   let theatreReels: Awaited<ReturnType<typeof getHomepageTheatreReels>> = [];
   let theatreStories: Awaited<ReturnType<typeof getHomepageTheatreStories>> = [];
+  let homepageMedia: Awaited<ReturnType<typeof getHomepageMedia>> = { stories: [], reels: [] };
   let stats = { plays: 0, theatres: 0, bookings: 0, upcomingShows: 0 };
 
   try {
-    [plays, heroPlays, shows, stats, theatres, theatreReels, theatreStories, playingNow, recentPlays] = await Promise.all([
+    [plays, heroPlays, shows, stats, theatres, theatreReels, theatreStories, homepageMedia, playingNow, recentPlays] = await Promise.all([
       loadHomeSection("featured plays", getFeaturedPlays, plays),
       loadHomeSection("hero", getHeroPlays, heroPlays),
       loadHomeSection("upcoming shows", getUpcomingShows, shows),
@@ -34,6 +35,7 @@ export default async function Home() {
       loadHomeSection("theatres", getHomepageTheatres, theatres),
       loadHomeSection("theatre reels", getHomepageTheatreReels, theatreReels),
       loadHomeSection("theatre stories", getHomepageTheatreStories, theatreStories),
+      loadHomeSection("uploaded media", getHomepageMedia, homepageMedia),
       loadHomeSection("playing now", getPlayingNowPlays, playingNow),
       loadHomeSection("recent plays", getRecentPlays, recentPlays),
     ]);
@@ -108,11 +110,18 @@ export default async function Home() {
           </div>
         </section>
 
-        <ReelsSection items={theatreReels.map((reel) => ({ id: reel.id, title: reel.title, videoUrl: reel.videoUrl, theatreTitle: reel.theatre.title }))} />
+        <ReelsSection items={[
+          // Uploaded reels (from theatre dashboard) — shown first
+          ...homepageMedia.reels.flatMap(g => g.stories.map(s => ({ id: s.id, title: g.title, videoUrl: s.image, theatreTitle: g.title }))),
+          // TheatreReel model reels
+          ...theatreReels.map((reel) => ({ id: reel.id, title: reel.title, videoUrl: reel.videoUrl, theatreTitle: reel.theatre.title })),
+        ]} />
 
         {/* ── THEATREHUB STORIES (Interactive Theatre Stories) ── */}
         <PhotoStories
           groups={(() => {
+            // Uploaded stories (from theatre dashboard) — shown first
+            const uploaded = homepageMedia.stories;
             const managed = theatreStories.reduce<Record<string, { id: string; title: string; stories: { id: string; title: string; image: string; href: string; mediaType: string; theatreName: string }[] }>>((acc, story) => {
               const key = story.theatre.slug || `theatre-${story.theatre.title}`;
               acc[key] ||= { id: `managed-${key}`, title: story.theatre.title, stories: [] };
@@ -154,7 +163,10 @@ export default async function Home() {
               mk(1000021, "Behind the Curtain", "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=900&q=80", "TheatreHub"),
               mk(1000022, "Behind the Curtain", "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=900&q=80", "TheatreHub"),
             ];
-            return [...Object.values(managed),
+            return [
+              // uploaded TheatrePost stories first
+              ...uploaded,
+              ...Object.values(managed),
               { id: "photo-story-kantipur", title: "TheaterHub Stories", stories: kantipurStories },
               { id: "photo-story-workshop", title: "TheaterHub Stories", stories: secondStories },
               { id: "photo-story-production", title: "TheaterHub Stories", stories: thirdStories },

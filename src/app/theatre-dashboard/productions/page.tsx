@@ -5,6 +5,16 @@ import { getOwnerTheatre, formatDate } from "@/lib/theatre-dashboard";
 
 export const dynamic = "force-dynamic";
 
+function displayStatus(play: { status: string; launchedOn: Date | null; endedOn: Date | null }) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (play.status === "UPCOMING" && play.launchedOn && new Date(play.launchedOn) <= today) {
+    if (play.endedOn && new Date(play.endedOn) < today) return "ARCHIVED";
+    return "PUBLISHED";
+  }
+  return play.status;
+}
+
 export default async function TheatreProductionsPage() {
   const { theatre } = await getOwnerTheatre();
   if (!theatre) return null;
@@ -35,6 +45,7 @@ export default async function TheatreProductionsPage() {
               Status
               <select name="status" defaultValue="PUBLISHED">
                 <option value="PUBLISHED">Published</option>
+                <option value="UPCOMING">Upcoming</option>
                 <option value="DRAFT">Draft</option>
               </select>
             </label>
@@ -93,7 +104,7 @@ export default async function TheatreProductionsPage() {
                   {!play.coverImage && play.title.slice(0, 1)}
                 </div>
                 <div className="owner-play-info">
-                  <span>{play.status}</span>
+                  <span>{displayStatus(play)}</span>
                   <h3>{play.title}</h3>
                   <p>{play.abstract || play.description || "No production summary added yet."}</p>
                   <small>
