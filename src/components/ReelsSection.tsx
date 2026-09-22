@@ -2,10 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-<<<<<<< HEAD
-import type { TheatreMediaGroup } from "@/lib/theatre-post-groups";
-type Reel = { id: string; src: string; title: string; mediaType: string };
-=======
 const reels = [
   { id: "reel-1", src: "/reels/1.mp4", title: "TheaterHub" },
   { id: "reel-2", src: "/reels/2.mp4", title: "TheaterHub" },
@@ -18,7 +14,6 @@ const reels = [
   { id: "reel-9", src: "/reels/9.mp4", title: "TheaterHub" },
 ];
 export type TheatreReelItem = { id: number | string; title: string; videoUrl: string; theatreTitle?: string };
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
 
 function ReelBrand() {
   return (
@@ -68,13 +63,8 @@ function ReelCover({ src, title }: { src: string; title: string }) {
   );
 }
 
-<<<<<<< HEAD
-export function ReelsSection({ groups }: { groups: TheatreMediaGroup[] }) {
-  const [reels, setReels] = useState<Reel[]>([]);
-=======
 export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
   const feedReels: Array<{ id: string; src: string; title: string; theatreTitle?: string }> = items.length ? items.map((item) => ({ id: `theatre-reel-${item.id}`, src: item.videoUrl, title: item.title, theatreTitle: item.theatreTitle })) : reels.map((reel) => ({ ...reel }));
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
@@ -137,23 +127,6 @@ export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
           </div>
         </div>
         <div className="landing-reels-grid">
-<<<<<<< HEAD
-          {groups.slice(0, 6).map((group) => {
-            const cover = group.stories[0];
-            if (!cover) return null;
-            return <button className="landing-reel-card" key={group.id} onClick={() => {
-              const collection = group.id.startsWith("featured-reel-")
-                ? groups.filter(item => item.id.startsWith("featured-reel-")).flatMap(item => item.stories)
-                : group.stories;
-              setReels(collection.map(item => ({ id: item.id, src: item.image, title: item.theatreName, mediaType: item.mediaType })));
-              setActiveIndex(Math.max(0, collection.findIndex(item => item.id === cover.id)));
-            }} type="button" aria-label={`Watch ${group.title}`}>
-              {cover.mediaType === "video" ? <ReelCover src={cover.image} title={group.title} /> : <img className="landing-reel-cover" src={cover.image} alt="" />}
-              <span className="landing-reel-label">{group.id.startsWith("featured-reel-") ? "Featured Reel" : `${group.stories.length} reels`}</span>
-              <span className="landing-reel-title">{group.id.startsWith("featured-reel-") ? <ReelBrand /> : group.title}</span>
-            </button>;
-          })}
-=======
           {feedReels.slice(0, 6).map((reel, index) => (
             <button className="landing-reel-card" key={reel.id} onClick={() => setActiveIndex(index)} type="button" aria-label={`Watch ${reel.title}`}>
               <ReelCover src={reel.src} title={reel.title} />
@@ -161,7 +134,6 @@ export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
               <span className="landing-reel-title"><ReelBrand /></span>
             </button>
           ))}
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
         </div>
       </div>
 
