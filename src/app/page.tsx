@@ -113,71 +113,55 @@ export default async function Home() {
         {/* ── THEATREHUB STORIES (Interactive Theatre Stories) ── */}
         <PhotoStories
           groups={(() => {
-            const managed = theatreStories.reduce<Record<string, { id: string; title: string; stories: { id: number; title: string; image: string; href: string }[] }>>((groups, story) => {
+            const managed = theatreStories.reduce<Record<string, { id: string; title: string; stories: { id: string; title: string; image: string; href: string; mediaType: string; theatreName: string }[] }>>((acc, story) => {
               const key = story.theatre.slug || `theatre-${story.theatre.title}`;
-              groups[key] ||= { id: `managed-${key}`, title: story.theatre.title, stories: [] };
-              groups[key].stories.push({ id: story.id, title: story.title, image: story.imageUrl, href: story.theatre.slug ? `/theatre/${story.theatre.slug}` : "/theatre/" });
-              return groups;
+              acc[key] ||= { id: `managed-${key}`, title: story.theatre.title, stories: [] };
+              acc[key].stories.push({ id: String(story.id), title: story.title, image: story.imageUrl, href: story.theatre.slug ? `/theatre/${story.theatre.slug}` : "/theatre/", mediaType: "image", theatreName: story.theatre.title });
+              return acc;
             }, {});
+            const mk = (id: number, title: string, image: string, theatreName: string) => ({ id: String(id), title, image, href: "/theatre/", mediaType: "image" as const, theatreName });
             const kantipurStories = [
-              { id: 1000001, title: "Theatre at Kantipur", image: "/story-images/theatre-story-1.jpg", href: "/theatre/" },
-              { id: 1000002, title: "Theatre at Kantipur", image: "/story-images/theatre-story-2.jpg", href: "/theatre/" },
-              { id: 1000003, title: "Theatre at Kantipur", image: "/story-images/theatre-story-3.jpg", href: "/theatre/" },
+              mk(1000001, "Theatre at Kantipur", "/story-images/theatre-story-1.jpg", "Kantipur"),
+              mk(1000002, "Theatre at Kantipur", "/story-images/theatre-story-2.jpg", "Kantipur"),
+              mk(1000003, "Theatre at Kantipur", "/story-images/theatre-story-3.jpg", "Kantipur"),
             ];
             const secondStories = [
-              { id: 1000004, title: "Theatre Workshop", image: "/story-images/theatre-story-4.jpg", href: "/theatre/" },
-              { id: 1000005, title: "Theatre Workshop", image: "/story-images/theatre-story-5.jpg", href: "/theatre/" },
-              { id: 1000006, title: "Theatre Workshop", image: "/story-images/theatre-story-6.jpg", href: "/theatre/" },
-              { id: 1000007, title: "Theatre Workshop", image: "/story-images/theatre-story-7.jpg", href: "/theatre/" },
-              { id: 1000008, title: "Theatre Workshop", image: "/story-images/theatre-story-8.jpg", href: "/theatre/" },
+              mk(1000004, "Theatre Workshop", "/story-images/theatre-story-4.jpg", "TheatreHub"),
+              mk(1000005, "Theatre Workshop", "/story-images/theatre-story-5.jpg", "TheatreHub"),
+              mk(1000006, "Theatre Workshop", "/story-images/theatre-story-6.jpg", "TheatreHub"),
+              mk(1000007, "Theatre Workshop", "/story-images/theatre-story-7.jpg", "TheatreHub"),
+              mk(1000008, "Theatre Workshop", "/story-images/theatre-story-8.jpg", "TheatreHub"),
             ];
             const thirdStories = [
-              { id: 1000009, title: "Theatre Production", image: "/story-images/theatre-story-9.jpg", href: "/theatre/" },
-              { id: 1000010, title: "Theatre Production", image: "/story-images/theatre-story-10.jpg", href: "/theatre/" },
-              { id: 1000011, title: "Theatre Production", image: "/story-images/theatre-story-11.jpg", href: "/theatre/" },
-              { id: 1000012, title: "Theatre Production", image: "/story-images/theatre-story-12.jpg", href: "/theatre/" },
+              mk(1000009, "Theatre Production", "/story-images/theatre-story-9.jpg", "TheatreHub"),
+              mk(1000010, "Theatre Production", "/story-images/theatre-story-10.jpg", "TheatreHub"),
+              mk(1000011, "Theatre Production", "/story-images/theatre-story-11.jpg", "TheatreHub"),
+              mk(1000012, "Theatre Production", "/story-images/theatre-story-12.jpg", "TheatreHub"),
             ];
             const fourthStories = [
-              { id: 1000013, title: "Theatre Spotlight", image: "/story-images/theatre-story-13.jpg", href: "/theatre/" },
-              { id: 1000014, title: "Theatre Spotlight", image: "/story-images/theatre-story-14.jpg", href: "/theatre/" },
-              { id: 1000015, title: "Theatre Spotlight", image: "/story-images/theatre-story-15.jpg", href: "/theatre/" },
-              { id: 1000016, title: "Theatre Spotlight", image: "/story-images/theatre-story-16.jpg", href: "/theatre/" },
+              mk(1000013, "Theatre Spotlight", "/story-images/theatre-story-13.jpg", "TheatreHub"),
+              mk(1000014, "Theatre Spotlight", "/story-images/theatre-story-14.jpg", "TheatreHub"),
+              mk(1000015, "Theatre Spotlight", "/story-images/theatre-story-15.jpg", "TheatreHub"),
+              mk(1000016, "Theatre Spotlight", "/story-images/theatre-story-16.jpg", "TheatreHub"),
             ];
             const fifthStories = [
-              { id: 1000017, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
-              { id: 1000018, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
-              { id: 1000019, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              mk(1000017, "Stage Spaces", "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=900&q=80", "TheatreHub"),
+              mk(1000018, "Stage Spaces", "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=900&q=80", "TheatreHub"),
+              mk(1000019, "Stage Spaces", "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80", "TheatreHub"),
             ];
             const sixthStories = [
-              { id: 1000020, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
-              { id: 1000021, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
-              { id: 1000022, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              mk(1000020, "Behind the Curtain", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=900&q=80", "TheatreHub"),
+              mk(1000021, "Behind the Curtain", "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=900&q=80", "TheatreHub"),
+              mk(1000022, "Behind the Curtain", "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=900&q=80", "TheatreHub"),
             ];
-            return [...Object.values(managed), {
-              id: "photo-story-kantipur",
-              title: "TheaterHub Stories",
-              stories: kantipurStories.slice(0, 3),
-            }, {
-              id: "photo-story-workshop",
-              title: "TheaterHub Stories",
-              stories: secondStories,
-            }, {
-              id: "photo-story-production",
-              title: "TheaterHub Stories",
-              stories: thirdStories,
-            }, {
-              id: "photo-story-spotlight",
-              title: "TheaterHub Stories",
-              stories: fourthStories,
-            }, {
-              id: "photo-story-spaces",
-              title: "TheaterHub Stories",
-              stories: fifthStories,
-            }, {
-              id: "photo-story-curtain",
-              title: "TheaterHub Stories",
-              stories: sixthStories,
-            }];
+            return [...Object.values(managed),
+              { id: "photo-story-kantipur", title: "TheaterHub Stories", stories: kantipurStories },
+              { id: "photo-story-workshop", title: "TheaterHub Stories", stories: secondStories },
+              { id: "photo-story-production", title: "TheaterHub Stories", stories: thirdStories },
+              { id: "photo-story-spotlight", title: "TheaterHub Stories", stories: fourthStories },
+              { id: "photo-story-spaces", title: "TheaterHub Stories", stories: fifthStories },
+              { id: "photo-story-curtain", title: "TheaterHub Stories", stories: sixthStories },
+            ];
           })()}
         />
 
