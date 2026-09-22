@@ -64,7 +64,7 @@ function ReelCover({ src, title }: { src: string; title: string }) {
 }
 
 export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
-  const feedReels: Array<{ id: string; src: string; title: string; theatreTitle?: string }> = items.length ? items.map((item) => ({ id: `theatre-reel-${item.id}`, src: item.videoUrl, title: item.title, theatreTitle: item.theatreTitle })) : reels.map((reel) => ({ ...reel }));
+  const feedReels: Array<{ id: string; src: string; title: string; theatreTitle?: string; mediaType: string }> = items.length ? items.map((item) => ({ id: `theatre-reel-${item.id}`, src: item.videoUrl, title: item.title, theatreTitle: item.theatreTitle, mediaType: "video" })) : reels.map((reel) => ({ ...reel, mediaType: "video" }));
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
@@ -116,7 +116,7 @@ export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [activeIndex, reels]);
+  }, [activeIndex]);
 
   return (
     <section className="landing-reels" aria-labelledby="landing-reels-title">
