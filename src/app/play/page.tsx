@@ -294,46 +294,8 @@ export default async function Plays({
                   {runningPlays.length ? (
                     <div className="landing-play-grid play-list-grid-animated">
                       {runningPlays.map((play) => (
-<<<<<<< HEAD
-                        <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
-=======
-                        <PlayCard
-                          key={play.id}
-                          play={play}
-                          showTeaser={false}
-                          showAction={false}
-                        />
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="play-collection-empty">No currently running plays found.</div>
-                  )}
-                </section>
+                        <PlayCard key={play.id} play={play} showTeaser={false} showAction={false} />
 
-                <section className="play-collection-section play-archive-section" aria-labelledby="archive-plays-title">
-                  <div className="play-collection-heading">
-                    <div>
-                      <span className="play-collection-kicker">Past productions</span>
-                      <h2 id="archive-plays-title">Play Archive</h2>
-                    </div>
-                    <span>
-                      {archivedPlays.length} production{archivedPlays.length === 1 ? "" : "s"}
-                    </span>
-                  </div>
-                  {archivedPlays.length ? (
-                    <div className="landing-play-grid play-list-grid-animated">
-                      {archivedPlays.map((play) => (
-<<<<<<< HEAD
-                        <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
-=======
-                        <PlayCard
-                          key={play.id}
-                          play={play}
-                          showTeaser={false}
-                          showAction={false}
-                        />
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
                       ))}
                     </div>
                   ) : (
@@ -344,16 +306,7 @@ export default async function Plays({
             ) : plays.length ? (
               <div className="landing-play-grid play-list-grid-animated">
                 {plays.map((play) => (
-<<<<<<< HEAD
-                  <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
-=======
-                  <PlayCard
-                    key={play.id}
-                    play={play}
-                    showTeaser={false}
-                    showAction={false}
-                  />
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
+                        <PlayCard key={play.id} play={play} showTeaser={false} showAction={false} />
                 ))}
               </div>
             ) : (
