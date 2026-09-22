@@ -2,17 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const reels = [
-  { id: "reel-1", src: "/reels/1.mp4", title: "TheaterHub" },
-  { id: "reel-2", src: "/reels/2.mp4", title: "TheaterHub" },
-  { id: "reel-3", src: "/reels/3.mp4", title: "TheaterHub" },
-  { id: "reel-4", src: "/reels/4.mp4", title: "TheaterHub" },
-  { id: "reel-5", src: "/reels/5.mp4", title: "TheaterHub" },
-  { id: "reel-6", src: "/reels/6.mp4", title: "TheaterHub" },
-  { id: "reel-7", src: "/reels/7.mp4", title: "TheaterHub" },
-  { id: "reel-8", src: "/reels/8.mp4", title: "TheaterHub" },
-  { id: "reel-9", src: "/reels/9.mp4", title: "TheaterHub" },
-];
+import type { TheatreMediaGroup } from "@/lib/theatre-post-groups";
+type Reel = { id: string; src: string; title: string; mediaType: string };
 
 function ReelBrand() {
   return (
@@ -54,7 +45,7 @@ function ReelCover({ src, title }: { src: string; title: string }) {
           canvas.width = Math.min(video.videoWidth, 540);
           canvas.height = Math.round(canvas.width * video.videoHeight / video.videoWidth);
           canvas.getContext("2d")?.drawImage(video, 0, 0, canvas.width, canvas.height);
-          setThumbnail(canvas.toDataURL("image/jpeg", 0.82));
+          try { setThumbnail(canvas.toDataURL("image/jpeg", 0.82)); } catch { /* Keep fallback for media without canvas access. */ }
         }}
       />
       <span className="sr-only">{title}</span>
@@ -62,7 +53,8 @@ function ReelCover({ src, title }: { src: string; title: string }) {
   );
 }
 
-export function ReelsSection() {
+export function ReelsSection({ groups }: { groups: TheatreMediaGroup[] }) {
+  const [reels, setReels] = useState<Reel[]>([]);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
@@ -80,7 +72,7 @@ export function ReelsSection() {
           video.muted = false;
           void video.play().catch(() => {
             video.muted = true;
-            void video.play();
+            void video.play().catch(() => {});
           });
         } else {
           video.pause();
@@ -114,7 +106,7 @@ export function ReelsSection() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [activeIndex]);
+  }, [activeIndex, reels]);
 
   return (
     <section className="landing-reels" aria-labelledby="landing-reels-title">
@@ -125,13 +117,21 @@ export function ReelsSection() {
           </div>
         </div>
         <div className="landing-reels-grid">
-          {reels.slice(0, 6).map((reel, index) => (
-            <button className="landing-reel-card" key={reel.id} onClick={() => setActiveIndex(index)} type="button" aria-label={`Watch ${reel.title}`}>
-              <ReelCover src={reel.src} title={reel.title} />
-              <span className="landing-reel-label">Featured Reel</span>
-              <span className="landing-reel-title"><ReelBrand /></span>
-            </button>
-          ))}
+          {groups.slice(0, 6).map((group) => {
+            const cover = group.stories[0];
+            if (!cover) return null;
+            return <button className="landing-reel-card" key={group.id} onClick={() => {
+              const collection = group.id.startsWith("featured-reel-")
+                ? groups.filter(item => item.id.startsWith("featured-reel-")).flatMap(item => item.stories)
+                : group.stories;
+              setReels(collection.map(item => ({ id: item.id, src: item.image, title: item.theatreName, mediaType: item.mediaType })));
+              setActiveIndex(Math.max(0, collection.findIndex(item => item.id === cover.id)));
+            }} type="button" aria-label={`Watch ${group.title}`}>
+              {cover.mediaType === "video" ? <ReelCover src={cover.image} title={group.title} /> : <img className="landing-reel-cover" src={cover.image} alt="" />}
+              <span className="landing-reel-label">{group.id.startsWith("featured-reel-") ? "Featured Reel" : `${group.stories.length} reels`}</span>
+              <span className="landing-reel-title">{group.id.startsWith("featured-reel-") ? <ReelBrand /> : group.title}</span>
+            </button>;
+          })}
         </div>
       </div>
 
@@ -142,7 +142,7 @@ export function ReelsSection() {
             {reels.map((reel, index) => (
               <article className="reel-modal-item" data-reel-index={index} key={reel.id}>
                 <div className="reel-player-card">
-                  <video
+                  {reel.mediaType === "image" ? <img className="landing-reel-cover" src={reel.src} alt={reel.title} /> : <video
                     ref={(video) => { videoRefs.current[index] = video; }}
                     src={reel.src}
                     muted
@@ -163,8 +163,8 @@ export function ReelsSection() {
                     }}
                     tabIndex={0}
                     aria-label={`${reel.title}. Tap to play or pause.`}
-                  />
-                  <span className="reel-player-brand"><ReelBrand /></span>
+                  />}
+                  <span className="reel-player-brand">{reel.title === "TheaterHub" ? <ReelBrand /> : reel.title}</span>
                 </div>
               </article>
             ))}

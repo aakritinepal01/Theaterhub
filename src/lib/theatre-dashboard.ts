@@ -12,7 +12,7 @@ export const getOwnerTheatre = cache(async () => {
   const theatre = await prisma.theatre.findUnique({
     where: { ownerId: user.id },
     include: {
-      plays: { orderBy: [{ updated: "desc" }, { title: "asc" }] },
+      plays: { include: { makers: { include: { profile: true }, orderBy: { order: "asc" } }, cast: { include: { profile: true }, orderBy: { order: "asc" } }, crew: { include: { profile: true }, orderBy: { order: "asc" } } }, orderBy: [{ updated: "desc" }, { title: "asc" }] },
       showsMeta: { include: { play: true, excludeDates: true, extraShows: true }, orderBy: { startDate: "desc" } },
       shows: { include: { play: true }, orderBy: { showtime: "desc" } },
     },

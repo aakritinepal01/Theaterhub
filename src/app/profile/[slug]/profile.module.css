@@ -1,0 +1,11 @@
+.layout { display: grid; grid-template-columns: minmax(240px, 380px) minmax(0, 1fr); gap: clamp(28px, 5vw, 72px); align-items: start; }
+.sidebar, .credits { min-width: 0; }
+.portrait { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 16px; }
+.bio { margin-top: 22px; color: #475569; font-size: .95rem; line-height: 1.8; overflow-wrap: anywhere; }
+.bio p { margin: 0 0 14px; }
+.bio img { max-width: 100%; height: auto; }
+.address { font-size: .85rem; color: #64748b; }
+.credits { display: grid; gap: 32px; }
+:global(html[data-theme="dark"]) .bio, :global(html[data-theme="dark"]) .address { color: #cbd5e1; }
+:global(html[data-theme="dark"]) .credits :global(h3), :global(html[data-theme="dark"]) .credits :global(.role-person-link) { color: #f1f5f9; }
+@media (max-width: 700px) { .layout { grid-template-columns: minmax(0, 1fr); } .portrait { max-width: 380px; } }

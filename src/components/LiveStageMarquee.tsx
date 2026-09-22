@@ -19,6 +19,7 @@ type LiveShow = {
 };
 
 type LivePlay = {
+  stageLabel?: string;
   id: number;
   title: string;
   slug: string | null;
@@ -53,6 +54,7 @@ export function LiveStageMarquee({
             minute: "2-digit",
             timeZone: "Asia/Kathmandu",
           }).format(new Date(s.showtime)),
+          stageLabel: "ON STAGE",
         }))
     : plays
         .filter((p) => p.slug)
@@ -64,6 +66,7 @@ export function LiveStageMarquee({
           price: null,
           image: getPlayPhoto(p),
           timeText: null,
+          stageLabel: p.stageLabel ?? "ON STAGE",
         }));
 
   if (!items.length) return null;
@@ -71,7 +74,7 @@ export function LiveStageMarquee({
   const loopItems = [...items, ...items, ...items];
   const subtext = hasScheduledShows
     ? `${items.length} scheduled on-stage performances with ticket details`
-    : `${items.length} theatre titles currently on stage on TheaterHub`;
+    : `${items.length} current, recent and featured theatre productions`;
   const cardAction = "View details";
 
   return (
@@ -106,7 +109,7 @@ export function LiveStageMarquee({
                       <span aria-hidden="true">{item.title.slice(0, 2).toUpperCase()}</span>
                     </div>
                   )}
-                  <span className="live-thumb-stage-tag">ON STAGE</span>
+                  <span className="live-thumb-stage-tag">{item.stageLabel}</span>
                 </div>
               </Link>
             ))}

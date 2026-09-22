@@ -1,3 +1,4 @@
+import "./restored-dashboard.css";
 import { ReactNode } from "react";
 import Link from "next/link";
 import { getOwnerTheatre, formatDate } from "@/lib/theatre-dashboard";

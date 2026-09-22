@@ -1,0 +1,3 @@
+.lines { display: flex; flex-direction: column; gap: 6px; }
+.line { display: block; }
+.line + .line { margin-top: 6px; }

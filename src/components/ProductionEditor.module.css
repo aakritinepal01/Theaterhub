@@ -1,0 +1,74 @@
+.editor { min-width: 0; }
+.trigger, .actions button, .header button {
+  border: 1px solid var(--owner-line);
+  border-radius: 9px;
+  padding: 10px 16px;
+  background: var(--owner-card-bg);
+  color: var(--owner-text-main);
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+.trigger:hover, .actions button:hover { border-color: var(--owner-accent); color: var(--owner-accent); }
+.dialog {
+  width: min(820px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--owner-line);
+  border-radius: 20px;
+  background: var(--owner-card-bg);
+  color: var(--owner-text-main);
+  box-shadow: 0 24px 100px #0005;
+}
+.dialog::backdrop { background: #111827a6; backdrop-filter: blur(5px); }
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 26px 30px; border-bottom: 1px solid var(--owner-line); background: var(--owner-accent-light); }
+.header span { font-size: .62rem; font-weight: 800; letter-spacing: .16em; color: var(--owner-accent); }
+.header h2 { margin: 8px 0; font-size: 1.65rem; letter-spacing: -.04em; }
+.header p { margin: 0; font-size: .85rem; color: var(--owner-text-sub); overflow-wrap: anywhere; }
+.header button { padding: 3px 12px; font-size: 1.5rem; }
+.form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 26px 30px 0; }
+.intro, .wide, .featured, .footer { grid-column: 1 / -1; }
+.intro h3 { margin: 0 0 5px; font-size: .95rem; }
+.intro p { margin: 0; font-size: .78rem; color: var(--owner-text-muted); }
+.form > label { display: flex; flex-direction: column; gap: 8px; font-size: .76rem; font-weight: 650; color: var(--owner-text-sub); min-width: 0; }
+.form input:not([type="checkbox"]), .form select, .form textarea { box-sizing: border-box; width: 100%; min-width: 0; border: 1px solid var(--owner-input-border); border-radius: 9px; padding: 11px 13px; background: var(--owner-input-bg); color: var(--owner-text-main); font: inherit; font-size: .85rem; }
+.form textarea { min-height: 100px; resize: vertical; line-height: 1.65; }
+.form input:focus, .form select:focus, .form textarea:focus { outline: 2px solid var(--owner-accent); outline-offset: 2px; }
+.form > .featured { flex-direction: row; align-items: center; padding: 15px; background: var(--owner-accent-light); border-radius: 10px; }
+.featured input { width: 17px; height: 17px; accent-color: var(--owner-accent); }
+.footer { position: sticky; bottom: 0; margin: 0 -30px; padding: 16px 30px 22px; background: var(--owner-card-bg); border-top: 1px solid var(--owner-line); }
+.footer p { margin: 0 0 12px; color: var(--owner-text-sub); font-size: .78rem; }
+.actions { display: flex; gap: 10px; }
+.actions .danger { margin-right: auto; color: #dc2626; background: transparent; }
+.actions .primary { color: white; background: var(--owner-accent); border-color: var(--owner-accent); }
+.actions button:disabled, .header button:disabled { opacity: .55; cursor: wait; }
+.dialog button:focus-visible { outline: 2px solid var(--owner-accent); outline-offset: 3px; }
+@media (max-width: 600px) {
+  .dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); border-radius: 14px; }
+  .header { padding: 20px; }
+  .form { grid-template-columns: minmax(0, 1fr); padding: 20px 20px 0; }
+  .footer { margin: 0 -20px; padding: 14px 20px; }
+  .actions { flex-wrap: wrap; }
+  .actions .danger { width: 100%; margin: 0; }
+  .actions button { flex: 1; }
+}
+
+@media (max-width: 800px) {
+  .trigger { min-height: 44px; padding: 8px 12px; }
+  .header > div, .form > * { min-width: 0; }
+  .header button { flex-shrink: 0; min-width: 44px; min-height: 44px; }
+  .form { grid-template-columns: minmax(0, 1fr); }
+  .form input:not([type="checkbox"]), .form select, .form textarea { font-size: 16px; min-height: 44px; }
+  .actions button { min-height: 44px; }
+}
+@media (max-width: 600px) {
+  .dialog { width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; border: 0; border-radius: 0; }
+  .header { position: sticky; top: 0; z-index: 2; padding: max(14px, env(safe-area-inset-top)) 16px 14px; background: var(--owner-card-bg); }
+  .header h2 { font-size: 1.2rem; }
+  .form { gap: 16px; padding: 16px 16px 0; }
+  .footer { position: static; margin: 0 -16px; padding: 14px 16px max(16px, env(safe-area-inset-bottom)); }
+}
