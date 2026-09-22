@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum ContentStatus {
@@ -146,6 +146,7 @@ model Theatre {
   plays          Play[]
   showsMeta      ShowsMeta[]
   shows          Show[]
+  socialPosts    TheatrePost[]
 
   @@index([title])
 }
@@ -473,4 +474,29 @@ model Media {
 
   @@index([resourceType])
   @@index([uploadedAt])
+}
+
+model TheatrePost {
+  id        String   @id @default(cuid())
+  theatreId Int
+  kind      String
+  caption   String   @default("")
+  createdAt DateTime @default(now())
+  theatre   Theatre  @relation(fields: [theatreId], references: [id], onDelete: Cascade)
+  assets    TheatrePostAsset[]
+
+  @@index([theatreId, createdAt])
+  @@index([kind, createdAt])
+}
+
+model TheatrePostAsset {
+  id        String @id @default(cuid())
+  postId    String
+  url       String
+  mediaType String
+  publicId  String?
+  position  Int
+  post      TheatrePost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, position])
 }
