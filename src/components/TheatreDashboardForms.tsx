@@ -2,8 +2,10 @@
 
 import type { ContentStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import styles from "./ProductionEditor.module.css";
 import { ImageUploadField } from "@/components/ImageUploadField";
+import { ProductionCreditsFields } from "@/components/ProductionCreditsFields";
 
 type Play = {
   id: number;
@@ -17,6 +19,8 @@ type Play = {
   endedOn: Date | string | null;
   status: ContentStatus;
   isFeatured: boolean;
+  cast: { profile: { name: string } }[];
+  crew: { profile: { name: string } }[];
 };
 
 export function ProfileForm({ theatre }: { theatre: Record<string, unknown> }) {
@@ -120,55 +124,80 @@ export function PlayEditor({ play }: { play: Play }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [state, setState] = useState("");
+  const [busy, setBusy] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    dialog.current?.showModal();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [open]);
+
+  function close() {
+    if (busy) return;
+    dialog.current?.close();
+    setOpen(false);
+  }
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy) return;
+    const body = new FormData(event.currentTarget);
+    if (String(body.get("coverImage") || "").startsWith("blob:")) {
+      setState("Please wait for the poster upload to finish.");
+      return;
+    }
+    setBusy(true);
+    setState("");
+    try {
     const response = await fetch(`/api/theatre/plays/${play.id}`, {
       method: "PATCH",
-      body: new FormData(event.currentTarget),
+      body,
     });
     setState(
       response.ok ? "Saved." : (await response.json().catch(() => null))?.error || "Unable to save."
     );
     if (response.ok) router.refresh();
+    } catch {
+      setState("Connection lost. Please try saving again.");
+    } finally { setBusy(false); }
   }
 
   async function remove() {
+    if (busy) return;
     if (!confirm(`Delete ${play.title}?`)) return;
+    setBusy(true);
+    try {
     const response = await fetch(`/api/theatre/plays/${play.id}`, { method: "DELETE" });
-    if (response.ok) router.refresh();
+    if (response.ok) { setOpen(false); router.refresh(); }
     else setState((await response.json().catch(() => null))?.error || "Unable to delete.");
+    } catch {
+      setState("Connection lost. Please try again.");
+    } finally { setBusy(false); }
   }
 
   return (
-    <article className="play-editor">
-      <div className="play-editor-head">
-        <div>
-          <h3>{play.title}</h3>
-          <p>
-            {play.launchedOn ? new Date(play.launchedOn).toLocaleDateString() : "Launch date not set"} ·{" "}
-            {play.status}
-          </p>
-        </div>
-        <div>
-          <button type="button" onClick={() => setOpen(!open)}>
-            {open ? "Close" : "Edit"}
-          </button>
-          <button type="button" className="danger" onClick={remove}>
-            Delete
-          </button>
-        </div>
-      </div>
+    <div className={styles.editor}>
+      <button className={styles.trigger} type="button" onClick={() => { setState(""); setOpen(true); }} aria-label={`Edit ${play.title}`}>Edit</button>
       {open && (
-        <form className="manage-form" onSubmit={save}>
+        <dialog ref={dialog} className={styles.dialog} aria-labelledby={`production-editor-${play.id}`} onCancel={event => { event.preventDefault(); close(); }} onClose={() => setOpen(false)}>
+        <header className={styles.header}>
+          <div><span>PRODUCTION STUDIO</span><h2 id={`production-editor-${play.id}`}>Edit production</h2><p>{play.title}</p></div>
+          <button type="button" onClick={close} disabled={busy} aria-label="Close editor">×</button>
+        </header>
+        <form className={styles.form} onSubmit={save} aria-busy={busy}>
+          <div className={styles.intro}><h3>Production details</h3><p>Update the essentials, poster and story of your play.</p></div>
           <label>
             Title
-            <input name="title" defaultValue={play.title} required />
+            <input name="title" defaultValue={play.title} required autoFocus />
           </label>
           <label>
             Status
             <select name="status" defaultValue={play.status}>
               <option value="PUBLISHED">Published</option>
+              <option value="UPCOMING">Upcoming</option>
               <option value="DRAFT">Draft</option>
             </select>
           </label>
@@ -193,26 +222,34 @@ export function PlayEditor({ play }: { play: Play }) {
             Duration (minutes)
             <input type="number" min="1" name="duration" defaultValue={play.duration || ""} />
           </label>
-          <label>
+          <label className={styles.wide}>
             Description
             <textarea name="description" defaultValue={play.description} />
           </label>
-          <label>
+          <label className={styles.wide}>
             Abstract
             <textarea name="abstract" defaultValue={play.abstract} />
           </label>
-          <label>
+          <label className={styles.wide}>
             Directorial note
             <textarea name="directorialNote" defaultValue={play.directorialNote} />
           </label>
-          <label>
+          <ProductionCreditsFields onStage={play.cast.map(credit => credit.profile.name)} offStage={play.crew.map(credit => credit.profile.name)} />
+          <label className={styles.featured}>
             <input type="checkbox" name="isFeatured" defaultChecked={play.isFeatured} /> Featured play
           </label>
-          <button>Save play</button>
-          <p role="status">{state}</p>
+          <footer className={styles.footer}>
+            <p role="status">{state || "Review your details before saving."}</p>
+            <div className={styles.actions}>
+              <button type="button" className={styles.danger} onClick={remove} disabled={busy}>Delete production</button>
+              <button type="button" onClick={close} disabled={busy}>Cancel</button>
+              <button className={styles.primary} disabled={busy}>{busy ? "Please wait…" : "Save changes"}</button>
+            </div>
+          </footer>
         </form>
+        </dialog>
       )}
-    </article>
+    </div>
   );
 }
 
