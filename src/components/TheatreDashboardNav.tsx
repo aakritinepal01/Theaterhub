@@ -38,17 +38,6 @@ export function TheatreDashboardNav({
       <Link href="/theatre-dashboard/media" className={isMedia ? "is-active" : ""}>
         Reels &amp; Stories
       </Link>
-      <p>Public presence</p>
-      <Link href="/theatre-dashboard/media" className={pathname.startsWith("/theatre-dashboard/media") ? "is-active" : ""}>
-        Stories &amp; Reels <span>+</span>
-      </Link>
-      {slug ? (
-        <Link href={`/theatre/${slug}`} target="_blank" rel="noopener noreferrer">
-          View theatre page ↗
-        </Link>
-      ) : (
-        <span className="owner-muted-link">Public page unavailable</span>
-      )}
       </nav>
   );
 }
