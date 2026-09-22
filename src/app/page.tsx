@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTheatrePhoto, mediaUrl } from "@/lib/content";
-import { getFeaturedPlays, getHeroPlays, getHomepagePhotoStories, getHomepageStats, getHomepageTheatres, getUpcomingShows } from "@/lib/home";
+import { getFeaturedPlays, getHeroPlays, getHomepagePhotoStories, getHomepageStats, getHomepageTheatreReels, getHomepageTheatreStories, getHomepageTheatres, getUpcomingShows } from "@/lib/home";
 import { Hero } from "@/components/Hero";
 import { LiveStageMarquee } from "@/components/LiveStageMarquee";
 import { PlayCard } from "@/components/PlayCard";
@@ -21,16 +21,20 @@ export default async function Home() {
   let shows: Awaited<ReturnType<typeof getUpcomingShows>> = [];
   let theatres: Awaited<ReturnType<typeof getHomepageTheatres>> = [];
   let photoStories: Awaited<ReturnType<typeof getHomepagePhotoStories>> = [];
+  let theatreReels: Awaited<ReturnType<typeof getHomepageTheatreReels>> = [];
+  let theatreStories: Awaited<ReturnType<typeof getHomepageTheatreStories>> = [];
   let stats = { plays: 0, theatres: 0, bookings: 0, upcomingShows: 0 };
 
   try {
-    [plays, heroPlays, shows, stats, theatres, photoStories] = await Promise.all([
+    [plays, heroPlays, shows, stats, theatres, photoStories, theatreReels, theatreStories] = await Promise.all([
       getFeaturedPlays(),
       getHeroPlays(),
       getUpcomingShows(),
       getHomepageStats(),
       getHomepageTheatres(),
       getHomepagePhotoStories(),
+      getHomepageTheatreReels(),
+      getHomepageTheatreStories(),
     ]);
   } catch (error) {
     console.error("Unable to load landing-page data", error);
@@ -75,7 +79,12 @@ export default async function Home() {
           {plays.length ? (
             <div className="landing-play-grid">
               {plays.filter(play => play.slug).map((play) => (
-                <PlayCard key={play.id} play={play} showTeaser={false} />
+                <PlayCard
+                  key={play.id}
+                  play={play}
+                  showTeaser={false}
+                  showAction={false}
+                />
               ))}
             </div>
           ) : (
@@ -92,12 +101,18 @@ export default async function Home() {
           </div>
         </section>
 
-        <ReelsSection />
+        <ReelsSection items={theatreReels.map((reel) => ({ id: reel.id, title: reel.title, videoUrl: reel.videoUrl, theatreTitle: reel.theatre.title }))} />
 
-        {/* ── WEB STORIES (Interactive Theatre Stories) ── */}
+        {/* ── THEATREHUB STORIES (Interactive Theatre Stories) ── */}
         <PhotoStories
           groups={(() => {
-            const theatreStories = [
+            const managed = theatreStories.reduce<Record<string, { id: string; title: string; stories: { id: number; title: string; image: string; href: string }[] }>>((groups, story) => {
+              const key = story.theatre.slug || `theatre-${story.theatre.title}`;
+              groups[key] ||= { id: `managed-${key}`, title: story.theatre.title, stories: [] };
+              groups[key].stories.push({ id: story.id, title: story.title, image: story.imageUrl, href: story.theatre.slug ? `/theatre/${story.theatre.slug}` : "/theatre/" });
+              return groups;
+            }, {});
+            const kantipurStories = [
               { id: 1000001, title: "Theatre at Kantipur", image: "/story-images/theatre-story-1.jpg", href: "/theatre/" },
               { id: 1000002, title: "Theatre at Kantipur", image: "/story-images/theatre-story-2.jpg", href: "/theatre/" },
               { id: 1000003, title: "Theatre at Kantipur", image: "/story-images/theatre-story-3.jpg", href: "/theatre/" },
@@ -131,10 +146,10 @@ export default async function Home() {
               { id: 1000021, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
               { id: 1000022, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
             ];
-            return [{
+            return [...Object.values(managed), {
               id: "photo-story-kantipur",
               title: "TheaterHub Stories",
-              stories: theatreStories.slice(0, 3),
+              stories: kantipurStories.slice(0, 3),
             }, {
               id: "photo-story-workshop",
               title: "TheaterHub Stories",

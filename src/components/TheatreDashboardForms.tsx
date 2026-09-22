@@ -253,6 +253,51 @@ export function PlayEditor({ play }: { play: Play }) {
   );
 }
 
+type ManagedReel = { id: number; title: string; videoUrl: string; status: ContentStatus };
+type ManagedStory = { id: number; title: string; imageUrl: string; caption: string; status: ContentStatus };
+
+export function TheatreMediaManager({ reels, stories }: { reels: ManagedReel[]; stories: ManagedStory[] }) {
+  const router = useRouter();
+  const [state, setState] = useState("");
+  async function submit(event: React.FormEvent<HTMLFormElement>, endpoint: string) {
+    event.preventDefault(); setState("Saving…");
+    const response = await fetch(endpoint, { method: "POST", body: new FormData(event.currentTarget) });
+    setState(response.ok ? "Published." : (await response.json().catch(() => null))?.error || "Unable to save.");
+    if (response.ok) { event.currentTarget.reset(); router.refresh(); }
+  }
+  async function remove(endpoint: string) {
+    if (!confirm("Remove this item from the homepage?")) return;
+    const response = await fetch(endpoint, { method: "DELETE" });
+    setState(response.ok ? "Removed." : "Unable to remove."); if (response.ok) router.refresh();
+  }
+  return <section className="owner-panel theatre-media-manager">
+    <div className="owner-panel-head"><div><p>Homepage content</p><h2>Explore, Reels &amp; Stories</h2></div><span className="owner-small-empty">Use public image/video URLs</span></div>
+    <div className="media-manager-grid">
+      <form className="manage-form" onSubmit={(event) => submit(event, "/api/theatre/reels")}>
+        <h3>Add theatre reel</h3><p className="manage-help">Paste a hosted MP4 URL (Cloudinary or another public video URL).</p>
+        <label>Title<input name="title" placeholder="Opening night" required /></label>
+        <label>Video URL<input name="videoUrl" type="url" placeholder="https://…/reel.mp4" required /></label>
+        <label>Status<select name="status" defaultValue="PUBLISHED"><option value="PUBLISHED">Published</option><option value="DRAFT">Draft</option></select></label>
+        <button>Add reel</button>
+      </form>
+      <form className="manage-form" onSubmit={(event) => submit(event, "/api/theatre/stories")}>
+        <h3>Add TheatreHub story</h3><p className="manage-help">Stories appear under your theatre in the homepage story row.</p>
+        <label>Title<input name="title" placeholder="Behind the scenes" required /></label>
+        <label>Image URL<input name="imageUrl" type="url" placeholder="https://…/story.jpg" required /></label>
+        <label>Caption<textarea name="caption" placeholder="Optional caption" /></label>
+        <label>Status<select name="status" defaultValue="PUBLISHED"><option value="PUBLISHED">Published</option><option value="DRAFT">Draft</option></select></label>
+        <button>Add story</button>
+      </form>
+    </div>
+    <p role="status">{state}</p>
+    <div className="owner-media-list">
+      {reels.map((reel) => <div className="owner-media-row" key={`reel-${reel.id}`}><span>REEL</span><strong>{reel.title}</strong><small>{reel.status}</small><button type="button" className="danger" onClick={() => remove(`/api/theatre/reels/${reel.id}`)}>Remove</button></div>)}
+      {stories.map((story) => <div className="owner-media-row" key={`story-${story.id}`}><span>STORY</span><strong>{story.title}</strong><small>{story.status}</small><button type="button" className="danger" onClick={() => remove(`/api/theatre/stories/${story.id}`)}>Remove</button></div>)}
+      {!reels.length && !stories.length && <p className="owner-small-empty">No managed reels or stories yet.</p>}
+    </div>
+  </section>;
+}
+
 function dateValue(value: unknown) {
   if (!value) return "";
   const date = new Date(String(value));

@@ -10,6 +10,7 @@ const extensions: Record<string, string> = {
   "image/gif": "gif",
   "image/svg+xml": "svg",
 };
+const videoExtensions: Record<string, string> = { "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov", "video/ogg": "ogv" };
 
 export async function saveUploadedImage(value: FormDataEntryValue | null, folder: string) {
   if (!(value instanceof File) || value.size === 0) return null;
@@ -40,4 +41,18 @@ export async function uploadImage(file: File, folder = "theatres"): Promise<stri
   const url = await saveUploadedImage(file, folder);
   if (!url) throw new Error("Failed to save image");
   return url;
+}
+
+export async function uploadVideo(file: File, folder = "reels"): Promise<string> {
+  if (!file.type.startsWith("video/")) throw new Error("Please select a video file");
+  if (file.size > 100 * 1024 * 1024) throw new Error("Video must be smaller than 100 MB");
+  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+    try { const { uploadToCloudinary } = await import("./cloudinary"); return (await uploadToCloudinary(file, `theatrehub/${folder}`)).secureUrl; } catch (err) { console.warn("Cloudinary video upload failed, falling back to local storage:", err); }
+  }
+  const extension = videoExtensions[file.type] || "mp4";
+  const directory = path.join(process.cwd(), "public", "uploads", folder);
+  await mkdir(directory, { recursive: true });
+  const filename = `${randomUUID()}.${extension}`;
+  await writeFile(path.join(directory, filename), Buffer.from(await file.arrayBuffer()));
+  return `/uploads/${folder}/${filename}`;
 }

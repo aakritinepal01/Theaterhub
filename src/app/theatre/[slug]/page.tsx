@@ -78,10 +78,8 @@ export default async function TheatrePage({ params }: { params: Promise<{ slug: 
 
             <div className="theatre-single-title-box">
               <div className="theatre-single-badges">
-                {theatre.shows.length > 0 ? (
+                {theatre.shows.length > 0 && (
                   <span className="theatre-live-badge">● Stage Live ({theatre.shows.length} shows)</span>
-                ) : (
-                  <span className="theatre-listed-badge">Listed Venue</span>
                 )}
                 {establishedYear && <span className="theatre-year-badge">Est. {establishedYear}</span>}
               </div>
@@ -112,7 +110,7 @@ export default async function TheatrePage({ params }: { params: Promise<{ slug: 
           <main className="theatre-single-main">
             {/* Upcoming Shows at this venue */}
             <section className="theatre-single-section">
-              <div className="theatre-section-title">
+              <div className="theatre-section-title theatre-section-title-no-line">
                 <h2>Upcoming Performances</h2>
                 <span>{theatre.shows.length} shows scheduled</span>
               </div>
@@ -186,63 +184,6 @@ export default async function TheatrePage({ params }: { params: Promise<{ slug: 
               </div>
             </section>
 
-            {/* Stage Productions Archive */}
-            {theatre.plays.length > 0 && (
-              <section className="theatre-single-section">
-                <div className="theatre-section-title">
-                  <h2>Productions Staged Here</h2>
-                </div>
-
-                <div className="theatre-plays-grid">
-                  {theatre.plays.map((play) => {
-                    const img = mediaUrl(play.coverImage);
-                    return (
-                      <Link href={`/play/${play.slug}/`} key={play.id} className="theatre-play-mini-card">
-                        {img ? <img src={img} alt={play.title} /> : <div className="theatre-play-mini-empty">🎭</div>}
-                        <span>{play.title}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-
-            {/* Venue Amenities */}
-            <section className="theatre-single-section">
-              <div className="theatre-section-title">
-                <h2>Venue Features &amp; Amenities</h2>
-              </div>
-              <div className="theatre-amenities-grid">
-                <div className="theatre-amenity">
-                  <span>🎭</span>
-                  <div>
-                    <strong>Staging Facilities</strong>
-                    <small>Dedicated stage lighting &amp; acoustic setup</small>
-                  </div>
-                </div>
-                <div className="theatre-amenity">
-                  <span>🎟️</span>
-                  <div>
-                    <strong>Box Office Desk</strong>
-                    <small>On-site ticket sales and reservations</small>
-                  </div>
-                </div>
-                <div className="theatre-amenity">
-                  <span>🚗</span>
-                  <div>
-                    <strong>Parking &amp; Access</strong>
-                    <small>Accessible location with parking nearby</small>
-                  </div>
-                </div>
-                <div className="theatre-amenity">
-                  <span>☕</span>
-                  <div>
-                    <strong>Concessions &amp; Lounge</strong>
-                    <small>Pre-show waiting lounge &amp; refreshment counter</small>
-                  </div>
-                </div>
-              </div>
-            </section>
           </main>
 
           {/* Sidebar */}
@@ -308,6 +249,28 @@ export default async function TheatrePage({ params }: { params: Promise<{ slug: 
             </div>
           </aside>
         </div>
+
+        {/* Full-width Stage Productions Archive */}
+        {theatre.plays.length > 0 && (
+          <section className="theatre-single-section theatre-productions-wide">
+            <div className="theatre-section-title">
+              <h2>Productions Staged Here</h2>
+              <span>{theatre.plays.length} productions</span>
+            </div>
+
+            <div className="theatre-plays-grid">
+              {theatre.plays.map((play) => {
+                const img = mediaUrl(play.coverImage);
+                return (
+                  <Link href={`/play/${play.slug}/`} key={play.id} className="theatre-play-mini-card">
+                    {img ? <img src={img} alt={play.title} /> : <div className="theatre-play-mini-empty">🎭</div>}
+                    <span>{play.title}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </PageFrame>
     </>
   );

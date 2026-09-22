@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
-import { uploadImage } from "@/lib/uploads";
+import { uploadImage, uploadVideo } from "@/lib/uploads";
 
 export async function POST(request: Request) {
   try {
@@ -17,15 +17,16 @@ export async function POST(request: Request) {
       return Response.json({ error: "No file selected." }, { status: 400 });
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      return Response.json({ error: "File must be smaller than 10 MB." }, { status: 400 });
+    const isVideo = file.type.startsWith("video/");
+    if (file.size > (isVideo ? 100 : 10) * 1024 * 1024) {
+      return Response.json({ error: `File must be smaller than ${isVideo ? 100 : 10} MB.` }, { status: 400 });
     }
 
-    if (!file.type.startsWith("image/")) {
-      return Response.json({ error: "Only image files (JPG, PNG, WebP, GIF) are allowed." }, { status: 400 });
+    if (!file.type.startsWith("image/") && !isVideo) {
+      return Response.json({ error: "Only image or video files are allowed." }, { status: 400 });
     }
 
-    const url = await uploadImage(file, folder);
+    const url = isVideo ? await uploadVideo(file, folder) : await uploadImage(file, folder);
     return NextResponse.json({ url });
   } catch (error) {
     console.error("Upload error:", error);

@@ -101,6 +101,24 @@ export function getHomepagePhotoStories() {
   });
 }
 
+export function getHomepageTheatreReels() {
+  return prisma.theatreReel.findMany({
+    where: { status: "PUBLISHED", theatre: { status: "PUBLISHED" } },
+    orderBy: { created: "desc" },
+    take: 12,
+    select: { id: true, title: true, videoUrl: true, theatre: { select: { title: true } } },
+  }).catch(() => []);
+}
+
+export function getHomepageTheatreStories() {
+  return prisma.theatreStory.findMany({
+    where: { status: "PUBLISHED", theatre: { status: "PUBLISHED" } },
+    orderBy: { created: "desc" },
+    take: 30,
+    select: { id: true, title: true, imageUrl: true, caption: true, theatre: { select: { title: true, slug: true } } },
+  }).catch(() => []);
+}
+
 export async function getHomepageStats() {
   const now = new Date();
   const today = kathmanduToday();
