@@ -18,7 +18,15 @@ export const getOwnerTheatre = cache(async () => {
     },
   });
 
-  return { user, theatre };
+  // These tables may not exist until the deployment runs `prisma db push`.
+  // Keep the owner dashboard usable while that one-time sync is pending.
+  if (!theatre) return { user, theatre: null };
+  const [reels, stories] = await Promise.all([
+    prisma.theatreReel.findMany({ where: { theatreId: theatre.id }, orderBy: { created: "desc" } }).catch(() => []),
+    prisma.theatreStory.findMany({ where: { theatreId: theatre.id }, orderBy: { created: "desc" } }).catch(() => []),
+  ]);
+
+  return { user, theatre: { ...theatre, reels, stories } };
 });
 
 export function formatDate(value: Date | string | null) {

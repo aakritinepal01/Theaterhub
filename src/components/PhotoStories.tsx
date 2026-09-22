@@ -46,7 +46,11 @@ export function PhotoStories({ groups, variant = "stories" }: { groups: PhotoSto
     <section className={isReels ? "landing-reels" : "landing-photo-stories"} aria-labelledby={`${variant}-title`}>
       <div className="site-container">
         <div className="landing-photo-stories-heading">
+<<<<<<< HEAD
           <h2 id={`${variant}-title`}>{isReels ? "Theatre Reels" : "Theatre Stories"}</h2>
+=======
+          <h2 id="photo-stories-title">TheatreHub Stories</h2>
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
         </div>
         <div className={isReels ? "landing-reels-grid" : "landing-photo-story-list"}>
           {groups.slice(0, 6).map((group) => {

@@ -294,7 +294,16 @@ export default async function Plays({
                   {runningPlays.length ? (
                     <div className="landing-play-grid play-list-grid-animated">
                       {runningPlays.map((play) => (
+<<<<<<< HEAD
                         <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
+=======
+                        <PlayCard
+                          key={play.id}
+                          play={play}
+                          showTeaser={false}
+                          showAction={false}
+                        />
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
                       ))}
                     </div>
                   ) : (
@@ -315,7 +324,16 @@ export default async function Plays({
                   {archivedPlays.length ? (
                     <div className="landing-play-grid play-list-grid-animated">
                       {archivedPlays.map((play) => (
+<<<<<<< HEAD
                         <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
+=======
+                        <PlayCard
+                          key={play.id}
+                          play={play}
+                          showTeaser={false}
+                          showAction={false}
+                        />
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
                       ))}
                     </div>
                   ) : (
@@ -326,7 +344,16 @@ export default async function Plays({
             ) : plays.length ? (
               <div className="landing-play-grid play-list-grid-animated">
                 {plays.map((play) => (
+<<<<<<< HEAD
                   <PlayCard key={play.id} play={play} showTeaser={false} showReadMore={false} />
+=======
+                  <PlayCard
+                    key={play.id}
+                    play={play}
+                    showTeaser={false}
+                    showAction={false}
+                  />
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
                 ))}
               </div>
             ) : (

@@ -146,9 +146,38 @@ model Theatre {
   plays          Play[]
   showsMeta      ShowsMeta[]
   shows          Show[]
+  reels          TheatreReel[]
+  stories        TheatreStory[]
   socialPosts    TheatrePost[]
 
   @@index([title])
+}
+
+model TheatreReel {
+  id        Int           @id @default(autoincrement())
+  theatreId Int
+  title     String        @default("TheatreHub")
+  videoUrl  String
+  status    ContentStatus @default(PUBLISHED)
+  created   DateTime      @default(now())
+  updated   DateTime      @updatedAt
+  theatre   Theatre       @relation(fields: [theatreId], references: [id], onDelete: Cascade)
+
+  @@index([theatreId, status])
+}
+
+model TheatreStory {
+  id        Int           @id @default(autoincrement())
+  theatreId Int
+  title     String
+  imageUrl  String
+  caption   String        @default("")
+  status    ContentStatus @default(PUBLISHED)
+  created   DateTime      @default(now())
+  updated   DateTime      @updatedAt
+  theatre   Theatre       @relation(fields: [theatreId], references: [id], onDelete: Cascade)
+
+  @@index([theatreId, status])
 }
 
 model Play {

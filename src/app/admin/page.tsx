@@ -359,6 +359,10 @@ export default async function Admin() {
               <span>Editorial</span>
               <span className="adm-dock-pill">{posts}</span>
             </Link>
+            <Link href="/admin/media" className="adm-dock-item">
+              <span className="adm-dock-icon"><Icon name="layers" /></span>
+              <span>Reels &amp; Stories</span>
+            </Link>
             <Link href="/admin/reviews" className="adm-dock-item">
               <span className="adm-dock-icon"><Icon name="sparkle" /></span>
               <span>Reviews</span>

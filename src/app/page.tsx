@@ -1,7 +1,11 @@
 import { featuredStoryGroups, featuredReelGroups } from "@/lib/featured-theatre-media";
 import Link from "next/link";
 import { getTheatrePhoto, mediaUrl } from "@/lib/content";
+<<<<<<< HEAD
 import { getFeaturedPlays, getPlayingNowPlays, getHeroPlays, getHomepageMedia, getHomepageStats, getHomepageTheatres, getUpcomingShows } from "@/lib/home";
+=======
+import { getFeaturedPlays, getHeroPlays, getHomepagePhotoStories, getHomepageStats, getHomepageTheatreReels, getHomepageTheatreStories, getHomepageTheatres, getUpcomingShows } from "@/lib/home";
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
 import { Hero } from "@/components/Hero";
 import { LiveStageMarquee } from "@/components/LiveStageMarquee";
 import { PlayCard } from "@/components/PlayCard";
@@ -21,6 +25,7 @@ export default async function Home() {
   let heroPlays: Awaited<ReturnType<typeof getHeroPlays>> = [];
   let shows: Awaited<ReturnType<typeof getUpcomingShows>> = [];
   let theatres: Awaited<ReturnType<typeof getHomepageTheatres>> = [];
+<<<<<<< HEAD
   let homepageMedia: Awaited<ReturnType<typeof getHomepageMedia>> = { stories: [], reels: [] };
   let stats = { plays: 0, theatres: 0, bookings: 0, upcomingShows: 0 };
 
@@ -34,6 +39,23 @@ export default async function Home() {
       loadHomeSection("stories and reels", getHomepageMedia, homepageMedia),
       loadHomeSection("playing now", getPlayingNowPlays, playingNow),
       loadHomeSection("recent plays", getRecentPlays, recentPlays),
+=======
+  let photoStories: Awaited<ReturnType<typeof getHomepagePhotoStories>> = [];
+  let theatreReels: Awaited<ReturnType<typeof getHomepageTheatreReels>> = [];
+  let theatreStories: Awaited<ReturnType<typeof getHomepageTheatreStories>> = [];
+  let stats = { plays: 0, theatres: 0, bookings: 0, upcomingShows: 0 };
+
+  try {
+    [plays, heroPlays, shows, stats, theatres, photoStories, theatreReels, theatreStories] = await Promise.all([
+      getFeaturedPlays(),
+      getHeroPlays(),
+      getUpcomingShows(),
+      getHomepageStats(),
+      getHomepageTheatres(),
+      getHomepagePhotoStories(),
+      getHomepageTheatreReels(),
+      getHomepageTheatreStories(),
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
     ]);
   } catch (error) {
     console.error("Unable to load landing-page data", error);
@@ -84,7 +106,12 @@ export default async function Home() {
           {plays.length ? (
             <div className="landing-play-grid">
               {plays.filter(play => play.slug).map((play) => (
-                <PlayCard key={play.id} play={play} showTeaser={false} />
+                <PlayCard
+                  key={play.id}
+                  play={play}
+                  showTeaser={false}
+                  showAction={false}
+                />
               ))}
             </div>
           ) : (
@@ -101,8 +128,83 @@ export default async function Home() {
           </div>
         </section>
 
+<<<<<<< HEAD
         <ReelsSection groups={[...homepageMedia.reels, ...featuredReelGroups]} />
         <PhotoStories groups={[...homepageMedia.stories, ...featuredStoryGroups]} />
+=======
+        <ReelsSection items={theatreReels.map((reel) => ({ id: reel.id, title: reel.title, videoUrl: reel.videoUrl, theatreTitle: reel.theatre.title }))} />
+
+        {/* ── THEATREHUB STORIES (Interactive Theatre Stories) ── */}
+        <PhotoStories
+          groups={(() => {
+            const managed = theatreStories.reduce<Record<string, { id: string; title: string; stories: { id: number; title: string; image: string; href: string }[] }>>((groups, story) => {
+              const key = story.theatre.slug || `theatre-${story.theatre.title}`;
+              groups[key] ||= { id: `managed-${key}`, title: story.theatre.title, stories: [] };
+              groups[key].stories.push({ id: story.id, title: story.title, image: story.imageUrl, href: story.theatre.slug ? `/theatre/${story.theatre.slug}` : "/theatre/" });
+              return groups;
+            }, {});
+            const kantipurStories = [
+              { id: 1000001, title: "Theatre at Kantipur", image: "/story-images/theatre-story-1.jpg", href: "/theatre/" },
+              { id: 1000002, title: "Theatre at Kantipur", image: "/story-images/theatre-story-2.jpg", href: "/theatre/" },
+              { id: 1000003, title: "Theatre at Kantipur", image: "/story-images/theatre-story-3.jpg", href: "/theatre/" },
+            ];
+            const secondStories = [
+              { id: 1000004, title: "Theatre Workshop", image: "/story-images/theatre-story-4.jpg", href: "/theatre/" },
+              { id: 1000005, title: "Theatre Workshop", image: "/story-images/theatre-story-5.jpg", href: "/theatre/" },
+              { id: 1000006, title: "Theatre Workshop", image: "/story-images/theatre-story-6.jpg", href: "/theatre/" },
+              { id: 1000007, title: "Theatre Workshop", image: "/story-images/theatre-story-7.jpg", href: "/theatre/" },
+              { id: 1000008, title: "Theatre Workshop", image: "/story-images/theatre-story-8.jpg", href: "/theatre/" },
+            ];
+            const thirdStories = [
+              { id: 1000009, title: "Theatre Production", image: "/story-images/theatre-story-9.jpg", href: "/theatre/" },
+              { id: 1000010, title: "Theatre Production", image: "/story-images/theatre-story-10.jpg", href: "/theatre/" },
+              { id: 1000011, title: "Theatre Production", image: "/story-images/theatre-story-11.jpg", href: "/theatre/" },
+              { id: 1000012, title: "Theatre Production", image: "/story-images/theatre-story-12.jpg", href: "/theatre/" },
+            ];
+            const fourthStories = [
+              { id: 1000013, title: "Theatre Spotlight", image: "/story-images/theatre-story-13.jpg", href: "/theatre/" },
+              { id: 1000014, title: "Theatre Spotlight", image: "/story-images/theatre-story-14.jpg", href: "/theatre/" },
+              { id: 1000015, title: "Theatre Spotlight", image: "/story-images/theatre-story-15.jpg", href: "/theatre/" },
+              { id: 1000016, title: "Theatre Spotlight", image: "/story-images/theatre-story-16.jpg", href: "/theatre/" },
+            ];
+            const fifthStories = [
+              { id: 1000017, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              { id: 1000018, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1603190287605-e6ade32fa852?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              { id: 1000019, title: "Stage Spaces", image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+            ];
+            const sixthStories = [
+              { id: 1000020, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              { id: 1000021, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+              { id: 1000022, title: "Behind the Curtain", image: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=900&q=80", href: "/theatre/" },
+            ];
+            return [...Object.values(managed), {
+              id: "photo-story-kantipur",
+              title: "TheaterHub Stories",
+              stories: kantipurStories.slice(0, 3),
+            }, {
+              id: "photo-story-workshop",
+              title: "TheaterHub Stories",
+              stories: secondStories,
+            }, {
+              id: "photo-story-production",
+              title: "TheaterHub Stories",
+              stories: thirdStories,
+            }, {
+              id: "photo-story-spotlight",
+              title: "TheaterHub Stories",
+              stories: fourthStories,
+            }, {
+              id: "photo-story-spaces",
+              title: "TheaterHub Stories",
+              stories: fifthStories,
+            }, {
+              id: "photo-story-curtain",
+              title: "TheaterHub Stories",
+              stories: sixthStories,
+            }];
+          })()}
+        />
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
 
         {/* ── 2. UPCOMING SHOWS (Stage Calendar & Tickets) ── */}
         <section className="landing-section landing-upcoming">

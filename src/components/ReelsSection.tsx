@@ -2,8 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 
+<<<<<<< HEAD
 import type { TheatreMediaGroup } from "@/lib/theatre-post-groups";
 type Reel = { id: string; src: string; title: string; mediaType: string };
+=======
+const reels = [
+  { id: "reel-1", src: "/reels/1.mp4", title: "TheaterHub" },
+  { id: "reel-2", src: "/reels/2.mp4", title: "TheaterHub" },
+  { id: "reel-3", src: "/reels/3.mp4", title: "TheaterHub" },
+  { id: "reel-4", src: "/reels/4.mp4", title: "TheaterHub" },
+  { id: "reel-5", src: "/reels/5.mp4", title: "TheaterHub" },
+  { id: "reel-6", src: "/reels/6.mp4", title: "TheaterHub" },
+  { id: "reel-7", src: "/reels/7.mp4", title: "TheaterHub" },
+  { id: "reel-8", src: "/reels/8.mp4", title: "TheaterHub" },
+  { id: "reel-9", src: "/reels/9.mp4", title: "TheaterHub" },
+];
+export type TheatreReelItem = { id: number | string; title: string; videoUrl: string; theatreTitle?: string };
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
 
 function ReelBrand() {
   return (
@@ -53,8 +68,13 @@ function ReelCover({ src, title }: { src: string; title: string }) {
   );
 }
 
+<<<<<<< HEAD
 export function ReelsSection({ groups }: { groups: TheatreMediaGroup[] }) {
   const [reels, setReels] = useState<Reel[]>([]);
+=======
+export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
+  const feedReels: Array<{ id: string; src: string; title: string; theatreTitle?: string }> = items.length ? items.map((item) => ({ id: `theatre-reel-${item.id}`, src: item.videoUrl, title: item.title, theatreTitle: item.theatreTitle })) : reels.map((reel) => ({ ...reel }));
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
@@ -117,6 +137,7 @@ export function ReelsSection({ groups }: { groups: TheatreMediaGroup[] }) {
           </div>
         </div>
         <div className="landing-reels-grid">
+<<<<<<< HEAD
           {groups.slice(0, 6).map((group) => {
             const cover = group.stories[0];
             if (!cover) return null;
@@ -132,6 +153,15 @@ export function ReelsSection({ groups }: { groups: TheatreMediaGroup[] }) {
               <span className="landing-reel-title">{group.id.startsWith("featured-reel-") ? <ReelBrand /> : group.title}</span>
             </button>;
           })}
+=======
+          {feedReels.slice(0, 6).map((reel, index) => (
+            <button className="landing-reel-card" key={reel.id} onClick={() => setActiveIndex(index)} type="button" aria-label={`Watch ${reel.title}`}>
+              <ReelCover src={reel.src} title={reel.title} />
+              <span className="landing-reel-label">{reel.theatreTitle || "Featured Reel"}</span>
+              <span className="landing-reel-title"><ReelBrand /></span>
+            </button>
+          ))}
+>>>>>>> 17de0003a1445739044263eeed739c0d718681da
         </div>
       </div>
 
@@ -139,7 +169,7 @@ export function ReelsSection({ groups }: { groups: TheatreMediaGroup[] }) {
         <div className="reel-modal" role="dialog" aria-modal="true" aria-label="Theatre reels">
           <button className="reel-modal-close" onClick={() => setActiveIndex(null)} type="button" aria-label="Close reels">×</button>
           <div className="reel-modal-feed" ref={feedRef}>
-            {reels.map((reel, index) => (
+            {feedReels.map((reel, index) => (
               <article className="reel-modal-item" data-reel-index={index} key={reel.id}>
                 <div className="reel-player-card">
                   {reel.mediaType === "image" ? <img className="landing-reel-cover" src={reel.src} alt={reel.title} /> : <video
