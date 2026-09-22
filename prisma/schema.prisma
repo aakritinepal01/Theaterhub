@@ -148,6 +148,7 @@ model Theatre {
   shows          Show[]
   reels          TheatreReel[]
   stories        TheatreStory[]
+  socialPosts    TheatrePost[]
 
   @@index([title])
 }
