@@ -1,11 +1,7 @@
 import { featuredStoryGroups, featuredReelGroups } from "@/lib/featured-theatre-media";
 import Link from "next/link";
 import { getTheatrePhoto, mediaUrl } from "@/lib/content";
-<<<<<<< HEAD
-import { getFeaturedPlays, getPlayingNowPlays, getHeroPlays, getHomepageMedia, getHomepageStats, getHomepageTheatres, getUpcomingShows } from "@/lib/home";
-=======
-import { getFeaturedPlays, getHeroPlays, getHomepagePhotoStories, getHomepageStats, getHomepageTheatreReels, getHomepageTheatreStories, getHomepageTheatres, getUpcomingShows } from "@/lib/home";
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
+import { getFeaturedPlays, getPlayingNowPlays, getHeroPlays, getHomepageStats, getHomepageTheatres, getUpcomingShows, getHomepageTheatreReels, getHomepageTheatreStories } from "@/lib/home";
 import { Hero } from "@/components/Hero";
 import { LiveStageMarquee } from "@/components/LiveStageMarquee";
 import { PlayCard } from "@/components/PlayCard";
@@ -25,37 +21,21 @@ export default async function Home() {
   let heroPlays: Awaited<ReturnType<typeof getHeroPlays>> = [];
   let shows: Awaited<ReturnType<typeof getUpcomingShows>> = [];
   let theatres: Awaited<ReturnType<typeof getHomepageTheatres>> = [];
-<<<<<<< HEAD
-  let homepageMedia: Awaited<ReturnType<typeof getHomepageMedia>> = { stories: [], reels: [] };
-  let stats = { plays: 0, theatres: 0, bookings: 0, upcomingShows: 0 };
-
-  try {
-    [plays, heroPlays, shows, stats, theatres, homepageMedia, playingNow, recentPlays] = await Promise.all([
-      loadHomeSection("featured plays", getFeaturedPlays, plays),
-      loadHomeSection("hero", getHeroPlays, heroPlays),
-      loadHomeSection("upcoming shows", getUpcomingShows, shows),
-      loadHomeSection("statistics", getHomepageStats, stats),
-      loadHomeSection("theatres", getHomepageTheatres, theatres),
-      loadHomeSection("stories and reels", getHomepageMedia, homepageMedia),
-      loadHomeSection("playing now", getPlayingNowPlays, playingNow),
-      loadHomeSection("recent plays", getRecentPlays, recentPlays),
-=======
-  let photoStories: Awaited<ReturnType<typeof getHomepagePhotoStories>> = [];
   let theatreReels: Awaited<ReturnType<typeof getHomepageTheatreReels>> = [];
   let theatreStories: Awaited<ReturnType<typeof getHomepageTheatreStories>> = [];
   let stats = { plays: 0, theatres: 0, bookings: 0, upcomingShows: 0 };
 
   try {
-    [plays, heroPlays, shows, stats, theatres, photoStories, theatreReels, theatreStories] = await Promise.all([
-      getFeaturedPlays(),
-      getHeroPlays(),
-      getUpcomingShows(),
-      getHomepageStats(),
-      getHomepageTheatres(),
-      getHomepagePhotoStories(),
-      getHomepageTheatreReels(),
-      getHomepageTheatreStories(),
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
+    [plays, heroPlays, shows, stats, theatres, theatreReels, theatreStories, playingNow, recentPlays] = await Promise.all([
+      loadHomeSection("featured plays", getFeaturedPlays, plays),
+      loadHomeSection("hero", getHeroPlays, heroPlays),
+      loadHomeSection("upcoming shows", getUpcomingShows, shows),
+      loadHomeSection("statistics", getHomepageStats, stats),
+      loadHomeSection("theatres", getHomepageTheatres, theatres),
+      loadHomeSection("theatre reels", getHomepageTheatreReels, theatreReels),
+      loadHomeSection("theatre stories", getHomepageTheatreStories, theatreStories),
+      loadHomeSection("playing now", getPlayingNowPlays, playingNow),
+      loadHomeSection("recent plays", getRecentPlays, recentPlays),
     ]);
   } catch (error) {
     console.error("Unable to load landing-page data", error);
@@ -128,10 +108,6 @@ export default async function Home() {
           </div>
         </section>
 
-<<<<<<< HEAD
-        <ReelsSection groups={[...homepageMedia.reels, ...featuredReelGroups]} />
-        <PhotoStories groups={[...homepageMedia.stories, ...featuredStoryGroups]} />
-=======
         <ReelsSection items={theatreReels.map((reel) => ({ id: reel.id, title: reel.title, videoUrl: reel.videoUrl, theatreTitle: reel.theatre.title }))} />
 
         {/* ── THEATREHUB STORIES (Interactive Theatre Stories) ── */}
@@ -204,7 +180,6 @@ export default async function Home() {
             }];
           })()}
         />
->>>>>>> 17de0003a1445739044263eeed739c0d718681da
 
         {/* ── 2. UPCOMING SHOWS (Stage Calendar & Tickets) ── */}
         <section className="landing-section landing-upcoming">
