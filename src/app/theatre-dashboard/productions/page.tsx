@@ -1,5 +1,6 @@
 import { PlayEditor } from "@/components/TheatreDashboardForms";
 import { ImageUploadField } from "@/components/ImageUploadField";
+import { ProductionCreditsFields } from "@/components/ProductionCreditsFields";
 import { getOwnerTheatre, formatDate } from "@/lib/theatre-dashboard";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +12,7 @@ export default async function TheatreProductionsPage() {
   const published = theatre.plays.filter((play) => play.status === "PUBLISHED").length;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div className="owner-productions-page" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       <section className="owner-panel" id="plays" style={{ margin: 0 }}>
         <div className="owner-panel-head">
           <div>
@@ -69,6 +70,7 @@ export default async function TheatreProductionsPage() {
               Directorial note
               <textarea name="directorialNote" />
             </label>
+            <ProductionCreditsFields />
             <label>
               <input type="checkbox" name="isFeatured" /> Featured play
             </label>
@@ -99,10 +101,7 @@ export default async function TheatreProductionsPage() {
                     {play.ratingCount ? `· ★ ${play.ratingAverage.toFixed(1)}` : ""}
                   </small>
                 </div>
-                <details>
-                  <summary>Edit</summary>
-                  <PlayEditor play={play} />
-                </details>
+                <div className="owner-production-actions"><PlayEditor play={play} /></div>
               </div>
             ))}
           </div>

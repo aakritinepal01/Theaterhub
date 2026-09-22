@@ -33989,3 +33989,16 @@ html[data-theme="dark"] .play-archive-section .landing-play-card {
     font-size: 11.5px !important;
   }
 }
+
+/* Theatre-owned story and reel media */
+.landing-photo-story-collage video { width: 100%; height: 100%; object-fit: cover; min-width: 0; }
+.landing-photo-story-collage video:first-child { grid-row: span 2; }
+.theatre-reel-preview, .theatre-reel-preview img, .theatre-reel-preview video {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.photo-story-shade { pointer-events: none; }
+.theatre-story-video { padding-bottom: 120px; }
+.photo-story-caption { pointer-events: none; }
+.photo-story-caption a { pointer-events: auto; }
+
+.landing-photo-story-collage > :only-child { grid-column: 1 / -1; }
