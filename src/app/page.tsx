@@ -111,11 +111,9 @@ export default async function Home() {
         </section>
 
         <ReelsSection items={[
-          // Uploaded reels (from theatre dashboard) — shown first
-          ...homepageMedia.reels.flatMap(g => g.stories.map(s => ({ id: s.id, title: g.title, videoUrl: s.image, theatreTitle: g.title }))),
-          // TheatreReel model reels
-          ...theatreReels.map((reel) => ({ id: reel.id, title: reel.title, videoUrl: reel.videoUrl, theatreTitle: reel.theatre.title })),
-        ]} />
+          ...homepageMedia.reels.flatMap(g => g.stories.map(s => ({ id: `post-${s.id}`, title: s.title, videoUrl: s.image, theatreTitle: g.title, createdAt: s.createdAt ?? 0 }))),
+          ...theatreReels.map((reel) => ({ id: `managed-${reel.id}`, title: reel.title, videoUrl: reel.videoUrl, theatreTitle: reel.theatre.title, createdAt: reel.created.getTime() })),
+        ].sort((a, b) => b.createdAt - a.createdAt)} />
 
         {/* ── THEATREHUB STORIES (Interactive Theatre Stories) ── */}
         <PhotoStories

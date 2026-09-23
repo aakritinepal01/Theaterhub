@@ -117,9 +117,8 @@ export function getHomepagePhotoStories() {
 export function getHomepageTheatreReels() {
   return prisma.theatreReel.findMany({
     where: { status: "PUBLISHED", theatre: { status: "PUBLISHED" } },
-    orderBy: { created: "desc" },
-    take: 12,
-    select: { id: true, title: true, videoUrl: true, theatre: { select: { title: true } } },
+    orderBy: [{ created: "desc" }, { id: "desc" }],
+    select: { id: true, title: true, videoUrl: true, created: true, theatre: { select: { title: true } } },
   }).catch(() => []);
 }
 

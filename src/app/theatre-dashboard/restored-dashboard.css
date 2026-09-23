@@ -115,7 +115,7 @@
 
 .owner-dashboard .new-play-form > * { min-width: 0; }
 .owner-dashboard .new-play-form { grid-template-columns: 1fr; }
-.owner-dashboard .owner-play-row .play-editor > .play-editor-head { display: flex; }
+.owner-dashboard .owner-play-card .play-editor > .play-editor-head { display: flex; }
 .owner-schedule-form { gap: 16px; }
 .schedule-form-heading span { color: var(--owner-accent); font-size: .7rem; font-weight: 800; text-transform: uppercase; }
 .schedule-form-heading h3 { margin: 6px 0; }
@@ -150,37 +150,169 @@
   .owner-schedule-creator .schedule-week-grid { grid-template-columns: 1fr; }
 }
 
-/* Keep production controls within the same mobile shell as the profile page. */
-.owner-productions-page, .owner-productions-page .manage-form > * { min-width: 0; }
+/* ── Productions page: polished card layout ───────────────────────────────── */
+
+.owner-productions-page,
+.owner-productions-page .manage-form > * { min-width: 0; }
+
+/* Play list: gap between cards instead of per-row border */
+.owner-productions-page .owner-play-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* Each play rendered as a standalone card */
+.owner-play-card {
+  border: 1px solid var(--owner-line);
+  border-radius: 12px;
+  background: var(--owner-card-bg);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.owner-play-card:hover {
+  border-color: color-mix(in srgb, var(--owner-accent) 40%, transparent);
+  box-shadow: var(--owner-shadow-md);
+}
+
+/* Row inside the card: poster + info side-by-side */
+.owner-play-card .owner-play-row {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px 16px 12px;
+  border-bottom: none;
+  align-items: start;
+}
+
+/* Poster: rectangle with proper aspect ratio */
+.owner-play-card .owner-play-poster {
+  width: 68px;
+  aspect-ratio: 3 / 4;
+  border-radius: 8px;
+  border: 1px solid var(--owner-line);
+  background: var(--owner-accent-light) center / cover no-repeat;
+  display: grid;
+  place-items: center;
+  color: var(--owner-accent);
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: "Raleway", sans-serif;
+  flex-shrink: 0;
+}
+
+/* Status badge: pill in accent color */
+.owner-play-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--owner-accent-light);
+  color: var(--owner-accent);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+/* Info typography: matches profile tab hierarchy */
+.owner-play-card .owner-play-info h3 {
+  margin: 2px 0 5px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--owner-text-main);
+  font-family: "Raleway", sans-serif;
+}
+.owner-play-card .owner-play-info p {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--owner-text-sub);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.owner-play-card .owner-play-info small {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.68rem;
+  color: var(--owner-text-muted);
+  line-height: 1.5;
+}
+
+/* Edit action: full-width, accent-bordered, comfortable tap target */
+.owner-play-card .owner-production-actions {
+  width: 100%;
+  border-top: 1px solid var(--owner-line-subtle);
+}
+.owner-play-card .owner-production-actions > div {
+  width: 100%;
+}
+.owner-play-card .owner-production-actions > div > button {
+  width: 100%;
+  min-height: 42px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--owner-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+  letter-spacing: 0.02em;
+}
+.owner-play-card .owner-production-actions > div > button:hover {
+  background: var(--owner-accent-light);
+}
+
+/* Add new production: CTA button variant */
+.owner-add-play--cta > summary {
+  border: 1.5px solid var(--owner-accent);
+  border-radius: 10px;
+  background: var(--owner-accent-light);
+  color: var(--owner-accent);
+  font-weight: 800;
+  font-size: 0.82rem;
+  padding: 13px 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 0 0 0 transparent;
+}
+.owner-add-play--cta > summary:hover {
+  background: color-mix(in srgb, var(--owner-accent-light) 80%, var(--owner-accent) 20%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px -3px color-mix(in srgb, var(--owner-accent) 35%, transparent);
+}
+.owner-add-play--cta[open] > summary {
+  margin-bottom: 20px;
+  border-radius: 10px 10px 0 0;
+}
+
+/* ── Mobile overrides ────────────────────────────────────────────────────── */
 @media (max-width: 800px) {
-  .owner-dashboard .owner-productions-page .owner-panel { padding: 12px 10px; border-radius: 8px; min-width: 0; }
+  .owner-dashboard .owner-content:has(.owner-productions-page) {
+    min-width: 0;
+    box-sizing: border-box;
+    margin-block: 0;
+    align-self: start;
+  }
+  .owner-dashboard .owner-productions-page { width: 100%; max-width: 100%; min-width: 0; }
+  .owner-dashboard .owner-productions-page .owner-panel { box-sizing: border-box; width: 100%; padding: 14px 12px; border-radius: 10px; }
   .owner-dashboard .owner-productions-page .owner-panel-head { flex-wrap: wrap; align-items: flex-start; gap: 6px; }
   .owner-dashboard .owner-productions-page .owner-panel-head h2 { font-size: 1rem; }
   .owner-dashboard .owner-productions-page .owner-panel-head > span { font-size: .7rem; }
-  .owner-dashboard .owner-productions-page .owner-add-play > summary { min-height: 44px; display: flex; align-items: center; padding: 10px 12px; font-size: .8rem; }
+  .owner-dashboard .owner-productions-page .owner-add-play--cta > summary { min-height: 46px; display: flex; align-items: center; justify-content: center; font-size: .82rem; }
   .owner-dashboard .owner-productions-page .manage-form { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .owner-dashboard .owner-productions-page .manage-form label { min-width: 0; font-size: .78rem; }
   .owner-dashboard .owner-productions-page .manage-form :is(input:not([type="checkbox"]), select, textarea) { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; min-height: 44px; padding: 10px; font-size: 16px; }
   .owner-dashboard .owner-productions-page .manage-form label:has(> input[type="checkbox"]) { flex-direction: row; align-items: center; gap: 10px; }
   .owner-dashboard .owner-productions-page .manage-form input[type="checkbox"] { width: 18px; height: 18px; }
-  .owner-dashboard .owner-productions-page .owner-play-row { grid-template-columns: 56px minmax(0, 1fr); gap: 10px 12px; padding: 14px 0; align-items: start; }
-  .owner-dashboard .owner-productions-page .owner-play-poster { width: 56px; }
-  .owner-dashboard .owner-productions-page .owner-play-info { overflow-wrap: anywhere; }
-  .owner-dashboard .owner-productions-page .owner-play-info h3 { font-size: .9rem; line-height: 1.4; }
-  .owner-dashboard .owner-productions-page .owner-play-info p { font-size: .75rem; line-height: 1.5; }
-  .owner-dashboard .owner-productions-page .owner-play-info small { font-size: .68rem; }
-}
-
-@media (max-width: 800px) {
-  .owner-dashboard .owner-content:has(.owner-productions-page) { min-width: 0; box-sizing: border-box; }
-  .owner-dashboard .owner-productions-page { width: 100%; max-width: 100%; min-width: 0; }
-  .owner-dashboard .owner-productions-page .owner-panel { box-sizing: border-box; width: 100%; }
-  .owner-dashboard .owner-productions-page .owner-panel-head { flex-direction: column; }
   .owner-dashboard .owner-productions-page .owner-play-list { min-width: 0; }
-  .owner-dashboard .owner-productions-page .owner-production-actions { grid-column: 1 / -1; width: 100%; min-width: 0; }
-  .owner-dashboard .owner-productions-page .owner-production-actions > div > button { width: 100%; min-height: 44px; }
-  .owner-dashboard .owner-productions-page .owner-play-info p { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-  .owner-dashboard .owner-productions-page .owner-play-info small { display: block; margin-top: 6px; line-height: 1.5; }
+  .owner-dashboard .owner-productions-page .owner-play-card .owner-play-row { grid-template-columns: 60px minmax(0, 1fr) !important; gap: 12px !important; padding: 14px 14px 10px !important; align-items: start !important; border-bottom: none !important; }
+  .owner-dashboard .owner-productions-page .owner-play-card .owner-play-poster { width: 60px !important; aspect-ratio: 3/4 !important; border-radius: 8px !important; }
+  .owner-dashboard .owner-productions-page .owner-play-info { overflow-wrap: anywhere; }
   .owner-dashboard .owner-productions-page .owner-image-field { min-width: 0; max-width: 100%; }
   .owner-dashboard .owner-productions-page .owner-image-field > div:first-child { flex-wrap: wrap; gap: 6px; }
   .owner-dashboard .owner-productions-page .owner-image-field div { min-width: 0; }
@@ -192,5 +324,12 @@
 }
 
 @media (max-width: 800px) {
-  .owner-dashboard .owner-content:has(.owner-media-page) { min-width: 0; width: 100%; max-width: 100%; box-sizing: border-box; }
+  .owner-dashboard .owner-content:has(.owner-media-page) {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-block: 0;
+    align-self: start;
+  }
 }

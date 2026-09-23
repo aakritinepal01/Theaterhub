@@ -5,6 +5,7 @@ export type TheatreMediaItem = {
   mediaType: string;
   href: string;
   theatreName: string;
+  createdAt?: number;
 };
 export type TheatreMediaGroup = { id: string; title: string; stories: TheatreMediaItem[] };
 type Post = {
@@ -23,7 +24,7 @@ export function groupTheatrePosts(posts: Post[], kind: "STORY" | "REEL"): Theatr
     const group = groups.get(theatre.id) ?? { id: `${kind}-${theatre.id}`, title: theatre.title, stories: [] };
     for (const asset of [...post.assets].sort((a, b) => a.position - b.position)) {
       group.stories.push({ id: asset.id, title: post.caption || theatre.title, image: asset.url,
-        mediaType: asset.mediaType, theatreName: theatre.title,
+        mediaType: asset.mediaType, theatreName: theatre.title, createdAt: post.createdAt.getTime(),
         href: theatre.slug ? `/theatre/${theatre.slug}/` : "/theatre/" });
     }
     groups.set(theatre.id, group);
