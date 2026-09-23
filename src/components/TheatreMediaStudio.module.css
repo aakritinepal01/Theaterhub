@@ -20,7 +20,7 @@
 .postCaption { display: grid; gap: 8px; padding: 14px; overflow-wrap: anywhere; }
 .postCaption small { color: var(--owner-text-muted); font-size: .7rem; }
 .deleteBtn { justify-self: start; padding: 5px 12px; border: 1px solid #e05252; border-radius: 7px; color: #c0392b; background: #fff5f5; font-size: .7rem; font-weight: 700; cursor: pointer; transition: background .18s, color .18s; }
-.deleteBtn:hover { background: #c0392b; color: #fff; }
+.deleteBtn:hover:not(:disabled) { background: var(--owner-accent); border-color: var(--owner-accent); color: #fff; }
 .deleteBtn:disabled { opacity: .5; cursor: not-allowed; }
 .notice { border-radius: 10px; padding: 14px; background: var(--owner-accent-light); color: var(--owner-accent); }
 .dialog { width: min(900px,calc(100vw - 24px)); max-height: calc(100dvh - 32px); margin: auto; padding: 0; border: 1px solid var(--owner-line); border-radius: 22px; background: var(--owner-card-bg); color: var(--owner-text-main); overflow: auto; }
@@ -106,8 +106,20 @@
   .tabs button { width: 100%; white-space: normal; overflow-wrap: anywhere; }
   .tabs small { margin-left: 4px; }
   .grid[data-kind="REEL"] { grid-template-columns: minmax(0, 1fr); }
-  .grid[data-kind="REEL"] .newCard { min-height: 100px; flex-direction: row; flex-wrap: wrap; gap: 10px; }
+  .grid[data-kind="REEL"] .newCard {
+    min-height: 88px;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 4px;
+    text-align: left;
+  }
+  .grid[data-kind="REEL"] .newCard > span { grid-row: 1 / 3; }
+  .grid[data-kind="REEL"] .newCard > strong { align-self: end; }
+  .grid[data-kind="REEL"] .newCard > small { grid-column: 2; align-self: start; }
   .grid[data-kind="REEL"] .postMedia > * { aspect-ratio: 9 / 16; max-height: 60dvh; }
+  .grid[data-kind="REEL"] .postCaption { gap: 10px; padding: 12px; }
+  .grid[data-kind="REEL"] .deleteBtn { min-height: 44px; min-width: 80px; padding: 10px 14px; }
   .captureControls, .modeSwitch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .captureControls button, .modeSwitch button { min-width: 0; padding-inline: 8px; white-space: normal; }
   .details > *, .caption { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }

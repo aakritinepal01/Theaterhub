@@ -26,15 +26,52 @@ export default async function TheatreProductionsPage() {
       <section className="owner-panel" id="plays" style={{ margin: 0 }}>
         <div className="owner-panel-head">
           <div>
-            <p>Production archive</p>
+            <p>Production Archive</p>
             <h2>Your plays &amp; productions</h2>
           </div>
           <span>
-            {theatre.plays.length} total · {published} published
+            {theatre.plays.length} total&nbsp;·&nbsp;{published} published
           </span>
         </div>
 
-        <details className="owner-add-play" id="add-play">
+        {theatre.plays.length ? (
+          <div className="owner-play-list">
+            {theatre.plays.map((play) => (
+              <div className="owner-play-card" key={play.id}>
+                <div className="owner-play-row">
+                  <div
+                    className="owner-play-poster"
+                    style={
+                      play.coverImage
+                        ? { backgroundImage: `url(${JSON.stringify(play.coverImage).slice(1, -1)})` }
+                        : undefined
+                    }
+                  >
+                    {!play.coverImage && play.title.slice(0, 1)}
+                  </div>
+                  <div className="owner-play-info">
+                    <span className="owner-play-badge">{displayStatus(play)}</span>
+                    <h3>{play.title}</h3>
+                    <p>{play.abstract || play.description || "No production summary added yet."}</p>
+                    <small>
+                      {formatDate(play.launchedOn)} {play.duration ? `· ${play.duration} min` : ""}{" "}
+                      {play.ratingCount ? `· ★ ${play.ratingAverage.toFixed(1)}` : ""}
+                    </small>
+                  </div>
+                </div>
+                <div className="owner-production-actions"><PlayEditor play={play} /></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="owner-empty">
+            <span>♪</span>
+            <h3>No plays added yet</h3>
+            <p>Start building your theatre archive with its first production below.</p>
+          </div>
+        )}
+
+        <details className="owner-add-play owner-add-play--cta" id="add-play">
           <summary>+ Add a new production</summary>
           <form action="/api/theatre/plays" method="post" className="manage-form">
             <label>
@@ -89,40 +126,6 @@ export default async function TheatreProductionsPage() {
           </form>
         </details>
 
-        {theatre.plays.length ? (
-          <div className="owner-play-list">
-            {theatre.plays.map((play) => (
-              <div className="owner-play-row" key={play.id}>
-                <div
-                  className="owner-play-poster"
-                  style={
-                    play.coverImage
-                      ? { backgroundImage: `url(${JSON.stringify(play.coverImage).slice(1, -1)})` }
-                      : undefined
-                  }
-                >
-                  {!play.coverImage && play.title.slice(0, 1)}
-                </div>
-                <div className="owner-play-info">
-                  <span>{displayStatus(play)}</span>
-                  <h3>{play.title}</h3>
-                  <p>{play.abstract || play.description || "No production summary added yet."}</p>
-                  <small>
-                    {formatDate(play.launchedOn)} {play.duration ? `· ${play.duration} min` : ""}{" "}
-                    {play.ratingCount ? `· ★ ${play.ratingAverage.toFixed(1)}` : ""}
-                  </small>
-                </div>
-                <div className="owner-production-actions"><PlayEditor play={play} /></div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="owner-empty">
-            <span>♪</span>
-            <h3>No plays added yet</h3>
-            <p>Start building your theatre archive with its first production above.</p>
-          </div>
-        )}
       </section>
     </div>
   );

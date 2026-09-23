@@ -2065,7 +2065,7 @@ html[data-theme="dark"] .play-filter-reset {
   transform: translateX(-50%);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  transition: background .35s, box-shadow .35s, border-color .35s, top .35s;
+  transition: background .35s, box-shadow .35s, border-color .35s, top .35s, border-radius .35s;
 }
 
 .navbar.is-scrolled,
@@ -2452,7 +2452,6 @@ html[data-theme="dark"] .logo-img-dark,
   overflow: hidden;
   background: transparent;
   opacity: 0;
-  backdrop-filter: blur(18px);
   transition: max-height .4s ease, opacity .25s;
 }
 
@@ -5860,6 +5859,10 @@ html[data-theme="dark"] .landing-cta-grid h3 {
     -webkit-backdrop-filter: blur(16px) !important;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
     border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .navbar.menu-open {
+    border-radius: 26px !important;
   }
 
   html[data-theme="dark"] .navbar {
@@ -10875,11 +10878,18 @@ html[data-theme="dark"] .theatre-type-examples span {
 
 .landing-reels-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 70px) / 6);
   gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
 }
 
 .landing-reel-card {
+  scroll-snap-align: start;
   position: relative;
   overflow: hidden;
   padding: 0;
@@ -11004,6 +11014,9 @@ html[data-theme="dark"] .theatre-type-examples span {
 
 .reel-modal-feed {
   height: 100dvh;
+  overflow-x: hidden;
+  touch-action: pan-y pinch-zoom;
+  overscroll-behavior: contain;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
@@ -11377,12 +11390,15 @@ html[data-theme="dark"] .theatre-type-examples span {
   inset: 0;
   display: grid;
   place-items: center;
+  overflow: hidden;
+  overscroll-behavior: contain;
   padding: 16px;
   background: rgba(0, 0, 0, .96);
 }
 
 .photo-story-viewer {
   position: relative;
+  touch-action: pan-y pinch-zoom;
   overflow: hidden;
   width: min(460px, calc(90dvh * .5625), calc(100vw - 32px));
   aspect-ratio: 9 / 16;
@@ -12153,6 +12169,18 @@ html[data-theme="dark"] .landing-reel-label {
 html[data-theme="dark"] .landing-theatre-profiles {
   background: #171311;
   border-bottom-color: #352d28;
+}
+
+html[data-theme="dark"] .landing-theatre-profiles-heading h2 {
+  color: #f4eee8;
+}
+
+html[data-theme="dark"] .landing-theatre-profiles-heading a {
+  color: #e4a47b;
+}
+
+html[data-theme="dark"] .landing-theatre-profiles-heading a:hover {
+  color: #f0c09a;
 }
 
 html[data-theme="dark"] .landing-theatre-profile {
@@ -26551,6 +26579,21 @@ html[data-theme="dark"] .owner-status {
     width: 56px;
   }
 
+  /* Card layout: override the above for .owner-play-card context */
+  .owner-play-card .owner-play-row {
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px 12px 8px;
+    border-bottom: none;
+    align-items: start;
+  }
+
+  .owner-play-card .owner-play-poster {
+    width: 58px;
+    aspect-ratio: 3 / 4;
+    border-radius: 7px;
+  }
+
   .owner-play-row>details {
     grid-column: 1 / -1;
   }
@@ -32834,9 +32877,9 @@ html[data-theme="dark"] .play-filter-reset-inline:hover {
   }
 
   .owner-play-info > span {
+
     font-size: 0.5rem;
   }
-
   .owner-play-info h3 {
     margin: 2px 0 3px;
     font-size: 0.82rem;
@@ -33066,7 +33109,9 @@ html[data-theme="dark"] .play-filter-reset-inline:hover {
   .owner-dashboard {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto 1fr;
     align-items: start;
+    align-content: start;
   }
 
   .owner-dashboard .owner-workspace,

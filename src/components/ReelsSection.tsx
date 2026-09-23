@@ -64,7 +64,10 @@ function ReelCover({ src, title }: { src: string; title: string }) {
 }
 
 export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
-  const feedReels: Array<{ id: string; src: string; title: string; theatreTitle?: string; mediaType: string }> = items.length ? items.map((item) => ({ id: `theatre-reel-${item.id}`, src: item.videoUrl, title: item.title, theatreTitle: item.theatreTitle, mediaType: "video" })) : reels.map((reel) => ({ ...reel, mediaType: "video" }));
+  const feedReels: Array<{ id: string; src: string; title: string; theatreTitle?: string; mediaType: string }> = [
+    ...items.map((item) => ({ id: `theatre-reel-${item.id}`, src: item.videoUrl, title: item.title, theatreTitle: item.theatreTitle, mediaType: "video" })),
+    ...reels.filter((reel) => !items.some((item) => item.videoUrl === reel.src)).map((reel) => ({ ...reel, mediaType: "video" })),
+  ];
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
@@ -75,7 +78,9 @@ export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
     document.body.style.overflow = "hidden";
     const feed = feedRef.current;
     const modalVideos = videoRefs.current;
+    let visibleIndex = activeIndex;
     const activateReel = (index: number) => {
+      visibleIndex = index;
       modalVideos.forEach((video, videoIndex) => {
         if (!video) return;
         if (videoIndex === index) {
@@ -105,10 +110,21 @@ export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
     );
 
     Array.from(feed?.children ?? []).forEach((item) => observer.observe(item));
+    const moveReel = (direction: number) => {
+      const next = Math.max(0, Math.min(modalVideos.length - 1, visibleIndex + direction));
+      feed?.children[next]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    const onArrowKey = (event: KeyboardEvent) => {
+      if (!["ArrowUp", "ArrowDown"].includes(event.key)) return;
+      event.preventDefault();
+      moveReel(event.key === "ArrowDown" ? 1 : -1);
+    };
+    window.addEventListener("keydown", onArrowKey);
     const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && setActiveIndex(null);
     window.addEventListener("keydown", closeOnEscape);
     return () => {
       observer.disconnect();
+      window.removeEventListener("keydown", onArrowKey);
       modalVideos.forEach((video) => {
         video?.pause();
         if (video) video.muted = true;
@@ -127,7 +143,7 @@ export function ReelsSection({ items = [] }: { items?: TheatreReelItem[] }) {
           </div>
         </div>
         <div className="landing-reels-grid">
-          {feedReels.slice(0, 6).map((reel, index) => (
+          {feedReels.map((reel, index) => (
             <button className="landing-reel-card" key={reel.id} onClick={() => setActiveIndex(index)} type="button" aria-label={`Watch ${reel.title}`}>
               <ReelCover src={reel.src} title={reel.title} />
               <span className="landing-reel-label">{reel.theatreTitle || "Featured Reel"}</span>
