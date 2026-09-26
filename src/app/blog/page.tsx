@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { formatDate, mediaUrl, plainText } from "@/lib/content";
+import { displayBlogCategoryTitle, isPublicBlogCategory } from "@/lib/blog-categories";
+import { FESTIVAL_CATEGORY_SLUGS } from "@/lib/festivals";
 import { BlogInteractiveView, type BlogViewPost, type CategoryFilter } from "@/components/BlogInteractiveView";
 import Link from "next/link";
 
@@ -39,9 +41,46 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 800): P
 }
 
 
+function NewsPageIntro({
+  postCount,
+  topicCount,
+  newsletterCount,
+}: {
+  postCount: number;
+  topicCount: number;
+  newsletterCount: number;
+}) {
+  return (
+      <section className="reviews-intro news-intro" aria-labelledby="news-page-title">
+        <div className="reviews-intro-copy">
+          <span className="reviews-eyebrow">TheatreHub newsroom</span>
+          <h1 id="news-page-title">Stories from Nepal&apos;s living stage</h1>
+          <p>
+            Theatre news, artist conversations, festival coverage, and community updates from the people shaping Nepal&apos;s stage.
+          </p>
+        </div>
+        <div className="reviews-summary-grid" aria-label="News overview">
+          <div className="reviews-summary-stat">
+            <strong>{postCount}</strong>
+            <span>Published stories</span>
+          </div>
+          <div className="reviews-summary-stat reviews-summary-stat-accent">
+            <strong>{topicCount}</strong>
+            <span>Topics covered</span>
+          </div>
+          <div className="reviews-summary-stat">
+            <strong>{newsletterCount}</strong>
+            <span>Newsletters</span>
+          </div>
+        </div>
+      </section>
+  );
+}
+
 function BlogDBError() {
   return (
-    <main className="blog-page-content site-container">
+    <main className="blog-page-content site-container news-index-page">
+      <NewsPageIntro postCount={0} topicCount={0} newsletterCount={0} />
       <div className="blog-db-error-card">
         <div className="blog-db-error-icon">🎭</div>
         <h2>Stage is briefly unavailable</h2>
@@ -63,7 +102,12 @@ export default async function BlogPage() {
   try {
     dbPosts = await withRetry(() =>
       prisma.blogPost.findMany({
-        where: { status: "PUBLISHED" },
+        where: {
+          status: "PUBLISHED",
+          NOT: {
+            categories: { some: { category: { slug: { in: [...FESTIVAL_CATEGORY_SLUGS] } } } },
+          },
+        },
         orderBy: { publishDate: "desc" },
         include: { categories: { include: { category: true } } },
       })
@@ -89,21 +133,32 @@ export default async function BlogPage() {
       excerpt: excerptText,
       date: formatDate(post.publishDate),
       readTime,
-      categories: post.categories.map((item) =>
-        item.category.title === "Press Release" ? "Newsletter" : item.category.title
-      ),
+      categories: post.categories
+        .filter((item) => isPublicBlogCategory(item.category))
+        .map((item) => displayBlogCategoryTitle(item.category)),
     };
   });
 
-  const categories: CategoryFilter[] = dbCategories.map((c) => ({
-    id: c.id,
-    title: c.title === "Press Release" ? "Newsletter" : c.title,
-    slug: c.slug === "press-release" ? "newsletter" : c.slug,
-  }));
+  const categories: CategoryFilter[] = dbCategories
+    .filter(isPublicBlogCategory)
+    .map((category) => ({
+      id: category.id,
+      title: displayBlogCategoryTitle(category),
+      slug: category.slug === "press-release" ? "newsletter" : category.slug,
+    }));
+
+  const newsletterCount = posts.filter((post) =>
+    post.categories.some((category) => category.toLowerCase() === "newsletter")
+  ).length;
 
   return (
-    <main className="blog-page-content site-container">
-      <BlogInteractiveView posts={posts} categories={categories} />
+    <main className="blog-page-content site-container news-index-page">
+      <NewsPageIntro
+        postCount={posts.length}
+        topicCount={categories.length}
+        newsletterCount={newsletterCount}
+      />
+      <BlogInteractiveView posts={posts} categories={categories} showEditorialNav />
     </main>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { BentoBlogGrid, type BentoBlogPost } from "@/components/BentoBlogGrid";
+import { EditorialSectionNav } from "@/components/EditorialSectionNav";
 import { NewsletterSubscribe } from "@/components/NewsletterSubscribe";
 
 export type BlogViewPost = {
@@ -50,9 +51,11 @@ function getCardImage(post: BlogViewPost): string {
 export function BlogInteractiveView({
   posts,
   categories,
+  showEditorialNav = false,
 }: {
   posts: BlogViewPost[];
   categories: CategoryFilter[];
+  showEditorialNav?: boolean;
 }) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -96,22 +99,8 @@ export function BlogInteractiveView({
     <div className="blog-view-container">
 
       {/* ── Controls ── */}
-      <section className="blog-controls-section">
-        <div className="blog-search-bar">
-          <svg className="blog-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search stories, reviews, newsletters..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="blog-search-input"
-          />
-          {searchQuery && (
-            <button type="button" className="blog-search-clear" onClick={() => setSearchQuery("")} aria-label="Clear search">✕</button>
-          )}
-        </div>
+      <section className={`blog-controls-section${showEditorialNav ? " has-editorial-nav" : ""}`}>
+        {showEditorialNav && <EditorialSectionNav activeSection="news" embedded />}
 
         <div className="blog-category-tabs" role="tablist">
           <button
@@ -136,6 +125,22 @@ export function BlogInteractiveView({
               </button>
             );
           })}
+        </div>
+
+        <div className="blog-search-bar">
+          <svg className="blog-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search stories, reviews, newsletters..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="blog-search-input"
+          />
+          {searchQuery && (
+            <button type="button" className="blog-search-clear" onClick={() => setSearchQuery("")} aria-label="Clear search">✕</button>
+          )}
         </div>
       </section>
 

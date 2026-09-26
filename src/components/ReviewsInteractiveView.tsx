@@ -2,6 +2,7 @@
 
 import { useState, useMemo, type ChangeEvent, type FormEvent } from "react";
 import Link from "next/link";
+import { EditorialSectionNav } from "@/components/EditorialSectionNav";
 
 export type ReviewItem = {
   id: string | number;
@@ -127,10 +128,6 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
   const [newContent, setNewContent] = useState("");
   const [newWhatWorked, setNewWhatWorked] = useState("");
   const [newWhatCouldImprove, setNewWhatCouldImprove] = useState("");
-
-  const spotlightReview = useMemo(() => {
-    return reviewsList.find((r) => r.isSpotlight) || reviewsList[0];
-  }, [reviewsList]);
 
   const filteredReviews = useMemo(() => {
     return reviewsList.filter((rev) => {
@@ -277,57 +274,9 @@ export function ReviewsInteractiveView({ initialReviews }: { initialReviews: Rev
           </div>
         </section>
 
-        {/* ── 2. SPOTLIGHT / EDITOR'S CHOICE REVIEW ── */}
-        {spotlightReview && (
-          <section id="featured-spotlight" className="reviews-spotlight-section">
-            <div className="spotlight-card">
-              <div className="spotlight-img-wrap">
-                <img
-                  src={getReviewImage(spotlightReview, 0)}
-                  alt={spotlightReview.playTitle}
-                  className="spotlight-img"
-                />
-                <div className="spotlight-tag-badge">{spotlightReview.verdictTag}</div>
-              </div>
+        <EditorialSectionNav activeSection="reviews" embedded />
 
-              <div className="spotlight-body">
-                <div className="spotlight-top-meta">
-                  <StarRating rating={spotlightReview.rating} size="lg" />
-                  <span className="spotlight-date">{spotlightReview.date}</span>
-                </div>
-
-                <h2 className="spotlight-play-title">{spotlightReview.playTitle}</h2>
-                <div className="spotlight-venue">🏛️ {spotlightReview.theatreName}</div>
-                <h3 className="spotlight-review-headline">&ldquo;{spotlightReview.title}&rdquo;</h3>
-                <p className="spotlight-mini-note">{spotlightReview.excerpt}</p>
-
-                <div className="spotlight-footer">
-                  <div className="reviewer-info">
-                    <img
-                      src={spotlightReview.reviewerAvatar}
-                      alt={spotlightReview.reviewerName}
-                      className="reviewer-avatar"
-                    />
-                    <div>
-                      <strong>{spotlightReview.reviewerName}</strong>
-                      <small>{spotlightReview.reviewerRole}</small>
-                    </div>
-                  </div>
-
-                  <Link
-                    href={`/reviews/${spotlightReview.playSlug}/`}
-                    className="read-full-btn"
-                    aria-label={`Read full review for ${spotlightReview.playTitle}`}
-                  >
-                    Read Full Review →
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ── 3. REVIEW LIBRARY: FILTERS + GRID ── */}
+        {/* ── REVIEW LIBRARY: FILTERS + GRID ── */}
         <section className="reviews-library-layout" aria-label="Review library">
           <aside className="reviews-controls-bar" aria-label="Review filters">
             <div className="section-heading-row reviews-library-toolbar">

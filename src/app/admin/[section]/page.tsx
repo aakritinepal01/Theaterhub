@@ -12,10 +12,17 @@ import { AdminProductionManager } from "@/components/AdminProductionManager";
 import { AdminArtistManager } from "@/components/AdminArtistManager";
 import { AdminScheduleManager } from "@/components/AdminScheduleManager";
 import { AdminMediaManager } from "@/components/AdminMediaManager";
+import { AdminFestivalManager, type AdminFestivalRecord } from "@/components/AdminFestivalManager";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { getArtistPhoto, getPlayPhoto, plainText } from "@/lib/content";
+import { getArtistPhoto, getPlayPhoto, mediaUrl, plainText } from "@/lib/content";
+import {
+  FESTIVAL_CATEGORY_SLUGS,
+  FESTIVAL_LIVE_STAGE_SLUG,
+  festivalSeriesTitle,
+  isFestivalSeriesSlug,
+} from "@/lib/festivals";
 
 const SECTION_META: Record<
   string,
@@ -73,6 +80,18 @@ const SECTION_META: Record<
         <path d="M6 5.5h18a2 2 0 0 1 2 2v19H8a2 2 0 0 1-2-2zM10 10h12M10 14h12" />
         <rect x="10" y="18" width="5" height="5" rx=".8" fill="currentColor" opacity="0.14" />
         <path d="M18 18h4M18 21h4M10 26.5V28" />
+      </svg>
+    ),
+  },
+  festivals: {
+    title: "Festival Publishing",
+    subtitle: "Live Stage & Archive",
+    description: "Create festival stories and control whether they appear on Live Stage or in the Festival Archive",
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M5 7h22v19H5z" fill="currentColor" opacity="0.08" />
+        <path d="M5 7h22v19H5zM10 4v6M22 4v6M5 13h22" />
+        <path d="m16 16 1.3 2.7 3 .4-2.2 2.1.6 3-2.7-1.5-2.7 1.5.6-3-2.2-2.1 3-.4z" />
       </svg>
     ),
   },
@@ -178,12 +197,15 @@ export default async function Section({
   if (!meta) notFound();
 
   // Counts for sidebar nav
-  const [totalTheatres, totalPlays, totalProfiles, totalSchedules, totalPosts, totalEntries, reviewStats, totalReels, totalStories, mediaTheatres] = await Promise.all([
+  const [totalTheatres, totalPlays, totalProfiles, totalSchedules, totalPosts, totalFestivals, totalEntries, reviewStats, totalReels, totalStories, mediaTheatres] = await Promise.all([
     prisma.theatre.count(),
     prisma.play.count(),
     prisma.profile.count(),
     prisma.showsMeta.count(),
     prisma.blogPost.count(),
+    prisma.blogPost.count({
+      where: { categories: { some: { category: { slug: { in: [...FESTIVAL_CATEGORY_SLUGS] } } } } },
+    }),
     prisma.formEntry.count(),
     getReviewModerationStats(),
     prisma.theatreReel.count().catch(() => 0),
@@ -236,6 +258,11 @@ export default async function Section({
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>
               <span>Editorial</span>
               <span className="adm-inner-nav-pill">{totalPosts}</span>
+            </Link>
+            <Link href="/admin/festivals" className={`adm-inner-nav-item${section === "festivals" ? " is-active" : ""}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/><path d="m12 14 .8 1.7 1.9.3-1.4 1.3.4 1.9-1.7-.9-1.7.9.4-1.9-1.4-1.3 1.9-.3z"/></svg>
+              <span>Festivals</span>
+              <span className="adm-inner-nav-pill">{totalFestivals}</span>
             </Link>
             <Link href="/admin/media" className={`adm-inner-nav-item${section === "media" ? " is-active" : ""}`}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 9 5 3-5 3V9Z"/></svg>
@@ -313,6 +340,7 @@ export default async function Section({
           {section === "profiles" && <ProfilesSection requestedPage={query.page} />}
           {section === "schedules" && <SchedulesSection requestedPage={query.page} />}
           {section === "posts" && <PostsSection requestedPage={query.page} />}
+          {section === "festivals" && <FestivalSection totalFestivals={totalFestivals} />}
           {section === "reviews" && <ReviewsSection requestedPage={query.page} />}
           {section === "entries" && <EntriesSection />}
           {section === "media" && <MediaSection reels={totalReels} stories={totalStories} theatres={mediaTheatres} />}
@@ -754,6 +782,40 @@ async function SchedulesSection({ requestedPage }: { requestedPage?: string }) {
       )}
     </div>
   );
+}
+
+async function FestivalSection({ totalFestivals }: { totalFestivals: number }) {
+  const posts = await prisma.blogPost.findMany({
+    where: {
+      categories: { some: { category: { slug: { in: [...FESTIVAL_CATEGORY_SLUGS] } } } },
+    },
+    include: { categories: { include: { category: true } } },
+    orderBy: [{ publishDate: "desc" }, { created: "desc" }],
+    take: 100,
+  });
+
+  const festivals: AdminFestivalRecord[] = posts.map((post) => {
+    const categories = post.categories.map((item) => item.category);
+    const series = categories.find((category) => isFestivalSeriesSlug(category.slug));
+    const isLive = categories.some((category) => category.slug === FESTIVAL_LIVE_STAGE_SLUG);
+
+    return {
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      status: post.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT",
+      description: post.description,
+      content: post.content,
+      featuredImage: post.featuredImage,
+      image: mediaUrl(post.featuredImage),
+      publishDate: post.publishDate?.toISOString() ?? null,
+      seriesSlug: series?.slug ?? FESTIVAL_CATEGORY_SLUGS[0],
+      seriesTitle: series ? festivalSeriesTitle(series.slug) : "Festival",
+      placement: isLive ? "LIVE" : "ARCHIVE",
+    };
+  });
+
+  return <AdminFestivalManager festivals={festivals} totalFestivals={totalFestivals} />;
 }
 
 /* ══════════════════════════════════════════════════════════

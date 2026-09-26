@@ -7,6 +7,7 @@ export default async function sitemap():Promise<MetadataRoute.Sitemap>{const bas
     { url: `${base}/reviews/`, lastModified: new Date() },
     { url: `${base}/profile/`, lastModified: new Date() },
     { url: `${base}/blog/`, lastModified: new Date() },
+    { url: `${base}/festival/`, lastModified: new Date() },
     { url: `${base}/about-us/`, lastModified: new Date() },
     { url: `${base}/contact-us/`, lastModified: new Date() },
   ];
