@@ -18,6 +18,9 @@ export function Navbar({ links }: { links: NavLink[]; user: NavUser; logoutActio
   const currentPath = normalize(pathname);
   const isActive = (href: string) => {
     const target = normalize(href);
+    if (target === "/reviews" && (currentPath === "/blog" || currentPath.startsWith("/blog/"))) {
+      return true;
+    }
     return currentPath === target || (target !== "/" && currentPath.startsWith(`${target}/`));
   };
 

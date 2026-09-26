@@ -4,6 +4,7 @@ import { getReviewModerationStats } from "@/lib/reviews";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { FESTIVAL_CATEGORY_SLUGS } from "@/lib/festivals";
 
 type IconName = 
   | "theatre" 
@@ -133,12 +134,15 @@ export default async function Admin() {
   if (!user || (!user.isStaff && !user.isSuperuser)) redirect("/login");
   if (!user.isPasswordChanged) redirect("/set-new-password");
 
-  const [plays, profiles, theatres, schedules, posts, entries, claimed, users, reviewStats] = await Promise.all([
+  const [plays, profiles, theatres, schedules, posts, festivals, entries, claimed, users, reviewStats] = await Promise.all([
     prisma.play.count(),
     prisma.profile.count(),
     prisma.theatre.count(),
     prisma.showsMeta.count(),
     prisma.blogPost.count(),
+    prisma.blogPost.count({
+      where: { categories: { some: { category: { slug: { in: [...FESTIVAL_CATEGORY_SLUGS] } } } } },
+    }),
     prisma.formEntry.count(),
     prisma.theatre.count({ where: { ownerId: { not: null } } }),
     prisma.user.count({ where: { isActive: true } }),
@@ -276,6 +280,16 @@ export default async function Admin() {
       actionLabel: "Manage posts",
     },
     {
+      title: "Festivals",
+      desc: "Publish festival stories and place them on Live Stage or in the public archive.",
+      count: festivals,
+      unit: "Stories",
+      icon: "calendar" as const,
+      href: "/admin/festivals",
+      accent: "app-rose",
+      actionLabel: "Manage festivals",
+    },
+    {
       title: "Reviews",
       desc: "Approve or delete audience reviews before they appear on the website.",
       count: reviewStats.total,
@@ -358,6 +372,11 @@ export default async function Admin() {
               <span className="adm-dock-icon"><Icon name="article" /></span>
               <span>Editorial</span>
               <span className="adm-dock-pill">{posts}</span>
+            </Link>
+            <Link href="/admin/festivals" className="adm-dock-item">
+              <span className="adm-dock-icon"><Icon name="calendar" /></span>
+              <span>Festivals</span>
+              <span className="adm-dock-pill">{festivals}</span>
             </Link>
             <Link href="/admin/media" className="adm-dock-item">
               <span className="adm-dock-icon"><Icon name="layers" /></span>

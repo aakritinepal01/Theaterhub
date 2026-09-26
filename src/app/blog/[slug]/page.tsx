@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatDate, mediaUrl } from "@/lib/content";
+import { displayBlogCategoryTitle, isPublicBlogCategory } from "@/lib/blog-categories";
 import { NewsletterSubscribe } from "@/components/NewsletterSubscribe";
 
 export const revalidate = 300;
@@ -75,9 +76,9 @@ export default async function BlogPostPage({
       ? `${post.user.firstName} ${post.user.lastName}`.trim()
       : post.user.username || "TheatreHub Team";
 
-  const categories = post.categories.map((c) =>
-    c.category.title === "Press Release" ? "Newsletter" : c.category.title
-  );
+  const categories = post.categories
+    .filter((item) => isPublicBlogCategory(item.category))
+    .map((item) => displayBlogCategoryTitle(item.category));
 
   const featuredImg = mediaUrl(post.featuredImage);
 
@@ -209,19 +210,23 @@ export default async function BlogPostPage({
           <section className="post-related-section">
             <h3>More Stage Stories &amp; Newsletters</h3>
             <div className="related-grid">
-              {relatedPosts.map((rel) => (
-                <div key={rel.id} className="related-card">
-                  <span className="related-cat">
-                    {rel.categories[0]?.category.title === "Press Release"
-                      ? "Newsletter"
-                      : rel.categories[0]?.category.title || "Story"}
-                  </span>
-                  <h4>
-                    <Link href={`/blog/${rel.slug}/`}>{rel.title}</Link>
-                  </h4>
-                  <small>{formatDate(rel.publishDate)}</small>
-                </div>
-              ))}
+              {relatedPosts.map((rel) => {
+                const category = rel.categories
+                  .map((item) => item.category)
+                  .find(isPublicBlogCategory);
+
+                return (
+                  <div key={rel.id} className="related-card">
+                    <span className="related-cat">
+                      {category ? displayBlogCategoryTitle(category) : "Story"}
+                    </span>
+                    <h4>
+                      <Link href={`/blog/${rel.slug}/`}>{rel.title}</Link>
+                    </h4>
+                    <small>{formatDate(rel.publishDate)}</small>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
