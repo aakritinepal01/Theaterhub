@@ -1800,17 +1800,15 @@ html[data-theme="dark"] .play-index-actions a.about-btn-ghost {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, .05);
-  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 
 .landing-play-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 12px 28px -6px rgba(141, 66, 45, .14), 0 4px 12px rgba(0, 0, 0, .04);
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 }
 
 .landing-featured {
@@ -1821,16 +1819,18 @@ html[data-theme="dark"] .play-index-actions a.about-btn-ghost {
   position: relative;
   display: block;
   width: 100%;
-  height: 290px;
+  aspect-ratio: 1 / 1.42;
+  height: auto;
   overflow: hidden;
-  background: #0f172a;
+  background: #e8e0d8;
   flex-shrink: 0;
-  border-top-left-radius: 13px;
-  border-top-right-radius: 13px;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .08);
 }
 
 .play-archive-section .landing-play-poster-wrap {
-  height: 270px;
+  aspect-ratio: 1 / 1.42;
+  height: auto;
 }
 
 .landing-play-poster-wrap img {
@@ -1860,7 +1860,7 @@ html[data-theme="dark"] .play-index-actions a.about-btn-ghost {
 }
 
 .landing-play-card-body {
-  padding: 10px 14px 12px;
+  padding: 10px 4px 6px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -1868,10 +1868,10 @@ html[data-theme="dark"] .play-index-actions a.about-btn-ghost {
 }
 
 .landing-play-body-title {
-  margin: 0 0 2px;
+  margin: 0 0 1px;
   font-size: 14px;
   font-weight: 700;
-  line-height: 1.28;
+  line-height: 1.25;
   letter-spacing: -.01em;
 }
 
@@ -1886,13 +1886,13 @@ html[data-theme="dark"] .play-index-actions a.about-btn-ghost {
 }
 
 .landing-play-venue {
-  font-size: 13px;
-  font-weight: 500;
-  color: #666666;
+  font-size: 12px;
+  font-weight: 400;
+  color: #888888;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 2px;
+  margin-bottom: 0;
 }
 
 .landing-play-body-teaser {
@@ -1915,9 +1915,13 @@ html[data-theme="dark"] .play-index-actions a.about-btn-ghost {
 .landing-play-card-action {
   margin-top: auto;
   padding-top: 2px;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
+}
+
+.play-archive-section .landing-play-card-action {
+  display: none;
 }
 
 .landing-play-read-more {
@@ -5007,14 +5011,13 @@ html[data-theme="dark"] .auth-page {
 }
 
 html[data-theme="dark"] .landing-play-card {
-  border-color: #2a2420;
-  background: #181513;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 html[data-theme="dark"] .landing-play-card:hover {
-  border-color: #4a3f37;
-  box-shadow: 0 20px 45px -10px rgba(15, 118, 110, .25), 0 10px 25px rgba(0, 0, 0, .5);
+  transform: translateY(-3px);
 }
 
 html[data-theme="dark"] .landing-play-card-top {
@@ -5662,12 +5665,15 @@ html[data-theme="dark"] .landing-cta-grid h3 {
 
   .landing-play-card {
     border-radius: 10px !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   .landing-play-poster-wrap {
-    height: 135px !important;
-    border-top-left-radius: 9px !important;
-    border-top-right-radius: 9px !important;
+    aspect-ratio: 1 / 1.42 !important;
+    height: auto !important;
+    border-radius: 10px !important;
   }
 
   .landing-play-card-body {
@@ -5707,6 +5713,117 @@ html[data-theme="dark"] .landing-cta-grid h3 {
 
   .landing-play-card-large .landing-play-copy h3 {
     font-size: 18px
+  }
+
+  /* ── Featured Plays: Mobile horizontal swipe carousel (BookMyShow style) ── */
+  .landing-featured .landing-section-heading {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .landing-featured .landing-section-heading .landing-section-subtext {
+    display: none !important;
+  }
+
+  .landing-featured .landing-section-heading .landing-kicker {
+    font-size: 9.5px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.06em !important;
+    margin-bottom: 2px !important;
+  }
+
+  .landing-featured .landing-section-heading h2 {
+    font-size: 14.5px !important;
+    font-weight: 500 !important;
+    line-height: 1.22 !important;
+  }
+
+  .landing-featured .landing-section-link-light {
+    display: inline-flex !important;
+    white-space: nowrap !important;
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+    font-weight: 500 !important;
+    color: var(--brand, #ff527b) !important;
+    margin-bottom: 2px !important;
+  }
+
+  .landing-featured .landing-play-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin-inline: -16px !important;
+    padding-inline: 16px !important;
+    padding-bottom: 12px !important;
+    padding-top: 4px !important;
+    gap: 12px !important;
+  }
+
+  .landing-featured .landing-play-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .landing-featured .landing-play-card {
+    flex: 0 0 142px !important;
+    width: 142px !important;
+    min-width: 142px !important;
+    max-width: 142px !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+  }
+
+  .landing-featured .landing-play-poster-wrap {
+    width: 100% !important;
+    aspect-ratio: 1 / 1.42 !important;
+    height: auto !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .landing-featured .landing-play-card-body {
+    padding: 8px 2px 2px !important;
+  }
+
+  .landing-featured .landing-play-body-title {
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    margin-bottom: 2px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  .landing-featured .landing-play-venue {
+    font-size: 11px !important;
+    color: #888888 !important;
+    margin-bottom: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .landing-featured .landing-view-all {
+    display: none !important;
+  }
+
+  html[data-theme="dark"] .landing-featured .landing-section-link-light {
+    color: #ff6688 !important;
+  }
+
+  html[data-theme="dark"] .landing-featured .landing-play-venue {
+    color: #a3978f !important;
   }
 
   .landing-schedule-empty {
@@ -6007,14 +6124,14 @@ html[data-theme="dark"] .landing-cta-grid h3 {
   }
 
   .live-marquee-card {
-    width: 95px;
+    width: 115px;
     padding: 0;
     gap: 0;
   }
 
   .live-marquee-thumb {
-    width: 95px;
-    height: 142px;
+    width: 115px;
+    height: 172px;
     border-radius: 10px;
   }
 
@@ -6049,6 +6166,74 @@ html[data-theme="dark"] .landing-cta-grid h3 {
 
   .footer-connect {
     grid-column: auto
+  }
+}
+
+/* ── Compact mobile vertical gaps between homepage sections ── */
+@media (max-width: 768px) {
+  .landing-section {
+    padding-block: 22px !important;
+  }
+
+  /* 0. Live Stage Marquee (Playing Now in Nepal) */
+  .live-marquee-section {
+    padding-top: 14px !important;
+    padding-bottom: 12px !important;
+  }
+
+  /* 1. Featured Plays & Productions */
+  .landing-section.landing-featured,
+  .landing-featured {
+    padding-top: 18px !important;
+    padding-bottom: 22px !important;
+  }
+
+  /* 2. Theatre Reels */
+  .landing-reels {
+    padding-top: 20px !important;
+    padding-bottom: 22px !important;
+  }
+
+  /* 3. Theatre Stories */
+  .landing-photo-stories {
+    padding-top: 20px !important;
+    padding-bottom: 22px !important;
+  }
+
+  /* 4. Upcoming Shows & Performances */
+  .landing-section.landing-upcoming,
+  .landing-upcoming {
+    padding-top: 22px !important;
+    padding-bottom: 24px !important;
+  }
+
+  /* 5. Explore Theatres */
+  .landing-theatre-profiles {
+    padding-top: 20px !important;
+    padding-bottom: 22px !important;
+  }
+
+  /* 6. Footer */
+  .site-footer {
+    padding-top: 24px !important;
+  }
+
+  .site-footer .footer-spotlight {
+    padding: 24px 18px !important;
+    margin-bottom: 24px !important;
+    gap: 16px !important;
+  }
+
+  /* Compact section heading margins on mobile */
+  .landing-section-heading,
+  .landing-theatre-profiles-heading,
+  .landing-photo-stories-heading,
+  .landing-reels-heading {
+    margin-bottom: 12px !important;
+  }
+
+  .landing-kicker {
+    margin-bottom: 2px !important;
   }
 }
 
@@ -17872,7 +18057,7 @@ html[data-theme="dark"] .live-marquee-hint {
 
 .live-marquee-track {
   display: flex;
-  gap: 14px;
+  gap: 8px;
   width: max-content;
   animation: liveMarqueeScroll 28s linear infinite;
   padding: 8px 4px;
@@ -17900,7 +18085,7 @@ html[data-theme="dark"] .live-marquee-hint {
   border: none;
   border-radius: 14px;
   text-decoration: none;
-  width: 125px;
+  width: 175px;
   flex-shrink: 0;
   box-shadow: none;
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
@@ -17922,8 +18107,8 @@ html[data-theme="dark"] .live-marquee-card:hover {
 
 .live-marquee-thumb {
   position: relative;
-  width: 125px;
-  height: 188px;
+  width: 175px;
+  height: 260px;
   aspect-ratio: 2 / 3;
   border-radius: 14px;
   overflow: hidden;
@@ -18167,16 +18352,16 @@ html[data-theme="dark"] .live-card-btn {
 
 @media (max-width: 600px) {
   .live-marquee-card {
-    width: 95px;
+    width: 120px;
     padding: 0;
     gap: 0;
-    border-radius: 14px;
+    border-radius: 12px;
   }
 
   .live-marquee-thumb {
-    width: 95px;
-    height: 142px;
-    border-radius: 14px;
+    width: 120px;
+    height: 180px;
+    border-radius: 12px;
   }
 
   .live-marquee-info {
@@ -18190,9 +18375,9 @@ html[data-theme="dark"] .live-card-btn {
   }
 
   .live-marquee-thumb {
-    width: 68px;
-    height: 102px;
-    border-radius: 10px;
+    width: 120px;
+    height: 180px;
+    border-radius: 12px;
   }
 
   .live-marquee-title {
@@ -30667,6 +30852,25 @@ html[data-theme="dark"] .pf-venue-cta:hover {
   min-width: 0;
 }
 
+.play-browse-results .landing-play-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 1200px) {
+  .play-browse-results .landing-play-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .play-browse-results .landing-play-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+}
+
 /* ── Inline clear filter link in toolbar ────────────── */
 .play-filter-reset-inline {
   font-size: 0.8rem;
@@ -35036,17 +35240,27 @@ html[data-theme="dark"] body:has(.landing-upcoming) .landing-reels,
 html[data-theme="dark"] body:has(.landing-upcoming) .landing-photo-stories,
 html[data-theme="dark"] body:has(.landing-upcoming) .landing-cta,
 html[data-theme="dark"] body:has(.landing-upcoming) .live-marquee-section {
-  background: #12100f;
+  background: #12100f !important;
   border-block-color: transparent;
 }
 
 /* Keep dark-mode homepage cards bright and readable. */
-html[data-theme="dark"] body:has(.landing-upcoming) .landing-show-card,
-html[data-theme="dark"] body:has(.landing-upcoming) .landing-play-card {
+html[data-theme="dark"] body:has(.landing-upcoming) .landing-show-card {
   border-color: #eadfd8;
   border-radius: 14px;
   background: #ffffff;
   box-shadow: 0 10px 26px rgba(20, 13, 10, 0.22);
+}
+
+html[data-theme="dark"] body:has(.landing-upcoming) .landing-play-card {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Fix: remove dark poster-wrap background when card is forced white — eliminates double-line artifact behind poster on mobile */
+html[data-theme="dark"] body:has(.landing-upcoming) .landing-play-poster-wrap {
+  background: transparent;
 }
 
 html[data-theme="dark"] body:has(.landing-upcoming) .landing-show-card h3 a,
@@ -35069,10 +35283,16 @@ html[data-theme="dark"] body:has(.landing-upcoming) .landing-play-card-action {
 html[data-theme="dark"] body:has(.landing-upcoming) .live-marquee-card,
 html[data-theme="dark"] body:has(.landing-upcoming) .live-marquee-card:hover {
   overflow: hidden;
-  border: 1px solid #eadfd8;
+  border: none;
   border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 10px 26px rgba(20, 13, 10, 0.22);
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-theme="dark"] body:has(.landing-upcoming) .live-marquee-thumb {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 html[data-theme="dark"] body:has(.landing-upcoming) .live-marquee-info {
